@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import Checkbox from '../../../Components/Checkbox/Checkbox.js'
 import FieldContainer from '../../../Components/FieldContainer/FieldContainer.js'
 import Table from '../../../Components/Table/Table.js'
-import {useDispatch, useSelector} from 'react-redux'
-import {IoAttach} from 'react-icons/io5'
+import { useDispatch, useSelector } from 'react-redux'
+import { IoAttach } from 'react-icons/io5'
 import CategoryCard from '../../../Components/CategoryCard/CategoryCard.js'
 import NotFind from '../../../Components/NotFind/NotFind.js'
 import Spinner from '../../../Components/Spinner/SmallLoader.js'
@@ -17,15 +17,17 @@ import {
     savePayment,
     setAllProductsBySocket,
 } from '../Slices/registerSellingSlice.js'
-import {deleteSavedPayment} from '../Slices/savedSellingsSlice.js'
-import {getAllPackmans} from '../../Clients/clientsSlice.js'
+import { deleteSavedPayment } from '../Slices/savedSellingsSlice.js'
+import { getAllPackmans } from '../../Clients/clientsSlice.js'
 import SearchInput from '../../../Components/Inputs/SearchInput.js'
 import UniversalModal from '../../../Components/Modal/UniversalModal.js'
-import {UsdToUzs, UzsToUsd} from '../../../App/globalFunctions.js'
+import { UsdToUzs, UzsToUsd } from '../../../App/globalFunctions.js'
 import {
     universalToast,
     warningCountSellPayment,
     warningCurrencyRate,
+    warningEmptyPackCount,
+    warningLessPackCount,
     warningLessSellPayment,
     warningMoreDiscount,
     warningMorePayment,
@@ -33,25 +35,25 @@ import {
     warningSaleProductsEmpty,
 } from '../../../Components/ToastMessages/ToastMessages.js'
 import CustomerPayment from '../../../Components/Payment/CustomerPayment.js'
-import {useLocation, useNavigate} from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import BarcodeReader from 'react-barcode-reader'
-import {useTranslation} from 'react-i18next'
-import {filter, map} from 'lodash'
+import { useTranslation } from 'react-i18next'
+import { filter, map } from 'lodash'
 import socket from '../../../Config/socket.js'
-import {setAllCategories} from '../../Category/categorySlice.js'
+import { setAllCategories } from '../../Category/categorySlice.js'
 import Api from '../../../Config/Api.js'
 
 const RegisterSelling = () => {
-    const {t} = useTranslation(['common'])
+    const { t } = useTranslation(['common'])
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const location = useLocation()
-    const {user, market} = useSelector((state) => state.login)
-    const {currencyType, currency} = useSelector((state) => state.currency)
-    const {allcategories, loading} = useSelector((state) => state.category)
-    const {allProducts, clients, loadingMakePayment, lastPayments} =
+    const { user, market } = useSelector((state) => state.login)
+    const { currencyType, currency } = useSelector((state) => state.currency)
+    const { allcategories, loading } = useSelector((state) => state.category)
+    const { allProducts, clients, loadingMakePayment, lastPayments } =
         useSelector((state) => state.registerSelling)
-    const {packmans} = useSelector((state) => state.clients)
+    const { packmans } = useSelector((state) => state.clients)
     const [filteredProducts, setFilteredProducts] = useState([])
     const [selectedProduct, setSelectedProduct] = useState('')
     const [checked, setChecked] = useState(false)
@@ -70,6 +72,7 @@ const RegisterSelling = () => {
     const [paymentType, setPaymentType] = useState('cash')
     const [paymentCash, setPaymentCash] = useState('')
     const [paymentCashUzs, setPaymentCashUzs] = useState('')
+    const [paymentUsd, setPaymentUsd] = useState("")
     const [paymentCard, setPaymentCard] = useState('')
     const [paymentCardUzs, setPaymentCardUzs] = useState('')
     const [paymentTransfer, setPaymentTransfer] = useState('')
@@ -103,6 +106,7 @@ const RegisterSelling = () => {
     const [saleComment, setSaleComment] = useState('')
     const [lowUnitpriceProducts, setLowUnitpriceProducts] = useState([])
     const [wholesale, setWholesale] = useState(false)
+    const [debtType, setDebtType] = useState('sum')
 
     const [selectedFilial, setSelectedFilial] = useState({
         label: market.name,
@@ -112,26 +116,25 @@ const RegisterSelling = () => {
     let delay = null
 
     const headers = [
-        {title: '№'},
-        {title: t('Filial')},
-        {title: t('Qoldiq')},
-        {title: t('Nomi')},
-        {title: t('Soni')},
-        {title: 'Ombordan'},
-        {title: t('Narxi')},
-        {title: t('Jami'), styles: 'w-[8rem]'},
-        {title: ''},
-        {title: ''},
+        { title: '№' },
+        { title: t('Filial') },
+        { title: t('Qoldiq') },
+        { title: t('Nomi') },
+        { title: t('Soni') },
+        { title: t('Narxi') },
+        { title: t('Jami'), styles: 'w-[8rem]' },
+        { title: '' },
+        { title: '' },
     ]
 
     const headerReturn = [
-        {title: '№'},
-        {title: t('Kodi')},
-        {title: t('Nomi')},
-        {title: t('Soni')},
-        {title: t('Jami')},
-        {title: t('Soni')},
-        {title: t('Jami')},
+        { title: '№' },
+        { title: t('Kodi') },
+        { title: t('Nomi') },
+        { title: t('Soni') },
+        { title: t('Jami') },
+        { title: t('Soni') },
+        { title: t('Jami') },
     ]
 
     // payment
@@ -146,7 +149,7 @@ const RegisterSelling = () => {
         setPaymentDiscountPercent('')
         setPaymentDebt(0)
         setPaymentDebtUzs(0)
-        setDiscountSelectOption({label: '%', value: '%'})
+        setDiscountSelectOption({ label: '%', value: '%' })
     }
 
     const toggleCheckModal = () => {
@@ -349,12 +352,10 @@ const RegisterSelling = () => {
             if (type === 'cash') {
                 const all =
                     Number(value) +
-                    Number(paymentCard) +
-                    Number(paymentTransfer)
+                    Number(paymentUsd)
                 const allUzs =
                     Number(UsdToUzs(value, exchangerate)) +
-                    Number(paymentCardUzs) +
-                    Number(paymentTransferUzs)
+                    Number(UsdToUzs(paymentUsd, exchangerate))
                 if (all <= maxSum) {
                     setPaymentCash(value)
                     setPaymentCashUzs(UsdToUzs(value, exchangerate))
@@ -362,6 +363,22 @@ const RegisterSelling = () => {
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
                     setPaid(all)
                     setPaidUzs(allUzs)
+                } else {
+                    warningMorePayment()
+                }
+            } else if (type === 'usd') {
+                const all =
+                    Number(value) +
+                    Number(paymentCash)
+                const allUzs =
+                    Number(UsdToUzs(value, exchangerate)) +
+                    Number(paymentCashUzs)
+                if (all <= maxSum) {
+                    setPaymentDebt(convertToUsd(maxSum - all))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
+                    setPaid(all)
+                    setPaidUzs(allUzs)
+                    setPaymentUsd(value)
                 } else {
                     warningMorePayment()
                 }
@@ -406,12 +423,10 @@ const RegisterSelling = () => {
             if (type === 'cash') {
                 const all =
                     Number(value) +
-                    Number(paymentCardUzs) +
-                    Number(paymentTransferUzs)
+                    Number(UsdToUzs(paymentUsd, exchangerate))
                 const allUsd =
                     Number(UzsToUsd(value, exchangerate)) +
-                    Number(paymentCard) +
-                    Number(paymentTransfer)
+                    Number(paymentUsd)
                 if (all <= maxSumUzs) {
                     setPaymentCashUzs(value)
                     setPaymentCash(UzsToUsd(value, exchangerate))
@@ -419,6 +434,21 @@ const RegisterSelling = () => {
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
                     setPaidUzs(all)
+                } else {
+                    warningMorePayment()
+                }
+            } else if (type === 'usd') {
+                const all =
+                    Number(paymentCashUzs) +
+                    Number(UsdToUzs(value, exchangerate)) 
+                const allUsd =
+                    Number(value) + paymentCash 
+                if (all <= maxSumUzs) {
+                    setPaymentDebt(convertToUsd(maxSum - allUsd))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
+                    setPaid(allUsd)
+                    setPaidUzs(all)
+                    setPaymentUsd(value)
                 } else {
                     warningMorePayment()
                 }
@@ -584,6 +614,7 @@ const RegisterSelling = () => {
         setPaymentCardUzs('')
         setPaymentTransfer('')
         setPaymentTransferUzs('')
+        setPaymentUsd('')
         setPaymentDebt(0)
         setPaymentDebtUzs(0)
         setPaid(0)
@@ -689,9 +720,9 @@ const RegisterSelling = () => {
             },
             packman: packmanValue
                 ? {
-                      _id: packmanValue.value,
-                      name: packmanValue.label,
-                  }
+                    _id: packmanValue.value,
+                    name: packmanValue.label,
+                }
                 : null,
             discount: {
                 discount: Number(paymentDiscount),
@@ -711,10 +742,12 @@ const RegisterSelling = () => {
                 transferuzs: Number(paymentTransferUzs),
                 discount: Number(paymentDiscount),
                 discountuzs: Number(paymentDiscountUzs),
+                usdpayment: Number(paymentUsd),
             },
             debt: {
                 debt: Number(paymentDebt),
                 debtuzs: Number(paymentDebtUzs),
+                debtType: debtType,
                 comment: '',
             },
             user: user._id,
@@ -722,7 +755,7 @@ const RegisterSelling = () => {
             comment: saleComment,
         }
         dispatch(saleConnectorId ? addPayment(body) : makePayment(body)).then(
-            ({payload, error}) => {
+            ({ payload, error }) => {
                 if (!error) {
                     setModalData(payload)
                     setWholesale(false)
@@ -732,7 +765,7 @@ const RegisterSelling = () => {
                         clearAll()
                     }, 500)
                     if (temporary) {
-                        dispatch(deleteSavedPayment({_id: temporary._id}))
+                        dispatch(deleteSavedPayment({ _id: temporary._id }))
                         setTemporary(null)
                     }
                 }
@@ -778,7 +811,7 @@ const RegisterSelling = () => {
             saleconnectorid: saleConnectorId,
             comment: saleComment,
         }
-        dispatch(returnSaleProducts(body)).then(({payload, error}) => {
+        dispatch(returnSaleProducts(body)).then(({ payload, error }) => {
             if (!error) {
                 setModalData(payload)
                 setTimeout(() => {
@@ -811,14 +844,14 @@ const RegisterSelling = () => {
                     totalPriceUzs: allUzs,
                 },
             }
-            dispatch(savePayment(body)).then(({error}) => {
+            dispatch(savePayment(body)).then(({ error }) => {
                 if (!error) {
                     clearAll(false)
                     navigate('/sotuv/saqlanganlar')
                 }
             })
             if (temporary) {
-                dispatch(deleteSavedPayment({_id: temporary._id}))
+                dispatch(deleteSavedPayment({ _id: temporary._id }))
                 setTemporary(null)
             }
         }
@@ -839,10 +872,53 @@ const RegisterSelling = () => {
             case 'select':
                 handleSelectFilial(id, value)
                 break
+            case 'packcount':
+                handlePackcount(id, value)
+                break
             default:
                 break
         }
     }
+
+    const handlePackcount = (index, value) => {
+        if (tableProducts.some((prod, i) => i === index && !prod.packcount)) {
+            return warningEmptyPackCount()
+        }
+        if (tableProducts.some((prod, i) => i === index && prod?.packcount > prod.total)) {
+            return warningEmptyPackCount()
+        }
+        console.log(value);
+        const newRelease = map(tableProducts, (prod, i) => {
+            if (i === index) {
+                return {
+                    ...prod,
+                    totalpackcount: !prod?.isPackcount && ((prod.total / prod.packcount) / 100) * 100,
+                    isPackcount: !prod?.isPackcount,
+                    totalprice: !prod?.isPackcount ? convertToUsd(
+                        (prod?.packcount) *
+                        (wholesale
+                            ? prod.tradeprice ||
+                            prod.unitprice
+                            : prod.unitprice)
+                    ) : prod.unitprice,
+                    totalpriceuzs: !prod?.isPackcount ? convertToUzs(
+                        (prod?.packcount) *
+                        (wholesale
+                            ? prod.tradepriceuzs ||
+                            prod.unitpriceuzs
+                            : prod.unitpriceuzs)
+                    ) : prod.unitpriceuzs,
+                    packcountpieces: 1,
+                    pieces: !prod?.isPackcount ? prod.packcount : 1
+                }
+            }
+
+            return prod
+        })
+        setTableProducts(newRelease)
+    }
+
+    console.log(tableProducts);
 
     const handleDelete = (index) => {
         tableProducts.splice(index, 1)
@@ -875,64 +951,64 @@ const RegisterSelling = () => {
         const filterData = filter(allcategories, (obj) =>
             obj.name
                 ? obj.name.toLowerCase().includes(searchedStr) ||
-                  obj.code.includes(searchedStr)
+                obj.code.includes(searchedStr)
                 : obj.code.includes(searchedStr)
         )
         setFilteredCategories(str !== '' ? filterData : allcategories)
     }
 
     const handleChangeSelectedProduct = (option) => {
-        const hasProduct = option.barcode
-            ? filter(
-                  tableProducts,
-                  (obj) => obj.product.barcode === option.barcode
-              ).length > 0
-            : filter(tableProducts, (obj) => obj.product._id === option.value)
-                  .length > 0
-        if (!hasProduct) {
-            !option.barcode && setSelectedProduct(option)
-            const product = option.barcode
-                ? allProducts.find(
-                      (obj) => obj.productdata.barcode === option.barcode
-                  )
-                : allProducts.find((obj) => obj._id === option.value)
-            const currentProduct = {
-                total: product.total,
-                product: {
-                    _id: product._id,
-                    code: product.productdata.code,
-                    name: product.productdata.name,
-                    barcode: product.productdata.barcode,
-                },
-                totalprice: product.price.sellingprice,
-                totalpriceuzs: product.price.sellingpriceuzs,
-                tradeprice: product.price.tradeprice || 0,
-                tradepriceuzs: product.price.tradepriceuzs || 0,
-                pieces: 1,
-                incomingprice: product.price.incomingprice,
-                incomingpriceuzs: product.price.incomingpriceuzs,
-                unitprice: product.price.sellingprice,
-                unitpriceuzs: product.price.sellingpriceuzs,
-                categorycode: product.category.code,
-                filialProductsTotal: product.total,
-                fromFilial: 0,
-                filial: market._id,
-            }
-            if (
-                (currencyType === 'USD' &&
-                    currentProduct.incomingprice <= currentProduct.unitprice) ||
-                (currencyType === 'UZS' &&
-                    currentProduct.incomingpriceuzs <=
-                        currentProduct.unitpriceuzs)
-            ) {
-                setTableProducts([...tableProducts, currentProduct])
-                setSelectedProduct('')
-            } else {
-                warningLessSellPayment()
-            }
-        } else {
-            universalToast(t("Maxsulot ro'yxatda mavjud !"), 'error')
+        // const hasProduct = option.barcode
+        //     ? filter(
+        //           tableProducts,
+        //           (obj) => obj.product.barcode === option.barcode
+        //       ).length > 0
+        //     : filter(tableProducts, (obj) => obj.product._id === option.value)
+        //           .length > 0
+
+        !option.barcode && setSelectedProduct(option)
+        const product = option.barcode
+            ? allProducts.find(
+                (obj) => obj.productdata.barcode === option.barcode
+            )
+            : allProducts.find((obj) => obj._id === option.value)
+
+        const currentProduct = {
+            total: product.total,
+            product: {
+                _id: product._id,
+                code: product.productdata.code,
+                name: product.productdata.name,
+                barcode: product.productdata.barcode,
+            },
+            totalprice: product.price.sellingprice,
+            totalpriceuzs: product.price.sellingpriceuzs,
+            tradeprice: product.price.tradeprice || 0,
+            tradepriceuzs: product.price.tradepriceuzs || 0,
+            pieces: 1,
+            incomingprice: product.price.incomingprice,
+            incomingpriceuzs: product.price.incomingpriceuzs,
+            unitprice: product.price.sellingprice,
+            unitpriceuzs: product.price.sellingpriceuzs,
+            categorycode: product.category.code,
+            filialProductsTotal: product.total,
+            fromFilial: 0,
+            filial: market._id,
+            packcount: product?.packcount,
         }
+        if (
+            (currencyType === 'USD' &&
+                currentProduct.incomingprice <= currentProduct.unitprice) ||
+            (currencyType === 'UZS' &&
+                currentProduct.incomingpriceuzs <=
+                currentProduct.unitpriceuzs)
+        ) {
+            setTableProducts([...tableProducts, currentProduct])
+            setSelectedProduct('')
+        } else {
+            warningLessSellPayment()
+        }
+
     }
 
     const handleChangePackmanValue = (option) => {
@@ -965,7 +1041,7 @@ const RegisterSelling = () => {
         setUserValue('')
     }
 
-    const handleClickPrint = () => {}
+    const handleClickPrint = () => { }
 
     const handleChangeClientValue = (option) => {
         setClientValue(option)
@@ -1014,102 +1090,95 @@ const RegisterSelling = () => {
         })
     }
 
-    const handleChangeProductUnitPriceTable = (id, value) => {
+    const handleChangeProductUnitPriceTable = (index, value) => {
         const newRelease = !wholesale
-            ? map(tableProducts, (prevProduct) =>
-                  prevProduct.product._id === id
-                      ? {
-                            ...prevProduct,
-                            unitprice:
-                                currencyType === 'USD'
-                                    ? value
-                                    : UzsToUsd(value, exchangerate),
-                            unitpriceuzs:
-                                currencyType === 'UZS'
-                                    ? value
-                                    : UsdToUzs(value, exchangerate),
-                            totalprice:
-                                currencyType === 'USD'
-                                    ? value *
-                                      (Number(prevProduct.pieces) +
-                                          Number(prevProduct.fromFilial))
-                                    : UzsToUsd(
-                                          value *
-                                              (Number(prevProduct.pieces) +
-                                                  Number(
-                                                      prevProduct.fromFilial
-                                                  )),
-                                          exchangerate
-                                      ),
-                            totalpriceuzs:
-                                currencyType === 'UZS'
-                                    ? value *
-                                      (Number(prevProduct.pieces) +
-                                          Number(prevProduct.fromFilial))
-                                    : UsdToUzs(
-                                          value *
-                                              (Number(prevProduct.pieces) +
-                                                  Number(
-                                                      prevProduct.fromFilial
-                                                  )),
-                                          exchangerate
-                                      ),
-                        }
-                      : prevProduct
-              )
-            : map(tableProducts, (prevProduct) =>
-                  prevProduct.product._id === id
-                      ? {
-                            ...prevProduct,
-                            tradeprice:
-                                currencyType === 'USD'
-                                    ? value
-                                    : UzsToUsd(value, exchangerate),
-                            tradepriceuzs:
-                                currencyType === 'UZS'
-                                    ? value
-                                    : UsdToUzs(value, exchangerate),
-                            totalprice:
-                                currencyType === 'USD'
-                                    ? value * prevProduct.pieces
-                                    : UzsToUsd(
-                                          value * prevProduct.pieces,
-                                          exchangerate
-                                      ),
-                            totalpriceuzs:
-                                currencyType === 'UZS'
-                                    ? value * prevProduct.pieces
-                                    : UsdToUzs(
-                                          value * prevProduct.pieces,
-                                          exchangerate
-                                      ),
-                        }
-                      : prevProduct
-              )
+            ? map(tableProducts, (prevProduct, i) =>
+                i === index
+                    ? {
+                        ...prevProduct,
+                        unitprice:
+                            currencyType === 'USD'
+                                ? value
+                                : UzsToUsd(value, exchangerate),
+                        unitpriceuzs:
+                            currencyType === 'UZS'
+                                ? value
+                                : UsdToUzs(value, exchangerate),
+                        totalprice:
+                            currencyType === 'USD'
+                                ? value *
+                                (Number(prevProduct.pieces))
+                                : UzsToUsd(
+                                    value *
+                                    Number(prevProduct.pieces),
+                                    exchangerate
+                                ),
+                        totalpriceuzs:
+                            currencyType === 'UZS'
+                                ? value *
+                                (Number(prevProduct.pieces))
+                                : UsdToUzs(
+                                    value *
+                                    Number(prevProduct.pieces),
+                                    exchangerate
+                                ),
+                    }
+                    : prevProduct
+            )
+            : map(tableProducts, (prevProduct, i) =>
+                i === index
+                    ? {
+                        ...prevProduct,
+                        tradeprice:
+                            currencyType === 'USD'
+                                ? value
+                                : UzsToUsd(value, exchangerate),
+                        tradepriceuzs:
+                            currencyType === 'UZS'
+                                ? value
+                                : UsdToUzs(value, exchangerate),
+                        totalprice:
+                            currencyType === 'USD'
+                                ? value * prevProduct.pieces
+                                : UzsToUsd(
+                                    value * prevProduct.pieces,
+                                    exchangerate
+                                ),
+                        totalpriceuzs:
+                            currencyType === 'UZS'
+                                ? value * prevProduct.pieces
+                                : UsdToUzs(
+                                    value * prevProduct.pieces,
+                                    exchangerate
+                                ),
+                    }
+                    : prevProduct
+            )
         setTableProducts(newRelease)
     }
 
-    const handleChangeProductNumberTable = (id, value) => {
-        const newRelease = map(tableProducts, (prevProduct) =>
-            prevProduct.product._id === id
+    const handleChangeProductNumberTable = (index, value) => {
+        const newRelease = map(tableProducts, (prevProduct, i) =>
+            i === index
                 ? {
-                      ...prevProduct,
-                      pieces: Number(value),
-                      totalprice: convertToUsd(
-                          (Number(value) + Number(prevProduct.fromFilial)) *
-                              (wholesale
-                                  ? prevProduct.tradeprice ||
-                                    prevProduct.unitprice
-                                  : prevProduct.unitprice)
-                      ),
-                      totalpriceuzs: convertToUzs(
-                          (Number(value) + Number(prevProduct.fromFilial)) *
-                              (wholesale
-                                  ? prevProduct.tradepriceuzs ||
-                                    prevProduct.unitpriceuzs
-                                  : prevProduct.unitpriceuzs)
-                      ),
-                  }
+                    ...prevProduct,
+                    pieces: prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : Number(value),
+                    packcountpieces: prevProduct?.isPackcount ? Number(value) : 0,
+                    totalprice: convertToUsd(
+                        (prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : Number(value)) *
+                        (wholesale
+                            ? prevProduct.tradeprice ||
+                            prevProduct.unitprice
+                            : prevProduct.unitprice)
+                    ),
+                    totalpriceuzs: convertToUzs(
+                        (prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : Number(value)) *
+                        (wholesale
+                            ? prevProduct.tradepriceuzs ||
+                            prevProduct.unitpriceuzs
+                            : prevProduct.unitpriceuzs)
+                    ),
+                }
                 : prevProduct
         )
         setTableProducts(newRelease)
@@ -1119,23 +1188,23 @@ const RegisterSelling = () => {
         const newRelease = map(tableProducts, (prevProduct) =>
             prevProduct.product._id === id
                 ? {
-                      ...prevProduct,
-                      fromFilial: Number(value),
-                      totalprice: convertToUsd(
-                          (Number(value) + Number(prevProduct.pieces)) *
-                              (wholesale
-                                  ? prevProduct.tradeprice ||
-                                    prevProduct.unitprice
-                                  : prevProduct.unitprice)
-                      ),
-                      totalpriceuzs: convertToUzs(
-                          (Number(value) + Number(prevProduct.pieces)) *
-                              (wholesale
-                                  ? prevProduct.tradepriceuzs ||
-                                    prevProduct.unitpriceuzs
-                                  : prevProduct.unitpriceuzs)
-                      ),
-                  }
+                    ...prevProduct,
+                    fromFilial: Number(value),
+                    totalprice: convertToUsd(
+                        (Number(value) + Number(prevProduct.pieces)) *
+                        (wholesale
+                            ? prevProduct.tradeprice ||
+                            prevProduct.unitprice
+                            : prevProduct.unitprice)
+                    ),
+                    totalpriceuzs: convertToUzs(
+                        (Number(value) + Number(prevProduct.pieces)) *
+                        (wholesale
+                            ? prevProduct.tradepriceuzs ||
+                            prevProduct.unitpriceuzs
+                            : prevProduct.unitpriceuzs)
+                    ),
+                }
                 : prevProduct
         )
         setTableProducts(newRelease)
@@ -1158,27 +1227,27 @@ const RegisterSelling = () => {
         const newRelease = map(tableProducts, (prevProduct) =>
             prevProduct.product._id === id
                 ? {
-                      ...prevProduct,
-                      pieces: Number(prevProduct.pieces) + 1,
-                      totalprice: convertToUsd(
-                          (Number(prevProduct.pieces) +
-                              Number(prevProduct.fromFilial) +
-                              1) *
-                              (wholesale
-                                  ? prevProduct.tradeprice ||
-                                    prevProduct.unitprice
-                                  : prevProduct.unitprice)
-                      ),
-                      totalpriceuzs: convertToUzs(
-                          (Number(prevProduct.pieces) +
-                              Number(prevProduct.fromFilial) +
-                              1) *
-                              (wholesale
-                                  ? prevProduct.tradepriceuzs ||
-                                    prevProduct.unitpriceuzs
-                                  : prevProduct.unitpriceuzs)
-                      ),
-                  }
+                    ...prevProduct,
+                    pieces: Number(prevProduct.pieces) + 1,
+                    totalprice: convertToUsd(
+                        (Number(prevProduct.pieces) +
+                            Number(prevProduct.fromFilial) +
+                            1) *
+                        (wholesale
+                            ? prevProduct.tradeprice ||
+                            prevProduct.unitprice
+                            : prevProduct.unitprice)
+                    ),
+                    totalpriceuzs: convertToUzs(
+                        (Number(prevProduct.pieces) +
+                            Number(prevProduct.fromFilial) +
+                            1) *
+                        (wholesale
+                            ? prevProduct.tradepriceuzs ||
+                            prevProduct.unitpriceuzs
+                            : prevProduct.unitpriceuzs)
+                    ),
+                }
                 : prevProduct
         )
         setTableProducts(newRelease)
@@ -1188,34 +1257,34 @@ const RegisterSelling = () => {
         const newRelease = map(tableProducts, (prevProduct) =>
             prevProduct.product._id === id
                 ? {
-                      ...prevProduct,
-                      pieces:
-                          Number(prevProduct.pieces) > 1
-                              ? Number(prevProduct.pieces) - 1
-                              : 1,
-                      totalprice: convertToUsd(
-                          (Number(prevProduct.pieces) > 1
-                              ? Number(prevProduct.pieces) -
-                                1 +
-                                Number(prevProduct.fromFilial)
-                              : 1) *
-                              (wholesale
-                                  ? prevProduct.tradeprice ||
-                                    prevProduct.unitprice
-                                  : prevProduct.unitprice)
-                      ),
-                      totalpriceuzs: convertToUzs(
-                          (Number(prevProduct.pieces) > 1
-                              ? Number(prevProduct.pieces) -
-                                1 +
-                                Number(prevProduct.fromFilial)
-                              : 1) *
-                              (wholesale
-                                  ? prevProduct.tradepriceuzs ||
-                                    prevProduct.unitpriceuzs
-                                  : prevProduct.unitpriceuzs)
-                      ),
-                  }
+                    ...prevProduct,
+                    pieces:
+                        Number(prevProduct.pieces) > 1
+                            ? Number(prevProduct.pieces) - 1
+                            : 1,
+                    totalprice: convertToUsd(
+                        (Number(prevProduct.pieces) > 1
+                            ? Number(prevProduct.pieces) -
+                            1 +
+                            Number(prevProduct.fromFilial)
+                            : 1) *
+                        (wholesale
+                            ? prevProduct.tradeprice ||
+                            prevProduct.unitprice
+                            : prevProduct.unitprice)
+                    ),
+                    totalpriceuzs: convertToUzs(
+                        (Number(prevProduct.pieces) > 1
+                            ? Number(prevProduct.pieces) -
+                            1 +
+                            Number(prevProduct.fromFilial)
+                            : 1) *
+                        (wholesale
+                            ? prevProduct.tradepriceuzs ||
+                            prevProduct.unitpriceuzs
+                            : prevProduct.unitpriceuzs)
+                    ),
+                }
                 : prevProduct
         )
         setTableProducts(newRelease)
@@ -1230,7 +1299,7 @@ const RegisterSelling = () => {
     }
 
     const handleScan = (data) => {
-        handleChangeSelectedProduct({barcode: data})
+        handleChangeSelectedProduct({ barcode: data })
     }
 
     const handleChangeReturnProduct = (value, id, index) => {
@@ -1244,13 +1313,13 @@ const RegisterSelling = () => {
         const newRelease = map(returnProducts, (prevProduct) =>
             prevProduct._id === id
                 ? {
-                      ...prevProduct,
-                      pieces: value,
-                      totalprice: convertToUsd(value * prevProduct.unitprice),
-                      totalpriceuzs: convertToUzs(
-                          value * prevProduct.unitpriceuzs
-                      ),
-                  }
+                    ...prevProduct,
+                    pieces: value,
+                    totalprice: convertToUsd(value * prevProduct.unitprice),
+                    totalpriceuzs: convertToUzs(
+                        value * prevProduct.unitpriceuzs
+                    ),
+                }
                 : prevProduct
         )
         setReturnProducts(newRelease)
@@ -1268,34 +1337,34 @@ const RegisterSelling = () => {
             )
 
             const newRelease = discounts.map((discount) => {
-                let newDiscount = {...discount}
+                let newDiscount = { ...discount }
                 map(returnProducts, (product) => {
                     if (discount._id === product.product?.discount) {
                         newDiscount = {
                             ...discount,
                             discount: convertToUsd(
                                 newDiscount.discount -
-                                    (product.totalprice * discount.procient) /
-                                        100
+                                (product.totalprice * discount.procient) /
+                                100
                             ),
                             discountuzs: convertToUzs(
                                 newDiscount.discountuzs -
-                                    (product.totalpriceuzs *
-                                        discount.procient) /
-                                        100
+                                (product.totalpriceuzs *
+                                    discount.procient) /
+                                100
                             ),
                             totalprice: convertToUsd(
                                 newDiscount.totalprice - product.totalprice
                             ),
                             totalpriceuzs: convertToUzs(
                                 newDiscount.totalpriceuzs -
-                                    product.totalpriceuzs
+                                product.totalpriceuzs
                             ),
                         }
                     }
                     return ''
                 })
-                return {...newDiscount}
+                return { ...newDiscount }
             })
             const totalDiscountsUsd = newRelease.reduce(
                 (summ, discount) => summ + discount.discount,
@@ -1347,15 +1416,15 @@ const RegisterSelling = () => {
                         ...product,
                         totalprice: product.tradeprice
                             ? convertToUsd(
-                                  Number(product.pieces + product.fromFilial) *
-                                      product.tradeprice
-                              )
+                                Number(product.pieces + product.fromFilial) *
+                                product.tradeprice
+                            )
                             : product.totalprice,
                         totalpriceuzs: product.tradepriceuzs
                             ? convertToUzs(
-                                  Number(product.pieces + product.fromFilial) *
-                                      product.tradepriceuzs
-                              )
+                                Number(product.pieces + product.fromFilial) *
+                                product.tradepriceuzs
+                            )
                             : product.totalpriceuzs,
                     }))
                 )
@@ -1365,15 +1434,15 @@ const RegisterSelling = () => {
                         ...product,
                         totalprice: product.unitprice
                             ? convertToUsd(
-                                  Number(product.pieces + product.fromFilial) *
-                                      product.unitprice
-                              )
+                                Number(product.pieces + product.fromFilial) *
+                                product.unitprice
+                            )
                             : product.totalprice,
                         totalpriceuzs: product.unitpriceuzs
                             ? convertToUzs(
-                                  Number(product.pieces + product.fromFilial) *
-                                      product.unitpriceuzs
-                              )
+                                Number(product.pieces + product.fromFilial) *
+                                product.unitpriceuzs
+                            )
                             : product.totalpriceuzs,
                     }))
                 )
@@ -1395,16 +1464,16 @@ const RegisterSelling = () => {
                                 prod.fromFilial = 0
                                 prod.totalprice = convertToUsd(
                                     Number(prod.pieces) *
-                                        (wholesale
-                                            ? prod.tradeprice || prod.unitprice
-                                            : prod.unitprice)
+                                    (wholesale
+                                        ? prod.tradeprice || prod.unitprice
+                                        : prod.unitprice)
                                 )
                                 prod.totalpriceuzs = convertToUzs(
                                     Number(prod.pieces) *
-                                        (wholesale
-                                            ? prod.tradepriceuzs ||
-                                              prod.unitpriceuzs
-                                            : prod.unitpriceuzs)
+                                    (wholesale
+                                        ? prod.tradepriceuzs ||
+                                        prod.unitpriceuzs
+                                        : prod.unitpriceuzs)
                                 )
                             }
                         }
@@ -1416,7 +1485,7 @@ const RegisterSelling = () => {
     }
 
     const getFilialProducts = async (value) => {
-        const {data} = await Api.post('/filials/products/get', value)
+        const { data } = await Api.post('/filials/products/get', value)
         return data
     }
 
@@ -1428,29 +1497,26 @@ const RegisterSelling = () => {
                 market: market._id,
             })
         market &&
-            socket.on('categories', ({id, categories}) => {
+            socket.on('categories', ({ id, categories }) => {
                 id === market._id && dispatch(setAllCategories(categories))
             })
         market &&
-            socket.on('getProductsOfCount', ({id, products}) => {
+            socket.on('getProductsOfCount', ({ id, products }) => {
                 if (id === market._id) {
                     productsForSearch = [
                         ...productsForSearch,
                         ...map(products, (product) => ({
                             value: product._id,
-                            label: `(${product.total}) ${
-                                product.category.code
-                            }${product.productdata.code} - ${
-                                product.productdata.name
-                            } -------- (${
-                                currencyType === 'USD'
+                            label: `(${product.total}) ${product.category.code
+                                }${product.productdata.code} - ${product.productdata.name
+                                } -------- (${currencyType === 'USD'
                                     ? (product?.price?.sellingprice).toLocaleString(
-                                          'ru-RU'
-                                      )
+                                        'ru-RU'
+                                    )
                                     : (product?.price?.sellingpriceuzs).toLocaleString(
-                                          'ru-RU'
-                                      )
-                            } ${currencyType})`,
+                                        'ru-RU'
+                                    )
+                                } ${currencyType})`,
                         })),
                     ]
                     setFilteredProducts(productsForSearch)
@@ -1459,7 +1525,7 @@ const RegisterSelling = () => {
                 }
             })
         market &&
-            socket.on('error', ({id, message}) => {
+            socket.on('error', ({ id, message }) => {
                 id === market._id && universalToast(message, 'error')
             })
 
@@ -1492,7 +1558,7 @@ const RegisterSelling = () => {
     useEffect(() => {
         dispatch(getAllPackmans())
         dispatch(getClients())
-        dispatch(getFilials({marketData: market}))
+        dispatch(getFilials({ marketData: market }))
     }, [dispatch, market])
 
     useEffect(() => {
@@ -1576,8 +1642,8 @@ const RegisterSelling = () => {
                         totalprice: 0,
                         unitprice: saleProduct.unitprice,
                         unitpriceuzs: saleProduct.unitpriceuzs,
-                        product: {...sale},
-                        productdata: {...saleProduct.product.productdata},
+                        product: { ...sale },
+                        productdata: { ...saleProduct.product.productdata },
                         _id: saleProduct._id,
                     })
                 return ''
@@ -1590,11 +1656,11 @@ const RegisterSelling = () => {
             const totalSumm = (datas, property, type) => {
                 return type === 'uzs'
                     ? convertToUzs(
-                          datas.reduce((summ, data) => summ + data[property], 0)
-                      )
+                        datas.reduce((summ, data) => summ + data[property], 0)
+                    )
                     : convertToUsd(
-                          datas.reduce((summ, data) => summ + data[property], 0)
-                      )
+                        datas.reduce((summ, data) => summ + data[property], 0)
+                    )
             }
             setTotalPaymentsUsd(
                 totalSumm(data.saleconnector.products, 'totalprice', 'usd')
@@ -1621,24 +1687,27 @@ const RegisterSelling = () => {
             )}
             <CustomerPayment
                 returned={!!returnProducts.length}
+                exchangerate={exchangerate}
                 type={paymentType}
                 active={paymentModalVisible}
                 togglePaymentModal={togglePaymentModal}
                 changePaymentType={handleChangePaymentType}
                 onChange={handleChangePaymentInput}
                 client={userValue || clientValue.label || packmanValue.label}
-                allPayment={currencyType === 'USD' ? allPayment : allPaymentUzs}
+                allPayment={allPayment}
+                allPaymentUzs={allPaymentUzs}
                 card={currencyType === 'USD' ? paymentCard : paymentCardUzs}
                 cash={currencyType === 'USD' ? paymentCash : paymentCashUzs}
-                debt={currencyType === 'USD' ? paymentDebt : paymentDebtUzs}
+                debt={paymentDebt}
+                debtuzs={paymentDebtUzs}
                 discount={
                     currencyType === 'USD'
                         ? discountSelectOption.value === 'USD'
                             ? paymentDiscount
                             : paymentDiscountPercent
                         : discountSelectOption.value === 'UZS'
-                        ? paymentDiscountUzs
-                        : paymentDiscountPercent
+                            ? paymentDiscountUzs
+                            : paymentDiscountPercent
                 }
                 handleChangeDiscount={handleChangeDiscount}
                 hasDiscount={hasDiscount}
@@ -1657,6 +1726,9 @@ const RegisterSelling = () => {
                 changeComment={changeComment}
                 saleComment={saleComment}
                 onDoubleClick={handleDoubleClick}
+                paymentUsd={paymentUsd}
+                debtType={debtType}
+                setDebtType={setDebtType}
             />
             <UniversalModal
                 body={modalBody}
@@ -1785,7 +1857,7 @@ const RegisterSelling = () => {
                         placeholder={t('kategoriyani qidirish...')}
                         value={searchCategory}
                         onChange={handleSearchCategory}
-                        onKeyUp={() => {}}
+                        onKeyUp={() => { }}
                     />
                     <div className='grow relative overflow-auto'>
                         <div className='cards-container absolute left-0 right-[0.125rem] top-0 bottom-0'>

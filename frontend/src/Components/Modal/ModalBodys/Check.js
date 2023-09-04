@@ -65,7 +65,7 @@ function Check({ product, returned, isPayment, payment, isOrder, order }) {
         onBeforeGetContent: handleOnBeforeGetContent,
         removeAfterPrint: true,
     })
-
+    console.log(payment);
     useEffect(() => {
         if (
             loadContent &&

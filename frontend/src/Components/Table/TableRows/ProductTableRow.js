@@ -40,6 +40,9 @@ export const ProductTableRow = ({
                         {product.unit && product.unit.name}
                     </td>
                     <td className='td text-right'>
+                        {product?.packcount}
+                    </td>
+                    <td className='td text-right'>
                         {product.price &&
                             (currency === 'UZS'
                                 ? product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString(

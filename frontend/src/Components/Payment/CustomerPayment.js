@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux'
 import PaymentInput from './PaymentInput/PaymentInput.js'
 import { t } from 'i18next'
 import { useLocation } from 'react-router-dom'
+import Checkbox from '../Checkbox/Checkbox.js'
 
 function CustomerPayment({
     returned,
@@ -18,6 +19,7 @@ function CustomerPayment({
     hasDiscount,
     debt,
     allPayment,
+    allPaymentUzs,
     paid = 0,
     client = '',
     onChange,
@@ -27,10 +29,15 @@ function CustomerPayment({
     handleClickDiscountBtn,
     handleChangeDiscountSelectOption,
     handleChangeDiscount,
+    exchangerate,
     handleClickPay,
     saleComment,
     changeComment,
-    onDoubleClick
+    onDoubleClick,
+    paymentUsd = "",
+    debtuzs,
+    debtType,
+    setDebtType
 }) {
     const location = useLocation()
     const defineLabel = () => {
@@ -77,8 +84,15 @@ function CustomerPayment({
                     />
                 ))
             default:
-                return (
-                    <PaymentInput
+                return location.pathname.includes('/kassa/debts') ?
+                    debtType === 'dollar' ? <PaymentInput
+                        key={'sale-usd'}
+                        value={paymentUsd}
+                        onChange={onChange}
+                        keyInput={'usd'}
+                        onClose={onClose}
+                        label={t('USD')}
+                    /> : <PaymentInput
                         key={'sale-cash'}
                         value={cash}
                         onChange={onChange}
@@ -86,7 +100,24 @@ function CustomerPayment({
                         onClose={onClose}
                         label={t('Naqd')}
                     />
-                )
+                    : <>
+                        <PaymentInput
+                            key={'sale-usd'}
+                            value={paymentUsd}
+                            onChange={onChange}
+                            keyInput={'usd'}
+                            onClose={onClose}
+                            label={t('USD')}
+                        />
+                        <PaymentInput
+                            key={'sale-cash'}
+                            value={cash}
+                            onChange={onChange}
+                            keyInput={type}
+                            onClose={onClose}
+                            label={t('Naqd')}
+                        />
+                    </>
         }
     }
     const { currencyType } = useSelector((state) => state.currency)
@@ -122,11 +153,11 @@ function CustomerPayment({
                         </div>
                     )}
                     <div className='mb-[1.25rem] font-medium text-[1.25rem] text-center leading-[23.44px]'>
-                        {allPayment.toLocaleString('ru-Ru')} {currencyType}
+                        {location.pathname.includes('/kassa/debts') && debtType === 'dollar' ? allPayment + ' USD' : allPaymentUzs + ' UZS'}
                     </div>
                     <ul className='w-full pb-[1.25rem]'>
                         {!returned && defineLabel()}
-                        {(location.pathname.includes('/kassa/debts') || location.pathname.includes('/qarzdorlar') || location.pathname.includes('/maxsulotlar/qabul/qabulqilish') || location.pathname.includes('/maxsulotlar/qabul/qabullar') ) && defineLabel()}
+                        {(location.pathname.includes('/kassa/debts') || location.pathname.includes('/qarzdorlar') || location.pathname.includes('/maxsulotlar/qabul/qabulqilish') || location.pathname.includes('/maxsulotlar/qabul/qabullar')) && defineLabel()}
                         <PaymentInput
                             value={saleComment}
                             key={'sale-card'}
@@ -145,14 +176,51 @@ function CustomerPayment({
                                 onSelect={handleChangeDiscountSelectOption}
                             />
                         )}
-                        <li className='custom-payment-ul-li'>
+                        {location.pathname.includes('/kassa/debts') ?
+                            (debtType === 'dollar' ?
+                                <li className='custom-payment-ul-li'>
+                                    <span className='custom-payment-text-style'>
+                                        {t('Qarzlar')} :{' '}
+                                    </span>
+                                    <h3 className='text-error-500 text-[1rem]'>
+                                        {debt} USD
+                                    </h3>
+                                </li> : <li className='custom-payment-ul-li'>
+                                    <span className='custom-payment-text-style'>
+                                        {t('Qarzlar')} :{' '}
+                                    </span>
+                                    <h3 className='text-error-500 text-[1rem]'>
+                                        {debtuzs} UZS
+                                    </h3>
+                                </li>)
+                            : <li className='custom-payment-ul-li'>
+                                <span className='custom-payment-text-style'>
+                                    {t('Qarzlar')} :{' '}
+                                </span>
+                                <h3 className='text-error-500 text-[1rem]'>
+                                    {debt} USD <br /><br />
+                                    {debtuzs} UZS
+                                </h3>
+                            </li>}
+                        {!location.pathname.includes('/kassa/debts') && <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
-                                {t('Qarzlar')} :{' '}
+                                {t('Qarz')} :{' '}
                             </span>
-                            <h3 className='text-error-500 text-[1rem]'>
-                                {debt.toLocaleString('ru-Ru')} {currencyType}
+                            <h3 className='text-error-500 text-[1rem] flex items-center gap-2'>
+                                <Checkbox
+                                    id={`debt`}
+                                    onChange={() => setDebtType('dollar')}
+                                    value={debtType === 'dollar' ? true : false}
+                                    label={t('USD')}
+                                />
+                                <Checkbox
+                                    id={`debt2`}
+                                    onChange={() => setDebtType('sum')}
+                                    value={debtType === 'sum' ? true : false}
+                                    label={t('UZS')}
+                                />
                             </h3>
-                        </li>
+                        </li>}
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
@@ -186,7 +254,7 @@ function CustomerPayment({
                             active={type === 'transfer'}
                             onClick={changePaymentType}
                         />
-                        {!returned && <SaleBtn
+                        {/* {!returned && <SaleBtn
                             text={t(`Aralash`)}
                             type='mixed'
                             active={type === 'mixed'}
@@ -197,14 +265,14 @@ function CustomerPayment({
                             type='mixed'
                             active={type === 'mixed'}
                             onClick={changePaymentType}
-                        />}
+                        />} */}
                     </div>
-                    {!returned && (
+                    {/* {!returned && (
                         <DiscountBtn
                             text={t(`Chegirma`)}
                             onClick={handleClickDiscountBtn}
                         />
-                    )}
+                    )} */}
                     <Payment
                         text={t(`To'lash`)}
                         onClick={handleClickPay}

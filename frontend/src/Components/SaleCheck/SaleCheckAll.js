@@ -13,7 +13,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
         product,
         userInfo,
     } = props
-    console.log(selled);
+    console.log(props);
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -57,6 +57,40 @@ export const SaleCheckAll = forwardRef((props, ref) => {
             }, 0)
             : 0
     }
+
+    const calculateAllPaymentsUsd = (data) => {
+        return data
+            ? data.reduce((acc, pr) => {
+                return (
+                    acc +
+                    (pr.usdpayment && pr.usdpayment || 0)
+                )
+            }, 0)
+            : 0
+    }
+
+    const calculateDebt = (data) => {
+        return data
+            ? data.reduce((acc, pr) => {
+                return (
+                    acc +
+                    (pr?.debt?.debtType === 'sum' ? pr?.debtuzs : 0)
+                )
+            }, 0)
+            : 0
+    }
+
+    const calculateDebtUsd = (data) => {
+        return data
+            ? data.reduce((acc, pr) => {
+                return (
+                    acc +
+                    (pr?.debt?.debtType === 'dollar' ? pr?.debt?.debt : 0)
+                )
+            }, 0)
+            : 0
+    }
+
 
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
@@ -130,7 +164,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                 <td className='check-table-rtr'>Kodi</td>
                                 <td className='check-table-rtr'>Maxsulot</td>
                                 <td className='check-table-rtr'>Soni</td>
-                                {selled.some(el => el.fromFilial > 0) && <td style={{ backgroundColor: "grey" }} className='check-table-rtr'>Ombordan</td>}
+                                {selled.some(el => el.isPackcount) && <td className='check-table-rtr'>To'plam</td>}
                                 <td className='check-table-rtr'>Narxi(dona)</td>
                                 <td className='check-table-rtr'>Jami</td>
                                 <td className='check-table-rtr'>Sotuvchi</td>
@@ -157,8 +191,8 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                         <td className='check-table-body'>
                                             {item?.pieces}
                                         </td>
-                                        {selled.some(el => el.fromFilial > 0) && <td style={{ backgroundColor: item?.fromFilial ? "grey" : 'white' }} className='check-table-body'>
-                                            {item?.fromFilial}
+                                        {selled.some(el => el.isPackcount) && <td className='check-table-body'>
+                                            {item?.packcountpieces === 0 ? "" : item?.packcountpieces}
                                         </td>}
                                         <td className='check-table-body'>
                                             {currencyType === 'USD'
@@ -310,7 +344,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                         {currencyType}
                     </span>
                 </li>
-                <li className='text-black-900 check-ul-li-foot'>
+                {/* <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     Chegirma:{' '}
                     <span className='text-black-900 font-bold'>
@@ -320,7 +354,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                         ).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
-                </li>
+                </li> */}
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     To'langan:{' '}
@@ -334,19 +368,39 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                 </li>
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
+                    To'langan USD:{' '}
+                    <span className='text-black-900 font-bold'>
+                        {(
+                            calculateAllPaymentsUsd(selledPayments) +
+                            calculateAllPaymentsUsd(returnedPayments)
+                        ).toLocaleString('ru-Ru')}{' '}
+                        USD
+                    </span>
+                </li>
+                {calculateDebt > 0 && <li className='text-black-900 check-ul-li-foot'>
+                    {' '}
                     Qarz:{' '}
                     <span className=' text-black-900 font-bold'>
                         {(
-                            calculateAllSum(selled) +
-                            calculateAllSum(returned) -
+                            calculateDebt(selled) +
+                            calculateDebt(returned) -
                             (calculateAllPayments(selledPayments) +
-                                calculateAllPayments(returnedPayments)) -
-                            (calculateAllDiscounts(selledDiscounts) +
-                                calculateAllDiscounts(returnedDiscounts))
+                            calculateAllPayments(returnedPayments)) 
                         ).toLocaleString('ru-Ru')}{' '}
                         {currencyType}
                     </span>
-                </li>
+                </li>}
+                {calculateDebtUsd(selledPayments) > 0 && <li className='text-black-900 check-ul-li-foot'>
+                    {' '}
+                    Qarz:{' '}
+                    <span className=' text-black-900 font-bold'>
+                        {(
+                            calculateDebtUsd(selledPayments) +
+                            calculateDebtUsd(returnedPayments) 
+                        ).toLocaleString('ru-Ru')}{' '}
+                        {currencyType}
+                    </span>
+                </li>}
             </ul>
         </div>
     )

@@ -102,6 +102,7 @@ function Products() {
     })
     const [importLoading, setImportLoading] = useState(false)
     const [minimumCount, setMinimumCount] = useState('')
+    const [packcount, setPackCount] = useState('')
     const [tradePrice, setTradePrice] = useState('')
     const [tradePriceUzs, setTradePriceUzs] = useState('')
     const [tradePriceProcient, setTradePriceProcient] = useState('');
@@ -127,6 +128,10 @@ function Products() {
         {
             title: t('Soni'),
             filter: 'total',
+        },
+        {
+            title: t('Optom qiymat'),
+            filter: 'packcount',
         },
         {
             title: t('Olish'),
@@ -278,6 +283,12 @@ function Products() {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
             setMinimumCount(val)
+        }
+    }
+    const handleChangePackount = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setPackCount(val)
         }
     }
     const handleChangeTradePrice = (e) => {
@@ -500,6 +511,7 @@ function Products() {
                         tradeprice: tradePrice,
                         tradepriceuzs: tradePriceUzs,
                         minimumcount: minimumCount,
+                        packcount: packcount
                     },
                 }
                 dispatch(addProduct(body)).then(({ error }) => {
@@ -533,6 +545,7 @@ function Products() {
         setStickyForm(false)
         setSellingPriceOfProcient('')
         setTradePriceProcient('')
+        setPackCount('')
     }
     const handleEdit = (e) => {
         e.preventDefault()
@@ -595,6 +608,7 @@ function Products() {
                     tradeprice: tradePrice,
                     tradepriceuzs: tradePriceUzs,
                     minimumcount: minimumCount,
+                    packcount: packcount,
                 },
                 currentPage,
                 countPage: showByTotal,
@@ -921,6 +935,7 @@ function Products() {
                 total,
                 category,
                 minimumcount,
+                packcount,
                 price: {
                     sellingprice,
                     incomingprice,
@@ -949,6 +964,7 @@ function Products() {
             setMinimumCount(minimumcount || 0)
             setTradePrice(tradeprice || 0)
             setTradePriceUzs(tradepriceuzs || 0)
+            setPackCount(packcount || 0)
         }
     }, [currentProduct])
     useEffect(() => {
@@ -1086,6 +1102,8 @@ function Products() {
                 handleChangeMinimumCount={handleChangeMinimumCount}
                 tradePrice={currencyType === 'USD' ? tradePrice : tradePriceUzs}
                 handleChangeTradePrice={handleChangeTradePrice}
+                packcount={packcount}
+                handleChangePackount={handleChangePackount}
             />
             <div className={'flex justify-between items-center mainPadding'}>
                 <div className={'flex gap-[1.5rem]'}>

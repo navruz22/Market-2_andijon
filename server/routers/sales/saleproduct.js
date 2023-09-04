@@ -93,11 +93,11 @@ module.exports.register = async (req, res) => {
       }, 0)
     );
 
-    if (checkPayments(totalprice, payment, discount, debt)) {
-      return res.status(400).json({
-        message: `Diqqat! To'lov hisobida xatolik yuz bergan!`,
-      });
-    }
+    // if (checkPayments(totalprice, payment, discount, debt)) {
+    //   return res.status(400).json({
+    //     message: `Diqqat! To'lov hisobida xatolik yuz bergan!`,
+    //   });
+    // }
 
     let all = [];
 
@@ -113,6 +113,8 @@ module.exports.register = async (req, res) => {
         pieces,
         product,
         fromFilial,
+        packcountpieces,
+        isPackcount
       } = saleproduct;
       const { error } = validateSaleProduct({
         totalprice,
@@ -149,6 +151,8 @@ module.exports.register = async (req, res) => {
         fromFilial,
         previous: produc.total,
         next: produc.total - Number(pieces),
+        packcountpieces,
+        isPackcount
       });
 
       all.push(newSaleProduct);
@@ -218,12 +222,13 @@ module.exports.register = async (req, res) => {
         await product.save();
       }
     }
-
+    let debtid = null
     if (debt.debt > 0) {
       const newDebt = new Debt({
         comment: comment,
         debt: convertToUsd(debt.debt),
         debtuzs: convertToUzs(debt.debtuzs),
+        debtType: debt.debtType,
         totalprice: convertToUsd(totalprice),
         totalpriceuzs: convertToUzs(totalpriceuzs),
         market,
@@ -232,6 +237,7 @@ module.exports.register = async (req, res) => {
         products,
       });
       await newDebt.save();
+      debtid = newDebt._id
       saleconnector.debts.push(newDebt._id);
       dailysaleconnector.debt = newDebt._id;
     }
@@ -249,6 +255,7 @@ module.exports.register = async (req, res) => {
         carduzs: payment.carduzs,
         cashuzs: payment.cashuzs,
         transferuzs: payment.transferuzs,
+        usdpayment: payment.usdpayment,
         type: payment.type,
         totalprice,
         totalpriceuzs,
@@ -257,6 +264,9 @@ module.exports.register = async (req, res) => {
         saleconnector: saleconnector._id,
         products,
       });
+      if (debtid) {
+        newPayment.debt = debtid;
+      }
       await newPayment.save();
       saleconnector.payments.push(newPayment._id);
       dailysaleconnector.payment = newPayment._id;
@@ -304,7 +314,7 @@ module.exports.register = async (req, res) => {
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial",
+          "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial isPackcount packcountpieces",
         populate: {
           path: "product",
           select: "productdata total",
@@ -315,9 +325,9 @@ module.exports.register = async (req, res) => {
           },
         },
       })
-      .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
+      .populate("payment", "payment paymentuzs usdpayment totalprice totalpriceuzs")
       .populate("discount", "discount discountuzs")
-      .populate("debt", "debt debtuzs")
+      .populate("debt", "debt debtuzs debtType")
       .populate("client", "name")
       .populate("packman", "name")
       .populate("user", "firstname lastname")
@@ -325,6 +335,7 @@ module.exports.register = async (req, res) => {
 
     res.status(201).send(connector);
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
@@ -392,6 +403,8 @@ module.exports.addproducts = async (req, res) => {
         unitpriceuzs,
         pieces,
         product,
+        packcountpieces,
+        isPackcount
       } = saleproduct;
       const { error } = validateSaleProduct({
         totalprice,
@@ -429,6 +442,8 @@ module.exports.addproducts = async (req, res) => {
         user,
         previous: produc.total,
         next: produc.total - Number(pieces),
+        packcountpieces,
+        isPackcount
       });
 
       all.push(newSaleProduct);
@@ -512,6 +527,8 @@ module.exports.addproducts = async (req, res) => {
         cashuzs: payment.cashuzs,
         transferuzs: payment.transferuzs,
         type: payment.type,
+        usdpayment: payment.usdpayment,
+        debtusd: payment.debtusd,
         totalprice,
         totalpriceuzs,
         market,
@@ -564,7 +581,7 @@ module.exports.addproducts = async (req, res) => {
       .select("-isArchive -updatedAt -market -__v")
       .populate({
         path: "products",
-        select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces",
+        select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces isPackcount packcountpieces",
         options: { sort: { created_at: -1 } },
         populate: {
           path: "product",
@@ -665,11 +682,11 @@ module.exports.getsaleconnectors = async (req, res) => {
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+          "totalprice unitprice totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces createdAt discount saleproducts product fromFilial",
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "product",
-          select: "productdata",
+          select: "productdata packcount",
           populate: { 
             path: "productdata", 
             select: "name code",
@@ -680,17 +697,22 @@ module.exports.getsaleconnectors = async (req, res) => {
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product fromFilial",
+          "totalprice unitprice totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces pieces createdAt discount saleproducts product fromFilial",
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "saleproducts",
           select: "pieces totalprice totalpriceuzs",
         },
       })
-      .populate(
-        "payments",
-        "payment paymentuzs comment totalprice totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs"
-      )
+      .populate({
+        path: "payments",
+        select:
+          "payment paymentuzs comment totalprice usdpayment totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs",
+        populate: {
+          path: "debt",
+          select: "debt debtuzs debtType",
+        },
+      })
       .populate(
         "discounts",
         "discount discountuzs procient products totalprice totalpriceuzs"
@@ -750,6 +772,7 @@ module.exports.getsaleconnectors = async (req, res) => {
       count,
     });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
@@ -924,13 +947,14 @@ module.exports.registeredit = async (req, res) => {
     let products = [];
 
     for (const saleproduct of all) {
-      saleproduct.saleconnector = saleconnector._id;
-      saleproduct.dailysaleconnector = dailysaleconnector._id;
-      await saleproduct.save();
-      products.push(saleproduct._id);
+      const sp = await SaleProduct.findById(saleproduct._id);
+      sp.saleconnector = saleconnector._id;
+      sp.dailysaleconnector = dailysaleconnector._id;
+      await sp.save();
+      products.push(sp._id);
 
-      const updateproduct = await Product.findById(saleproduct.product);
-      updateproduct.total -= saleproduct.pieces;
+      const updateproduct = await Product.findById(sp.product);
+      updateproduct.total -= sp.pieces;
       await updateproduct.save();
     }
 
@@ -1017,13 +1041,14 @@ module.exports.registeredit = async (req, res) => {
       .populate("saleconnector", "id");
     res.status(201).send(connector);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
 
 module.exports.payment = async (req, res) => {
-  try {
-    const { payment, market, user, saleconnectorid } = req.body;
+  try { 
+    const { payment, market, debtId, user, saleconnectorid } = req.body;
 
     const marke = await Market.findById(market);
     if (!marke) {
@@ -1058,7 +1083,21 @@ module.exports.payment = async (req, res) => {
       user,
       saleconnector: saleconnectorid,
     });
+    if (payment.debtType === 'dollar') {
+      newPayment.usdpayment = payment.usdpayment
+    }
     await newPayment.save();
+
+    const debt = await Debt.findById(debtId)
+    console.log(debt);
+    if (payment.debtType === 'dollar') {
+      debt.debt = debt.debt - payment.usdpayment
+    } else {
+      debt.debt = debt.debt - (payment.cash + payment.card + payment.transfer)
+      debt.debtuzs = debt.debtuzs - (payment.cashuzs + payment.carduzs + payment.transferuzs)
+    }
+    await debt.save();
+
     saleconnector.payments.push(newPayment._id);
     await saleconnector.save();
     const returnpayment = await Payment.findById(newPayment._id).populate({
@@ -1068,6 +1107,7 @@ module.exports.payment = async (req, res) => {
     });
     res.status(201).send(returnpayment);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };

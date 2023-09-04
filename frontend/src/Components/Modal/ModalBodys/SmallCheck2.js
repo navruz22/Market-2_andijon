@@ -88,13 +88,11 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     Jami :{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {currencyType === 'USD'
-                            ? product?.payment?.totalprice
-                            : product?.payment?.totalpriceuzs}{' '}
-                        {currencyType}
+                        {product?.payment?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}
+                        UZS
                     </span>
                 </h3>
-                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                {/* <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
                     Chegirma:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
@@ -105,35 +103,38 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                             : 0}{' '}
                         {currencyType}
                     </span>
-                </h3>
+                </h3> */}
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
                     To'langan:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {currencyType === 'USD'
-                            ? product?.payment?.payment
-                            : product?.payment?.paymentuzs}{' '}
-                        {currencyType}
+                        {product?.payment?.paymentuzs.toLocaleString('ru-Ru')}{' '}
+                        UZS
                     </span>
                 </h3>
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
-                    Qarz:{' '}
+                    To'langan USD:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {currencyType === 'USD'
-                            ? calculateDebt(
-                                product?.payment?.totalprice,
-                                product?.payment?.payment,
-                                product?.discount?.discount
-                            )
-                            : calculateDebt(
-                                product?.payment?.totalpriceuzs,
-                                product?.payment?.paymentuzs,
-                                product?.discount?.discountuzs
-                            )}{' '}
-                        {currencyType}
+                        {product?.payment?.usdpayment.toLocaleString('ru-Ru')}{' '}
+                        USD
                     </span>
                 </h3>
+                {product?.debt?.debtType === 'dollar' ? <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                    {' '}
+                    Qarz:{' '}
+                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                        {product?.debt?.debt.toLocaleString('ru-Ru')} USD
+                    </span>
+                </h3> :
+                    <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                        {' '}
+                        Qarz:{' '}
+                        <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                            {product?.debt?.debtuzs.toLocaleString('ru-Ru')}{' '} UZS
+                        </span>
+                    </h3>
+                }
             </div>
         </div>
     )

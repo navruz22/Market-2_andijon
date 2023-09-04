@@ -616,6 +616,7 @@ module.exports.getPayment = async (req, res) => {
         carduzs: 0,
         transfer: 0,
         transferuzs: 0,
+        usdpayment: 0,
       },
       back: {
         cash: 0,
@@ -624,6 +625,7 @@ module.exports.getPayment = async (req, res) => {
         carduzs: 0,
         transfer: 0,
         transferuzs: 0,
+        usdpayment: 0,
       },
       result: {
         cash: 0,
@@ -632,82 +634,12 @@ module.exports.getPayment = async (req, res) => {
         carduzs: 0,
         transfer: 0,
         transferuzs: 0,
+        usdpayment: 0,
       },
     };
 
     for (const payment of allpayments) {
-      // if (payment.totalprice !== 0) {
-      //   const dailyconnectors = await DailySaleConnector.findOne({
-      //     payment: payment._id
-      //   })
-      //     .select('-isArchive -updatedAt -market -__v')
-      //     .populate(
-      //       'payment',
-      //       'cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs'
-      //     )
-      //     .populate({
-      //       path: 'saleconnector',
-      //       select: 'id',
-      //     })
-      //     .populate({
-      //       path: 'client',
-      //       select: 'name',
-      //     })
-      //     .populate({
-      //       path: 'user',
-      //       select: "firstname lastname"
-      //     })
-      //     .populate({
-      //       path: 'products',
-      //       select: 'totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user',
-      //       populate: {
-      //         path: 'price',
-      //         select: 'incomingprice incomingpriceuzs sellingprice sellingpriceuzs',
-      //       },
-      //     })
-      //     .populate({
-      //       path: 'products',
-      //       select: 'totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user',
-      //       populate: {
-      //         path: 'user',
-      //         select: 'firstname lastname',
-      //       },
-      //     })
-      //     .populate({
-      //       path: 'products',
-      //       select: 'totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user',
-      //       populate: {
-      //         path: 'product',
-      //         select: 'productdata',
-      //         populate: {
-      //           path: 'productdata',
-      //           select: "name code"
-      //         }
-      //       }
-      //     })
-      //     .populate(
-      //       'discount',
-      //       'discount discountuzs totalprice totalpriceuzs procient'
-      //     )
-      //     .lean()
-      //   respayments.push({
-      //     id: payment.saleconnector && payment.saleconnector.id,
-      //     saleconnector: dailyconnectors,
-      //     createdAt: payment.createdAt,
-      //     client:
-      //       payment.saleconnector &&
-      //       payment.saleconnector.client &&
-      //       payment.saleconnector.client,
-      //     cash: payment.cash,
-      //     cashuzs: payment.cashuzs,
-      //     card: payment.card,
-      //     carduzs: payment.carduzs,
-      //     transfer: payment.transfer,
-      //     transferuzs: payment.transferuzs,
-      //     totalprice: (payment.totalprice && payment.totalprice) || 0,
-      //     totalpriceuzs: (payment.totalpriceuzs && payment.totalpriceuzs) || 0,
-      //   })
-      // } else {
+     
       respayments.push({
         id: payment.saleconnector && payment.saleconnector.id,
         saleconnector: payment.saleconnector,
@@ -718,6 +650,7 @@ module.exports.getPayment = async (req, res) => {
           payment.saleconnector.client,
         cash: payment.cash,
         cashuzs: payment.cashuzs,
+        usdpayment: payment.usdpayment,
         card: payment.card,
         carduzs: payment.carduzs,
         transfer: payment.transfer,
@@ -726,13 +659,14 @@ module.exports.getPayment = async (req, res) => {
         totalpriceuzs: (payment.totalpriceuzs && payment.totalpriceuzs) || 0,
       });
 
-      if (payment.cash < 0 || payment.card < 0 || payment.transfer < 0) {
+      if (payment.cash < 0 || payment.card < 0 || payment.transfer < 0 || payment.usdpayment < 0) {
         total.back.cash += payment.cash;
         total.back.cashuzs += payment.cashuzs;
         total.back.card += payment.card;
         total.back.carduzs += payment.carduzs;
         total.back.transfer += payment.transfer;
         total.back.transferuzs += payment.transferuzs;
+        total.back.usdpayment += (payment.usdpayment || 0);
       } else {
         total.payment.cash += payment.cash;
         total.payment.cashuzs += payment.cashuzs;
@@ -740,6 +674,7 @@ module.exports.getPayment = async (req, res) => {
         total.payment.carduzs += payment.carduzs;
         total.payment.transfer += payment.transfer;
         total.payment.transferuzs += payment.transferuzs;
+        total.payment.usdpayment += (payment.usdpayment || 0);
       }
     }
 
@@ -748,6 +683,7 @@ module.exports.getPayment = async (req, res) => {
     total.result.card = total.payment.card + total.back.card;
     total.result.carduzs = total.payment.carduzs + total.back.carduzs;
     total.result.transfer = total.payment.transfer + total.back.transfer;
+    total.result.usdpayment = total.payment.usdpayment + total.back.usdpayment;
     total.result.transferuzs =
       total.payment.transferuzs + total.back.transferuzs;
 
@@ -808,9 +744,9 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate("client", "name")
       .populate(
         "payments",
-        "payment paymentuzs comment totalprice totalpriceuzs"
+        "payment paymentuzs usdpayment comment totalprice totalpriceuzs"
       )
-      .populate("debts", "comment")
+      .populate("debts")
       .populate(
         "discounts",
         "discount discountuzs procient products totalprice totalpriceuzs"
@@ -823,12 +759,11 @@ module.exports.getDebtsReport = async (req, res) => {
       .map((sale) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
-        const discount = reduce(sale.discounts, "discount");
-        const discountuzs = reduce(sale.discounts, "discountuzs");
-        const payment = reduce(sale.payments, "payment");
-        const paymentuzs = reduce(sale.payments, "paymentuzs");
-        const totalprice = reduce(sale.products, "totalprice");
-        const totalpriceuzs = reduce(sale.products, "totalpriceuzs");
+        
+        
+        const debt = sale.debts.reduce((prev, debt) => prev + debt?.debt, 0)
+        const debtuzs = sale.debts.reduce((prev, debt) => prev + debt?.debtuzs, 0)
+        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'dollar' ? debt?.debt : 0), 0) 
 
         const debtComment =
           sale.debts.length > 0
@@ -836,17 +771,17 @@ module.exports.getDebtsReport = async (req, res) => {
             : "";
         const debtId =
           sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
-
+        console.log(sale.debts);
         return {
           _id: sale._id,
           id: sale.id,
           createdAt: sale.createdAt,
           client: sale.client && sale.client,
-          totalprice,
-          totalpriceuzs,
-          debt: Math.round((totalprice - payment - discount) * 1000) / 1000,
-          debtuzs:
-            Math.round((totalpriceuzs - paymentuzs - discountuzs) * 1) / 1,
+          debtId: sale.debts.length > 0 && sale.debts[0]._id,
+          debtType: sale.debts.length > 0 && sale.debts[0].debtType,
+          debt: debt,
+          debtuzs: debtuzs,
+          debtusd: debtusd,
           debtid: debtId,
           comment: debtComment,
           saleconnector: { ...sale },
@@ -856,6 +791,7 @@ module.exports.getDebtsReport = async (req, res) => {
 
     res.status(201).json({ data: debtsreport });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };

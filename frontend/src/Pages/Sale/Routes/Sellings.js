@@ -43,9 +43,9 @@ const Sellings = ({id}) => {
         {
             title: t('Jami'),
         },
-        {
-            title: t('Chegirma'),
-        },
+        // {
+        //     title: t('Chegirma'),
+        // },
         {
             title: t('Qarz'),
         },

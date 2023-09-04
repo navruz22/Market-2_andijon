@@ -8,6 +8,7 @@ const payment = new Schema(
     products: [{ type: Schema.Types.ObjectId, ref: 'Product', required: true }],
     payment: { type: Number, required: true },
     paymentuzs: { type: Number, required: true },
+    usdpayment: {type: Number},
     cash: { type: Number, required: true },
     cashuzs: { type: Number, required: true },
     card: { type: Number, required: true },
@@ -19,6 +20,10 @@ const payment = new Schema(
     saleconnector: {
       type: Schema.Types.ObjectId,
       ref: 'SaleConnector',
+    },
+    debt: {
+      type: Schema.Types.ObjectId,
+      ref: 'Debt',
     },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     market: { type: Schema.Types.ObjectId, ref: 'Market', required: true },

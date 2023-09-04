@@ -8,6 +8,7 @@ const debt = new Schema(
     products: [{ type: Schema.Types.ObjectId, ref: "Product", required: true }],
     debt: { type: Number },
     debtuzs: { type: Number },
+    debtType: { type: String },
     comment: { type: String, min: 5 },
     saleconnector: {
       type: Schema.Types.ObjectId,

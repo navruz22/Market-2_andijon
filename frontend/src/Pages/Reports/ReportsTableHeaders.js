@@ -188,6 +188,9 @@ export const ReportsTableHeaders = (header) => {
                 title: 'Naqt',
             },
             {
+                title: 'Dollar',
+            },
+            {
                 title: 'Plastik',
             },
             {

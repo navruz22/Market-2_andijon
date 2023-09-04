@@ -3,13 +3,13 @@ import { useSelector } from 'react-redux'
 import { uniqueId, map } from 'lodash'
 export const SaleCheck = forwardRef((props, ref) => {
     const { product } = props
-    const {products} = product
+    const { products } = product
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateDebt = (total, payment, discount = 0) => {
         return (total - payment - discount).toLocaleString('ru-Ru')
     }
-    console.log(products);
+    console.log(props);
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
             <div className='flex pb-2 justify-between border-b-[0.8px] border-black-700'>
@@ -79,36 +79,36 @@ export const SaleCheck = forwardRef((props, ref) => {
                             <td className='check-table-rtr'>Kodi</td>
                             <td className='check-table-rtr'>Maxsulot</td>
                             <td className='check-table-rtr'>Soni</td>
-                            {product?.products.some(el => el.fromFilial > 0) && <td style={{ backgroundColor: "grey" }} className='check-table-rtr'>Ombordan</td>}
+                            {product?.products.some(el => el.isPackcount) && <td className='check-table-rtr'>To'plam</td>}
                             <td className='check-table-rtr'>Narxi (dona)</td>
                             <td className='check-table-rtr'>Jami</td>
                         </tr>
                     </thead>
                     <tbody>
                         {map([...products].sort(
-                                (a, b) =>
-                                    a.product?.category?.code.localeCompare(
-                                        b.product?.category?.code
-                                    ) ||
-                                    a.product?.productdata?.code -
-                                        b.product?.productdata?.code
-                            ), (item, index) => {
+                            (a, b) =>
+                                a.product?.category?.code.localeCompare(
+                                    b.product?.category?.code
+                                ) ||
+                                a.product?.productdata?.code -
+                                b.product?.productdata?.code
+                        ), (item, index) => {
                             return (
                                 <tr key={uniqueId('saleCheck')}>
                                     <td className='p-1 border text-center text-[0.875rem] font-bold'>
                                         {index + 1}
                                     </td>
                                     <td className='check-table-body text-center'>
-                                    {item?.product?.category?.code} {item?.product?.productdata?.code}
-                                    </td> 
+                                        {item?.product?.category?.code} {item?.product?.productdata?.code}
+                                    </td>
                                     <td className='check-table-body text-start'>
                                         {item?.product?.productdata?.name}
                                     </td>
                                     <td className='check-table-body'>
                                         {item?.pieces}
                                     </td>
-                                    {product?.products.some(el => el.fromFilial > 0) && <td style={{ background: item?.fromFilial ? 'grey' : "white" }} className='check-table-body'>
-                                        {item?.fromFilial}
+                                    {product?.products.some(el => el.isPackcount) && <td className='check-table-body'>
+                                        {item?.isPackcount && item?.packcountpieces > 0 ? item?.packcountpieces : ""}
                                     </td>}
                                     <td className='check-table-body'>
                                         {currencyType === 'USD'
@@ -141,44 +141,34 @@ export const SaleCheck = forwardRef((props, ref) => {
                 </li>
                 <li className='check-ul-li-foot'>
                     {' '}
-                    Chegirma:{' '}
-                    <span className='font-bold'>
-                        {product?.hasOwnProperty('discount')
-                            ? currencyType === 'USD'
-                                ? product?.discount.discount
-                                : product?.discount.discountuzs
-                            : 0}{' '}
-                        {currencyType}
-                    </span>
-                </li>
-                <li className='check-ul-li-foot'>
-                    {' '}
                     To'langan:{' '}
                     <span className='font-bold'>
-                        {currencyType === 'USD'
-                            ? product?.payment?.payment
-                            : product?.payment?.paymentuzs}{' '}
-                        {currencyType}
+                        {product?.payment?.paymentuzs}{' '} UZS
                     </span>
                 </li>
                 <li className='check-ul-li-foot'>
                     {' '}
-                    Qarz:{' '}
+                    To'langan USD:{' '}
                     <span className='font-bold'>
-                        {currencyType === 'USD'
-                            ? calculateDebt(
-                                product?.payment?.totalprice,
-                                product?.payment?.payment,
-                                product?.discount?.discount
-                            )
-                            : calculateDebt(
-                                product?.payment?.totalpriceuzs,
-                                product?.payment?.paymentuzs,
-                                product?.discount?.discountuzs
-                            )}{' '}
-                        {currencyType}
+                        {product?.payment?.usdpayment} USD
                     </span>
                 </li>
+                {product?.debt?.debtType === 'dollar' ?
+                    <li className='check-ul-li-foot'>
+                        {' '}
+                        Qarz:{' '}
+                        <span className='font-bold'>
+                            {product?.debt?.debt.toLocaleString('ru-Ru')} USD
+                        </span>
+                    </li> :
+                    <li className='check-ul-li-foot'>
+                        {' '}
+                        Qarz:{' '}
+                        <span className='font-bold'>
+                            {product?.debt?.debtuzs.toLocaleString('ru-Ru')}{' '} UZS
+                        </span>
+                    </li>
+                }
             </ul>
         </div>
     )

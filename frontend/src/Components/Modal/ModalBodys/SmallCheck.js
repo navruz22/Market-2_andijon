@@ -198,11 +198,11 @@ export const SmallCheck = forwardRef((props, ref) => {
             <div className='text-black-900  check-ul-li-foot mt-4'>
                 Jami :{' '}
                 <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                    {calculateAllSum(selled).toLocaleString('ru-Ru')}{' '}
-                    {currencyType}
+                    {product?.payment?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}
+                    UZS
                 </span>
             </div>
-            <div className='text-black-900 border-none check-ul-li-foot'>
+            {/* <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Chegirma:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
@@ -212,33 +212,32 @@ export const SmallCheck = forwardRef((props, ref) => {
                     ).toLocaleString('ru-Ru')}{' '}
                     {currencyType}
                 </span>
-            </div>
+            </div> */}
             <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 To'langan:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {(
-                        calculateAllPayments(selledPayments) +
-                        calculateAllPayments(returnedPayments)
-                    ).toLocaleString('ru-Ru')}{' '}
-                    {currencyType}
+                    {product?.payment?.paymentuzs.toLocaleString('ru-Ru')}{' '}
+                    UZS
                 </span>
             </div>
-            <div className='text-black-900 border-none check-ul-li-foot'>
-                {' '}
-                Qarz:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
-                    {(
-                        calculateAllSum(selled) +
-                        calculateAllSum(returned) -
-                        (calculateAllPayments(selledPayments) +
-                            calculateAllPayments(returnedPayments)) -
-                        (calculateAllDiscounts(selledDiscounts) +
-                            calculateAllDiscounts(returnedDiscounts))
-                    ).toLocaleString('ru-Ru')}{' '}
-                    {currencyType}
-                </span>
-            </div>
+            {product?.debt?.debtType === 'dollar' ? 
+                <div className='text-black-900 border-none check-ul-li-foot'>
+                    {' '}
+                    Qarz:{' '}
+                    <span className='text-black-900 text-[12px] font-bold'>
+                        {product?.debt?.debt.toLocaleString('ru-Ru')} USD
+                    </span>
+                </div> 
+                    :
+                <div className='text-black-900 border-none check-ul-li-foot'>
+                    {' '}
+                    Qarz:{' '}
+                    <span className='text-black-900 text-[12px] font-bold'>
+                        {product?.debt?.debtuzs.toLocaleString('ru-Ru')} UZS
+                    </span>
+                </div>
+            }
         </div>
     )
 })

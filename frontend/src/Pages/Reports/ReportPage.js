@@ -67,6 +67,9 @@ const ReportPage = () => {
     const [paymentTransfer, setPaymentTransfer] = useState('')
     const [paymentTransferUzs, setPaymentTransferUzs] = useState('')
     const [paymentDiscount, setPaymentDiscount] = useState('')
+    const [paymentUsd, setPaymentUsd] = useState('')
+    const [debtType, setDebtType] = useState("sum")
+    const [debtId, setDebtId] = useState(null)
     const [paymentDiscountUzs, setPaymentDiscountUzs] = useState('')
     const [paymentDiscountPercent, setPaymentDiscountPercent] = useState('')
     const [hasDiscount, setHasDiscount] = useState(false)
@@ -137,16 +140,33 @@ const ReportPage = () => {
     const convertToUsd = (value) => Math.round(value * 1000) / 1000
     const convertToUzs = (value) => Math.round(value)
     const handleClickPayment = (debt) => {
-        const all = debt.debt
-        const allUzs = debt.debtuzs
-        setAllPayment(all)
-        setAllPaymentUzs(allUzs)
-        setPaymentCash(all)
-        setPaymentCashUzs(allUzs)
-        setPaid(all)
-        setPaidUzs(allUzs)
-        setSaleConnectorId(debt._id)
-        setPaymentModalVisible(true)
+        if (debt?.debtusd > 0) {
+            const all = debt.debt
+            const allUzs = debt.debtuzs
+            setAllPayment(all)
+            setAllPaymentUzs(allUzs) 
+            // setPaymentCash(all)
+            // setPaymentCashUzs(allUzs)
+            setPaymentUsd(all)
+            setDebtType('dollar')
+            setPaid(all)
+            setPaidUzs(allUzs)
+            setSaleConnectorId(debt._id)
+            setPaymentModalVisible(true)
+        } else {
+            const all = debt.debt
+            const allUzs = debt.debtuzs
+            setAllPayment(all)
+            setAllPaymentUzs(allUzs)
+            setPaymentCash(all)
+            setPaymentCashUzs(allUzs)
+            setDebtType('sum')
+            setPaid(all)
+            setPaidUzs(allUzs)
+            setSaleConnectorId(debt._id)
+            setPaymentModalVisible(true)
+        }
+        setDebtId(debt?.debtId)
     }
     const handleChangePaymentType = (type) => {
         const all = allPayment - Number(paymentDiscount)
@@ -208,25 +228,39 @@ const ReportPage = () => {
         }
     }
     const writePayment = (value, type) => {
-        const maxSum = allPayment - Number(paymentDiscount)
-        const maxSumUzs = allPaymentUzs - Number(paymentDiscountUzs)
+        const maxSum = Math.abs(allPayment) - Number(paymentDiscount)
+        const maxSumUzs = Math.abs(allPaymentUzs) - Number(paymentDiscountUzs)
         if (currencyType === 'USD') {
             if (type === 'cash') {
                 const all =
                     Number(value) +
-                    Number(paymentCard) +
-                    Number(paymentTransfer)
+                    Number(paymentUsd)
                 const allUzs =
-                    Number(paymentCashUzs) +
-                    Number(paymentCardUzs) +
-                    Number(paymentTransferUzs)
+                    Number(UsdToUzs(value, currency)) +
+                    Number(UsdToUzs(paymentUsd, currency))
                 if (all <= maxSum) {
                     setPaymentCash(value)
                     setPaymentCashUzs(UsdToUzs(value, currency))
                     setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(UsdToUzs(maxSum - all, currency))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
                     setPaid(all)
                     setPaidUzs(allUzs)
+                } else {
+                    warningMorePayment()
+                }
+            } else if (type === 'usd') {
+                const all =
+                    Number(value) +
+                    Number(paymentCash)
+                const allUzs =
+                    Number(UsdToUzs(value, currency)) +
+                    Number(paymentCashUzs)
+                if (all <= maxSum) {
+                    setPaymentDebt(convertToUsd(maxSum - all))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
+                    setPaid(all)
+                    setPaidUzs(allUzs)
+                    setPaymentUsd(value)
                 } else {
                     warningMorePayment()
                 }
@@ -237,13 +271,13 @@ const ReportPage = () => {
                     Number(paymentTransfer)
                 const allUzs =
                     Number(paymentCashUzs) +
-                    Number(paymentCardUzs) +
+                    Number(UsdToUzs(value, currency)) +
                     Number(paymentTransferUzs)
                 if (all <= maxSum) {
                     setPaymentCard(value)
                     setPaymentCardUzs(UsdToUzs(value, currency))
                     setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(UsdToUzs(maxSum - all, currency))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
                     setPaid(all)
                     setPaidUzs(allUzs)
                 } else {
@@ -255,12 +289,12 @@ const ReportPage = () => {
                 const allUzs =
                     Number(paymentCashUzs) +
                     Number(paymentCardUzs) +
-                    Number(paymentTransferUzs)
+                    Number(UsdToUzs(value, currency))
                 if (all <= maxSum) {
                     setPaymentTransfer(value)
                     setPaymentTransferUzs(UsdToUzs(value, currency))
                     setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(UsdToUzs(maxSum - all, currency))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
                     setPaid(all)
                     setPaidUzs(allUzs)
                 } else {
@@ -271,19 +305,32 @@ const ReportPage = () => {
             if (type === 'cash') {
                 const all =
                     Number(value) +
-                    Number(paymentCardUzs) +
-                    Number(paymentTransferUzs)
+                    Number(UsdToUzs(paymentUsd, currency))
                 const allUsd =
-                    Number(paymentCash) +
-                    Number(paymentCard) +
-                    Number(paymentTransfer)
+                    Number(UzsToUsd(value, currency)) +
+                    Number(paymentUsd)
                 if (all <= maxSumUzs) {
                     setPaymentCashUzs(value)
                     setPaymentCash(UzsToUsd(value, currency))
-                    setPaymentDebt(UzsToUsd(maxSumUzs - all, currency))
+                    setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
                     setPaidUzs(all)
+                } else {
+                    warningMorePayment()
+                }
+            } else if (type === 'usd') {
+                const all =
+                    Number(paymentCashUzs) +
+                    Number(UsdToUzs(value, currency))
+                const allUsd =
+                    Number(value) + paymentCash
+                if (all <= maxSumUzs) {
+                    setPaymentDebt(convertToUsd(maxSum - allUsd))
+                    setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
+                    setPaid(allUsd)
+                    setPaidUzs(all)
+                    setPaymentUsd(value)
                 } else {
                     warningMorePayment()
                 }
@@ -292,10 +339,14 @@ const ReportPage = () => {
                     Number(value) +
                     Number(paymentCashUzs) +
                     Number(paymentTransferUzs)
+                const allUsd =
+                    Number(paymentCash) +
+                    Number(UzsToUsd(value, currency)) +
+                    Number(paymentTransfer)
                 if (all <= maxSumUzs) {
                     setPaymentCard(UzsToUsd(value, currency))
                     setPaymentCardUzs(value)
-                    setPaymentDebt(UzsToUsd(maxSumUzs - all, currency))
+                    setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(UzsToUsd(all, currency))
                     setPaidUzs(all)
@@ -310,11 +361,11 @@ const ReportPage = () => {
                 const allUsd =
                     Number(paymentCash) +
                     Number(paymentCard) +
-                    Number(paymentTransfer)
+                    Number(UzsToUsd(value, currency))
                 if (all <= maxSumUzs) {
                     setPaymentTransfer(UzsToUsd(value, currency))
                     setPaymentTransferUzs(value)
-                    setPaymentDebt(UzsToUsd(maxSumUzs - all, currency))
+                    setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
                     setPaidUzs(all)
@@ -473,7 +524,10 @@ const ReportPage = () => {
                 transferuzs: Number(paymentTransferUzs),
                 discount: Number(paymentDiscount),
                 discountuzs: Number(paymentDiscountUzs),
+                debtType: debtType,
+                usdpayment: Number(paymentUsd),
             },
+            debtId: debtId,
             user: user._id,
             saleconnectorid: saleConnectorId,
         }
@@ -708,9 +762,9 @@ const ReportPage = () => {
     useEffect(() => {
         if (id === 'debts') {
             setTotalDebt({
-                usd: roundUsd(datas.reduce((prev, { debt }) => prev + debt, 0)),
+                usd: roundUsd([...datas].reduce((prev, { debtusd }) => prev + debtusd, 0)),
                 uzs: roundUzs(
-                    datas.reduce((prev, { debtuzs }) => prev + debtuzs, 0)
+                    [...datas].reduce((prev, { debtuzs, debtusd }) => prev + (!debtusd && debtuzs || 0), 0)
                 ),
             })
         }
@@ -812,10 +866,8 @@ const ReportPage = () => {
                             className={`col-span-4 ${currentData.length === 0 && 'border-t-2'
                                 } td py-[0.625rem] font-bold`}
                         >
-                            {currencyType === 'USD'
-                                ? totalDebt.usd
-                                : totalDebt.uzs}{' '}
-                            {currencyType}
+                            {roundUzs(totalDebt.uzs)} UZS <br/>
+                            {roundUsd(totalDebt.usd)} USD
                         </li>
                     </ul>
                 )}
@@ -826,6 +878,12 @@ const ReportPage = () => {
                             <div>Naqt:</div>
                             <div>
                                 {currencyType === 'USD' ? roundUsd(totalpayment.payment.cash).toLocaleString('ru-RU') : roundUzs(totalpayment.payment.cashuzs).toLocaleString('ru-RU')}{' '}{currencyType}
+                            </div>
+                        </div>
+                        <div className='font-semibold w-[200px] flex justify-between'>
+                            <div>Dollar:</div>
+                            <div>
+                                {roundUsd(totalpayment.payment?.usdpayment)} USD
                             </div>
                         </div>
                         <div className='font-semibold w-[200px] flex justify-between'>
@@ -855,6 +913,9 @@ const ReportPage = () => {
                                 : roundUzs(totalpayment.back.cashuzs).toLocaleString('ru-RU')}{' '}
                             {currencyType}
                         </span></div>
+                        <div className='font-semibold w-[200px] flex justify-between w-[200px] flex justify-between'><div>Dollar:</div> <span>
+                            {totalpayment?.back?.usdpayment} USD
+                        </span></div>
                         <div className='font-semibold w-[200px] flex justify-between w-[200px] flex justify-between'><div>Plastik:</div>
                             <span>
                                 {currencyType === 'USD' ?
@@ -880,7 +941,12 @@ const ReportPage = () => {
                         <div className='text-[18px] font-bold mb-2'>Kassadagi qoldiq</div>
                         <div className='font-semibold w-[200px] flex justify-between'>
                             <div>Naqt:</div>
-                            <span>{currencyType === 'USD' ? roundUsd(totalpayment.result.cash).toLocaleString('ru-RU') : roundUzs(totalpayment.result.cashuzs).toLocaleString('ru-RU')}{' '}{currencyType}</span></div>
+                            <span>{currencyType === 'USD' ? roundUsd(totalpayment.result.cash).toLocaleString('ru-RU') : roundUzs(totalpayment.result.cashuzs).toLocaleString('ru-RU')}{' '}{currencyType}</span>
+                        </div>
+                        <div className='font-semibold w-[200px] flex justify-between'>
+                            <div>Dollar:</div>
+                            <span>{roundUsd(totalpayment?.result?.usdpayment)} USD</span>
+                        </div>
                         <div className='font-semibold w-[200px] flex justify-between'>
                             <div>Plastik:</div>
                             <span>{currencyType === 'USD' ? roundUsd(totalpayment.result.card).toLocaleString('ru-RU') : roundUzs(totalpayment.result.carduzs).toLocaleString('ru-RU')}{' '}{currencyType}</span></div>
@@ -905,12 +971,12 @@ const ReportPage = () => {
                     changePaymentType={handleChangePaymentType}
                     onChange={handleChangePaymentInput}
                     client={userValue}
-                    allPayment={
-                        currencyType === 'USD' ? allPayment : allPaymentUzs
-                    }
+                    allPayment={allPayment}
+                    allPaymentUzs={allPaymentUzs}
                     card={currencyType === 'USD' ? paymentCard : paymentCardUzs}
                     cash={currencyType === 'USD' ? paymentCash : paymentCashUzs}
-                    debt={currencyType === 'USD' ? paymentDebt : paymentDebtUzs}
+                    debt={paymentDebt}
+                    debtuzs={paymentDebtUzs}
                     discount={
                         currencyType === 'USD'
                             ? discountSelectOption.value === 'USD'
@@ -934,6 +1000,9 @@ const ReportPage = () => {
                     }
                     paid={currencyType === 'USD' ? paid : paidUzs}
                     handleClickPay={handleClickPay}
+                    paymentUsd={paymentUsd}
+                    setPaymentUsd={setPaymentUsd}
+                    debtType={debtType}
                 />
             </div>
             <UniversalModal

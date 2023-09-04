@@ -31,6 +31,8 @@ function CreateProductForm({
     handleChangeTradePrice,
     minimumCount,
     handleChangeMinimumCount,
+    packcount,
+    handleChangePackount,
     sellingPriceOfProcient,
     handleChangeSellingPriceOfProcient,
     handleChangeTradePriceProcient,
@@ -103,6 +105,13 @@ function CreateProductForm({
                             placeholder={`${t('misol')}: 100`}
                             type={'text'}
                         />
+                        <FieldContainer
+                            value={packcount}
+                            onChange={handleChangePackount}
+                            label={'Optom qiymat'}
+                            placeholder={`${t('misol')}: 300`}
+                            type={'text'}
+                        />
                     </>
                 )}
 
@@ -127,17 +136,18 @@ function CreateProductForm({
                         />
 
                         {/* -- sotish foizi -- */}
-                        <FieldContainer
-                            value={sellingPriceOfProcient}
-                            onChange={handleChangeSellingPriceOfProcient}
-                            label={t('Sotish foizi')}
-                            placeholder={`${t('misol')}: 30 %`}
-                            type={'text'}
-                        />
+
                     </>
                 )}
             </div>
             <div className='flex flex gap-[2.5rem] items-end'>
+                <FieldContainer
+                    value={sellingPriceOfProcient}
+                    onChange={handleChangeSellingPriceOfProcient}
+                    label={t('Sotish foizi')}
+                    placeholder={`${t('misol')}: 30 %`}
+                    type={'text'}
+                />
                 <FieldContainer
                     value={tradePriceProcient}
                     onChange={handleChangeTradePriceProcient}
@@ -159,6 +169,7 @@ function CreateProductForm({
                     placeholder={`${t('misol')}: 300`}
                     type={'text'}
                 />
+
                 <div className={'flex gap-[1.25rem] min-w-[20rem]'}>
                     <Button
                         onClick={stickyForm ? handleEdit : addNewProduct}

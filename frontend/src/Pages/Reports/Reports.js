@@ -22,11 +22,11 @@ const Reports = () => {
     const { t } = useTranslation(['common'])
 
     const card = [
-        {
-            name: 'Savdo',
-            type: 'sale',
-            percentage: 99,
-        },
+        // {
+        //     name: 'Savdo',
+        //     type: 'sale',
+        //     percentage: 99,
+        // },
         {
             name: 'Sof foyda',
             type: 'income',
@@ -43,10 +43,10 @@ const Reports = () => {
             name: 'Qaytarilgan',
             type: 'backproducts',
         },
-        {
-            name: 'Chegirmalar',
-            type: 'discounts',
-        },
+        // {
+        //     name: 'Chegirmalar',
+        //     type: 'discounts',
+        // },
         {
             name: 'Qarzlar',
             type: 'debts',

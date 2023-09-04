@@ -23,6 +23,8 @@ const saleproduct = new Schema(
       ref: "DailySaleConnector",
     },
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    isPackcount: {type: Boolean, default: false},
+    packcountpieces: {type: Number},
     isArchive: { type: Boolean, default: false },
   },
   {
@@ -40,6 +42,8 @@ function validateSaleProduct(saleproduct) {
     product: Joi.string().required(),
     market: Joi.string(),
     user: Joi.string(),
+    isPackcount: Joi.boolean().optional(),
+    packcountpieces: Joi.number().optional(),
   });
   return schema.validate(saleproduct);
 }

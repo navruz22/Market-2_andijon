@@ -252,6 +252,7 @@ module.exports.register = async (req, res) => {
       tradeprice,
       tradepriceuzs,
       minimumcount,
+      packcount
     } = req.body.product;
     const marke = await Market.findById(market);
 
@@ -317,6 +318,7 @@ module.exports.register = async (req, res) => {
       unit,
       minimumcount,
       total: Math.round(total * 100) / 100,
+      packcount
     });
 
     const newPrice = new ProductPrice({
@@ -545,6 +547,7 @@ module.exports.update = async (req, res) => {
       productdata,
       barcode,
       minimumcount,
+      packcount
     } = req.body.product;
 
     const { currentPage, countPage, search } = req.body;
@@ -624,6 +627,7 @@ module.exports.update = async (req, res) => {
     });
     product.unit = unit;
     product.total = total;
+    product.packcount = packcount;
 
     const productData = await ProductData.findById(productdata);
 
@@ -989,7 +993,7 @@ module.exports.getProducts = async (req, res) => {
       market: id,
     })
       .sort({ code: 1 })
-      .select("total market category minimumcount connections")
+      .select("total market category minimumcount connections packcount")
       .populate(
         "price",
         "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"

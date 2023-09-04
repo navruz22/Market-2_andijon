@@ -119,6 +119,12 @@ export const warningCountSellPayment = () =>
 export const warningReturnProductsEmpty = () =>
     toast.warn(i18n.t('Qaytariladigan maxsulotlar mavjud emas !'))
 
+export const warningEmptyPackCount = () =>
+    toast.warn(i18n.t('Optom qiymati kiritilmagan !'))
+
+export const warningLessPackCount = () =>
+    toast.warn(i18n.t('Optom qiymati sonidan past bo`lmasligi kerak !'))
+
 // Product Exchanges toast
 
 export const warningSellingExchanges = () =>

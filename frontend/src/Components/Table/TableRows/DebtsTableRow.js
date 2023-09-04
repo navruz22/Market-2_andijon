@@ -36,21 +36,10 @@ export const DebtsTableRow = ({data, currency, Pay, Print, Edit}) => {
                         )}
                     </td>
                     <td className='text-right td font-medium'>
-                        {(currency === 'USD'
-                            ? debt.totalprice
-                            : debt.totalpriceuzs
-                        ).toLocaleString('ru-RU')}{' '}
-                        <span className='text-warning-500'>{currency}</span>
+                        {debt?.debtusd > 0 ? debt?.debtusd : 0} USD
                     </td>
                     <td className='text-right td py-[0.625rem] font-medium'>
-                        {currency === 'UZS'
-                            ? (Math.round(debt.debtuzs * 1) / 1).toLocaleString(
-                                  'ru-RU'
-                              )
-                            : (
-                                  Math.round(debt.debt * 1000) / 1000
-                              ).toLocaleString('ru-RU')}{' '}
-                        <span className='text-error-500'>{currency}</span>
+                        {debt?.debtusd > 0 ? 0 : debt?.debtuzs} UZS
                     </td>
                     <td className='td border-r-0 py-[6px]'>
                         <div className='flex justify-center items-center gap-[0.625rem]'>

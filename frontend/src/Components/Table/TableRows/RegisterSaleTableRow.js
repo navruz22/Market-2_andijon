@@ -6,6 +6,8 @@ import { IoAdd, IoEye, IoEyeOff, IoRemove } from 'react-icons/io5'
 import { useSelector } from 'react-redux'
 import SelectInput from '../../SelectInput/SelectInput'
 import Select from 'react-select'
+import Checkbox from '../../Checkbox/Checkbox'
+import { useTranslation } from 'react-i18next'
 
 export const RegisterSaleTableRow = (
     {
@@ -18,7 +20,7 @@ export const RegisterSaleTableRow = (
         lowUnitpriceProducts,
         wholeSale,
     }) => {
-
+    const {t} = useTranslation(['common'])
     const { filials } = useSelector((state) => state.registerSelling)
 
     const { market } = useSelector((state) => state.login)
@@ -39,58 +41,33 @@ export const RegisterSaleTableRow = (
                     key={'salerow-' + index + 1}>
                     <td className='text-left td'>{index + 1}</td>
                     <td className='td w-[100px]'>
-                        <select onChange={(e) => changeHandler(
-                            product.product._id,
-                            {
-                                filial: e.target.value,
-                                productcode: product.product.code,
-                                categorycode: product.categorycode
-                            },
-                            'select'
-                        )} value={product.filial} className='w-full outline-none border-[1px] rounded h-[30px]'>
-                            {filials.length > 0 && filials.map((filial, ind) =>
-                                <option key={ind} value={filial.value}>{filial.label}</option>
+                        <Checkbox
+                            id={`packcount-selling${index}`}
+                            onChange={(e) => changeHandler(
+                                index,
+                                e.target.value,
+                                'packcount'
                             )}
-                        </select>
+                            value={product?.isPackcount ? true : false}
+                            label={t('Optom')}
+                        />
                     </td>
-                    <td className='text-right td font-bold'><span style={{ color: product?.filialProductsTotal > 0 ? "green" : 'red' }} >{product?.filialProductsTotal}</span></td>
+                    <td className='text-right td font-bold'>{product?.isPackcount ? (product?.totalpackcount % 1 === 0 ? product?.totalpackcount.toFixed(0) : product?.totalpackcount.toFixed(2)) : product?.total}</td>
                     <td className='text-left td'>{product.product.name}</td>
                     <td className='text-right td'>
                         <span className={'flex gap-[0.6rem] items-center'}>
-                            <button
-                                className={'rounded-[4px] duration-100 bg-error-500 hover:bg-error-600 p-[0.2rem] text-base text-white-900 active:scale-95'}
-                                onClick={() => decrement(product.product._id)}><IoRemove
-                                    size={'0.875rem'} /></button>
                             <TableInput
-                                value={product.pieces}
+                                value={product?.isPackcount ? product?.packcountpieces : product.pieces}
                                 onChange={(e) =>
                                     changeHandler(
-                                        product.product._id,
+                                        index,
                                         e.target.value,
                                         'pieces'
                                     )
                                 }
                                 type={'number'}
                             />
-                            <button
-                                className={'rounded-[4px] duration-100 bg-success-500 hover:bg-success-600 p-[0.2rem] text-base text-white-900 active:scale-95'}
-                                onClick={() => increment(product.product._id)}><IoAdd
-                                    size={'0.875rem'} /></button>
                         </span>
-                    </td>
-                    <td className='text-right td'>
-                        <TableInput
-                            value={product.fromFilial}
-                            onChange={(e) =>
-                                changeHandler(
-                                    product.product._id,
-                                    e.target.value,
-                                    'fromFilial'
-                                )
-                            }
-                            type={'number'}
-                            disabled={product.filial === market._id && true}
-                        />
                     </td>
                     <td className='text-right td'>
                         <TableInput
@@ -101,7 +78,7 @@ export const RegisterSaleTableRow = (
                             }
                             onChange={(e) =>
                                 changeHandler(
-                                    product.product._id,
+                                    index,
                                     e.target.value,
                                     'unitprice'
                                 )

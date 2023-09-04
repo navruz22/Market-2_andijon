@@ -25,6 +25,28 @@ export const SalesListTableRow = ({
         }, 0)
     }
 
+    const calculateDebt = (data) => {
+        return data
+            ? data.reduce((acc, pr) => {
+                return (
+                    acc +
+                    (pr?.debt?.debtType === 'sum' ? pr?.debtuzs : 0)
+                )
+            }, 0)
+            : 0
+    }
+
+    const calculateDebtUsd = (data) => {
+        return data
+            ? data.reduce((acc, pr) => {
+                return (
+                    acc +
+                    (pr?.debt?.debtType === 'dollar' ? pr?.debt?.debt : 0)
+                )
+            }, 0)
+            : 0
+    }
+
     const navigate = useNavigate()
     const linkToSale = (saleconnector, returnProducts) => {
         navigate(`${sellers ? '/' : '/sotuv/sotish'}`, {
@@ -227,33 +249,16 @@ export const SalesListTableRow = ({
                         ).toLocaleString('ru-Ru')}{' '}
                         {currency}
                     </td>
-                    <td className='text-warning-500 text-right td'>
+                    {/* <td className='text-warning-500 text-right td'>
                         {reduceEl(
                             saleconnector.discounts,
                             'discount',
                             'discountuzs'
                         ).toLocaleString('ru-Ru')}{' '}
                         {currency}
-                    </td>
+                    </td> */}
                     <td className='text-error-500 text-right td'>
-                        {(
-                            reduceEl(
-                                saleconnector.products,
-                                'totalprice',
-                                'totalpriceuzs'
-                            ) -
-                            reduceEl(
-                                saleconnector.payments,
-                                'payment',
-                                'paymentuzs'
-                            ) -
-                            reduceEl(
-                                saleconnector.discounts,
-                                'discount',
-                                'discountuzs'
-                            )
-                        ).toLocaleString('ru-Ru')}{' '}
-                        {currency}
+                        {calculateDebtUsd(saleconnector.payments) > 0 ? calculateDebtUsd(saleconnector.payments) + ' ' + 'USD' : calculateDebt(saleconnector.payments) + ' ' + 'USD'}
                     </td>
                     <td className='text-left td  '>
                         {saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (
@@ -285,11 +290,11 @@ export const SalesListTableRow = ({
                                 onClick={() => Print(saleconnector)}
                             />
                             {!location.pathname.includes('/kassa/sale') && <>
-                                <TableBtn
+                                {/* <TableBtn
                                     type={'add'}
                                     bgcolor={'bg-success-500'}
                                     onClick={() => linkToSale(saleconnector)}
-                                />
+                                /> */}
                                 <TableBtn
                                     type={'return'}
                                     bgcolor={'bg-error-500'}
