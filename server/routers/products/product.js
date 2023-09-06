@@ -112,23 +112,23 @@ module.exports.registerAll = async (req, res) => {
         category: categor._id,
         market,
         unit,
-        total: Math.round(total * 1000) / 1000,
+        total: Math.round(total * 10) / 10,
         minimumcount: minimumcount ? minimumcount : 0,
       });
 
       // Create Price
       const newPrice = new ProductPrice({
         incomingprice: incomingprice
-          ? Math.round(incomingprice * 1000) / 1000
+          ? Math.round(incomingprice * 10) / 10
           : 0,
-        sellingprice: sellingprice ? Math.round(sellingprice * 1000) / 1000 : 0,
+        sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
         incomingpriceuzs: incomingpriceuzs
           ? Math.round(incomingpriceuzs * 1) / 1
           : 0,
         sellingpriceuzs: sellingpriceuzs
           ? Math.round(sellingpriceuzs * 1) / 1
           : 0,
-        tradeprice: tradeprice ? Math.round(tradeprice * 1000) / 1000 : 0,
+        tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
         tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
         market,
       });
@@ -325,16 +325,16 @@ module.exports.register = async (req, res) => {
 
     const newPrice = new ProductPrice({
       incomingprice: incomingprice
-        ? Math.round(incomingprice * 1000) / 1000
+        ? Math.round(incomingprice * 10) / 10
         : 0,
-      sellingprice: sellingprice ? Math.round(sellingprice * 1000) / 1000 : 0,
+      sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
       incomingpriceuzs: incomingpriceuzs
         ? Math.round(incomingpriceuzs * 1) / 1
         : 0,
       sellingpriceuzs: sellingpriceuzs
         ? Math.round(sellingpriceuzs * 1) / 1
         : 0,
-      tradeprice: tradeprice ? Math.round(tradeprice * 1000) / 1000 : 0,
+      tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
       tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
       market,
     });
@@ -438,16 +438,16 @@ module.exports.register = async (req, res) => {
 
         const newFilialPrice = new ProductPrice({
           incomingprice: incomingprice
-            ? Math.round(incomingprice * 1000) / 1000
+            ? Math.round(incomingprice * 10) / 10
             : 0,
-          sellingprice: sellingprice ? Math.round(sellingprice * 1000) / 1000 : 0,
+          sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
           incomingpriceuzs: incomingpriceuzs
             ? Math.round(incomingpriceuzs * 1) / 1
             : 0,
           sellingpriceuzs: sellingpriceuzs
             ? Math.round(sellingpriceuzs * 1) / 1
             : 0,
-          tradeprice: tradeprice ? Math.round(tradeprice * 1000) / 1000 : 0,
+          tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
           tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
           market: filialId,
         });
@@ -611,8 +611,8 @@ module.exports.update = async (req, res) => {
       .sort({ _id: -1 });
 
     await ProductPrice.findByIdAndUpdate(priceid, {
-      incomingprice: Math.round(incomingprice * 1000) / 1000,
-      sellingprice: Math.round(sellingprice * 1000) / 1000,
+      incomingprice: Math.round(incomingprice * 10) / 10,
+      sellingprice: Math.round(sellingprice * 10) / 10,
       incomingpriceuzs:
         Math.round(
           (incomingpriceuzs
@@ -625,7 +625,7 @@ module.exports.update = async (req, res) => {
             ? sellingpriceuzs
             : exchangerate.exchangerate * sellingprice) * 1
         ) / 1,
-      tradeprice: Math.round(tradeprice * 1000) / 1000,
+      tradeprice: Math.round(tradeprice * 10) / 10,
       tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
     });
     product.unit = unit;
@@ -690,8 +690,8 @@ module.exports.update = async (req, res) => {
           });
 
         await ProductPrice.findByIdAndUpdate(filialproduct.price, {
-          incomingprice: Math.round(incomingprice * 1000) / 1000,
-          sellingprice: Math.round(sellingprice * 1000) / 1000,
+          incomingprice: Math.round(incomingprice * 10) / 10,
+          sellingprice: Math.round(sellingprice * 10) / 10,
           incomingpriceuzs:
             Math.round(
               (incomingpriceuzs
@@ -704,7 +704,7 @@ module.exports.update = async (req, res) => {
                 ? sellingpriceuzs
                 : exchangerate.exchangerate * sellingprice) * 1
             ) / 1,
-          tradeprice: Math.round(tradeprice * 1000) / 1000,
+          tradeprice: Math.round(tradeprice * 10) / 10,
           tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
         });
 

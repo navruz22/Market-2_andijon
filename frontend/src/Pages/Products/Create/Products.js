@@ -164,7 +164,7 @@ function Products() {
         },
         { title: '' },
     ]
-
+    console.log(priceOfProductUsd);
     const importHeaders = [
         { name: 'Shtrix kodi', value: 'barcode' },
         { name: 'Kategoriyasi', value: 'category' },

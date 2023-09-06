@@ -111,16 +111,16 @@ export const SaleCheck = forwardRef((props, ref) => {
                                         {item?.isPackcount && item?.packcountpieces > 0 ? item?.packcountpieces : ""}
                                     </td>}
                                     <td className='check-table-body'>
-                                        {currencyType === 'USD'
+                                        {item?.product?.isUsd 
                                             ? item?.unitprice
                                             : item?.unitpriceuzs}{' '}
-                                        {currencyType}
+                                        {item?.product?.isUsd ? "USD" : "UZS"}
                                     </td>
                                     <td className='check-table-body'>
-                                        {currencyType === 'USD'
+                                        {item?.product?.isUsd
                                             ? item?.totalprice
                                             : item?.totalpriceuzs}{' '}
-                                        {currencyType}
+                                        {item?.product?.isUsd ? "USD" : "UZS"}
                                     </td>
                                 </tr>
                             )

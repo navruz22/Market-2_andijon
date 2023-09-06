@@ -22,7 +22,7 @@ const {
   WarhouseProduct,
 } = require("../../models/WarhouseProduct/WarhouseProduct");
 
-const convertToUsd = (value) => Math.round(value * 1000) / 1000;
+const convertToUsd = (value) => Math.round(value * 10) / 10;
 const convertToUzs = (value) => Math.round(value);
 
 const transferWarhouseProducts = async (products) => {
@@ -317,7 +317,7 @@ module.exports.register = async (req, res) => {
           "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial isPackcount packcountpieces",
         populate: {
           path: "product",
-          select: "productdata total",
+          select: "productdata total isUsd",
           populate: {
             path: "productdata",
             select: "code name",
@@ -376,8 +376,8 @@ module.exports.addproducts = async (req, res) => {
       Math.round(
         saleproducts.reduce((summ, saleproduct) => {
           return summ + saleproduct.totalprice;
-        }, 0) * 10000
-      ) / 10000;
+        }, 0) * 10
+      ) / 10;
 
     const totalpriceuzs =
       Math.round(
@@ -686,7 +686,7 @@ module.exports.getsaleconnectors = async (req, res) => {
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "product",
-          select: "productdata packcount",
+          select: "productdata packcount isUsd",
           populate: { 
             path: "productdata", 
             select: "name code",
