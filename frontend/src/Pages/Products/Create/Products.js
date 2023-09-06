@@ -255,6 +255,7 @@ function Products() {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
             setSellingPriceOfProduct(val)
+            setSellingPriceOfProductUsd(UzsToUsd(val, currency))
         }
     }
 
@@ -262,6 +263,7 @@ function Products() {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
             setSellingPriceOfProductUsd(val)
+            setSellingPriceOfProduct(UsdToUzs(val, currency))
         }
     }
     const handleChangeSellingPriceOfProcient = (e) => {

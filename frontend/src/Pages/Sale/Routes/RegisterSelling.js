@@ -1518,14 +1518,14 @@ const RegisterSelling = () => {
                             value: product._id,
                             label: `(${product.total}) ${product.category.code
                                 }${product.productdata.code} - ${product.productdata.name
-                                } -------- (${currencyType === 'USD'
+                                } -------- (${product?.isUsd
                                     ? (product?.price?.sellingprice).toLocaleString(
                                         'ru-RU'
                                     )
                                     : (product?.price?.sellingpriceuzs).toLocaleString(
                                         'ru-RU'
                                     )
-                                } ${currencyType})`,
+                                } ${product?.isUsd ? "USD" : 'UZS'})`,
                         })),
                     ]
                     setFilteredProducts(productsForSearch)

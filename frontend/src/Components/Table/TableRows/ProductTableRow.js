@@ -1,6 +1,7 @@
 import React from 'react'
 import TableBtn from '../../Buttons/TableBtn'
 import { map } from 'lodash'
+import { roundUsd } from '../../../App/globalFunctions'
 export const ProductTableRow = ({
     currentPage,
     countPage,
@@ -60,7 +61,7 @@ export const ProductTableRow = ({
                         UZS
                     </td>
                     <td style={{color: product?.isUsd && "rgb(34 197 94)"}} className={`td text-right`}>
-                        {product.price && product?.price?.sellingprice && product?.price?.sellingprice.toLocaleString(
+                        {product.price && product?.price?.sellingprice && roundUsd(product?.price?.sellingprice).toLocaleString(
                                     'ru-RU'
                                 )} {' '}
                         USD

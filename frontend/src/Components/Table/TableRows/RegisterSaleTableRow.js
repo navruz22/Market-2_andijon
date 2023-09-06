@@ -40,7 +40,8 @@ export const RegisterSaleTableRow = (
                 <tr className={`tr ${filter(lowUnitpriceProducts, id => id === product.product._id).length > 0 ? 'bg-warning-200' : ''}`}
                     key={'salerow-' + index + 1}>
                     <td className='text-left td'>{index + 1}</td>
-                    <td className='td w-[100px]'>
+                    <td className='td w-[100px] text-center'>
+                        <div className='text-center'>
                         <Checkbox
                             id={`packcount-selling${index}`}
                             onChange={(e) => changeHandler(
@@ -49,8 +50,8 @@ export const RegisterSaleTableRow = (
                                 'packcount'
                             )}
                             value={product?.isPackcount ? true : false}
-                            label={t('Optom')}
                         />
+                        </div>
                     </td>
                     <td className='text-right td font-bold'>{product?.isPackcount ? (product?.totalpackcount % 1 === 0 ? product?.totalpackcount.toFixed(0) : product?.totalpackcount.toFixed(2)) : product?.total}</td>
                     <td className='text-left td'>{product.product.name}</td>
@@ -72,7 +73,7 @@ export const RegisterSaleTableRow = (
                     <td className='text-right td'>
                         <TableInput
                             value={
-                                currency !== 'UZS'
+                                product?.isUsd
                                     ? wholeSale ? product.tradeprice || product.unitprice : product.unitprice
                                     : wholeSale ? product.tradepriceuzs || product.unitpriceuzs : product.unitpriceuzs
                             }
@@ -86,13 +87,13 @@ export const RegisterSaleTableRow = (
                             type={'number'}
                         />
                     </td>
-                    <td className='text-right td'>
-                        {currency !== 'UZS'
+                    <td style={{color: product?.isUsd && "rgb(34 197 94)"}} className='text-right td'>
+                        {product?.isUsd
                             ? product.totalprice.toLocaleString('ru-Ru')
                             : product.totalpriceuzs.toLocaleString(
                                 'ru-Ru'
                             )}{' '}
-                        {currency}
+                        {product?.isUsd ? "USD" : "UZS"}
                     </td>
                     <td className='td'>
                         <div className='flex items-center justify-center'>

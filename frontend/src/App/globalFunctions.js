@@ -70,7 +70,7 @@ export const exportExcel = (data, fileName, headers) => {
 // round UZS||USD
 export const roundUzs = (val) => Math.round(val * 1) / 1
 
-export const roundUsd = (val) => Math.round(val * 1000) / 1000
+export const roundUsd = (val) => Math.round(val * 10) / 10
 
 // reduce
 export const reduceSumm = (arr, key) =>
