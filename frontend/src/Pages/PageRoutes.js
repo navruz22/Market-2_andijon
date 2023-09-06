@@ -13,10 +13,13 @@ const PageRoutes = () => {
     const {currency, currencyType, currencyError, getCurrencyLoading} =
         useSelector((state) => state.currency)
     const {user} = useSelector((state) => state.login)
-    const changeCurrency = () => {
-        const prevCurrencyType = currencyType === 'USD' ? 'UZS' : 'USD'
-        dispatch(changeCurrencyType({currency: prevCurrencyType}))
-    }
+    // const changeCurrency = () => {
+    //     const prevCurrencyType = currencyType === 'USD' ? 'UZS' : 'USD'
+    //     dispatch(changeCurrencyType({currency: prevCurrencyType}))
+    // }
+    useEffect(() => {
+        dispatch(changeCurrencyType({currency: 'UZS'}))
+    }, [dispatch])
     useEffect(() => {
         if (user.type !== 'Admin') {
             dispatch(getCurrency())
@@ -37,7 +40,7 @@ const PageRoutes = () => {
 
     return (
         <section className={'flex bg-background relative overflow-x-hidden'}>
-            {user.type !== 'Admin' && <Currency currency={currencyType} onClick={changeCurrency} />}
+            {/* {user.type !== 'Admin' && <Currency currency={currencyType} onClick={changeCurrency} />} */}
             <Navbar />
             <div className={'grow h-screen overflow-y-auto'}>
                 <Suspense fallback={<Loader />}>

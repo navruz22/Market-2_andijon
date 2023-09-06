@@ -191,10 +191,18 @@ const RegisterSelling = () => {
                     (acc, cur) => convertToUzs(acc + cur.totalpriceuzs),
                     0
                 )
+                const allUzs2 = tableProducts.reduce(
+                    (acc, cur) => convertToUzs(acc + (!cur.isUsd && cur.totalpriceuzs || 0)),
+                    0
+                )
+                const allUsd = tableProducts.reduce(
+                    (prev, el) => prev + (el.isUsd && el.totalprice || 0),
+                0 )
                 setAllPayment(all)
                 setAllPaymentUzs(allUzs)
+                setPaymentUsd(allUsd)
                 setPaymentCash(all)
-                setPaymentCashUzs(allUzs)
+                setPaymentCashUzs(allUzs2)
                 setPaid(all)
                 setPaidUzs(allUzs)
                 setPaymentModalVisible(true)
@@ -986,6 +994,7 @@ const RegisterSelling = () => {
             tradeprice: product.price.tradeprice || 0,
             tradepriceuzs: product.price.tradepriceuzs || 0,
             pieces: 1,
+            isUsd: product?.isUsd || false,
             incomingprice: product.price.incomingprice,
             incomingpriceuzs: product.price.incomingpriceuzs,
             unitprice: product.price.sellingprice,
@@ -1010,7 +1019,7 @@ const RegisterSelling = () => {
         }
 
     }
-
+    console.log(tableProducts);
     const handleChangePackmanValue = (option) => {
         setPackmanValue(option)
         const pack = filter(packmans, (pack) => pack._id === option.value)[0]

@@ -34,7 +34,7 @@ const getProductsByCount = async ({ socket, market }) => {
         { timestamp: 1 }
       )
         .sort({ timestamp: -1 })
-        .select("market total productdata price category unit packcount")
+        .select("market total productdata price category unit packcount isUsd")
         .populate("productdata", "name code barcode")
         .populate(
           "price",

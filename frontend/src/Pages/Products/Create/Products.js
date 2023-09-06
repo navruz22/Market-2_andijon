@@ -107,6 +107,8 @@ function Products() {
     const [tradePriceUzs, setTradePriceUzs] = useState('')
     const [tradePriceProcient, setTradePriceProcient] = useState('');
 
+    const [isUsd, setIsUsd] = useState(false)
+
     const [tableRowId, setTableRowId] = useState('')
 
     // modal toggle
@@ -142,10 +144,11 @@ function Products() {
         },
         {
             title: t('Sotish'),
-            filter:
-                currencyType === 'UZS'
-                    ? 'price.sellingpriceuzs'
-                    : 'price.sellingprice',
+            filter: 'price.sellingpriceuzs'
+        },
+        {
+            title: t('Sotish USD'),
+            filter: 'price.sellingprice',
         },
         {
             title: 'Optom',
@@ -251,13 +254,14 @@ function Products() {
     const handleChangeSellingPriceOfProduct = (e) => {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
-            if (currencyType === 'UZS') {
-                setSellingPriceOfProduct(val)
-                setSellingPriceOfProductUsd(UzsToUsd(val, currency))
-            } else {
-                setSellingPriceOfProductUsd(val)
-                setSellingPriceOfProduct(UsdToUzs(val, currency))
-            }
+            setSellingPriceOfProduct(val)
+        }
+    }
+
+    const handleChangeSellingPriceOfProductUsd = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setSellingPriceOfProductUsd(val)
         }
     }
     const handleChangeSellingPriceOfProcient = (e) => {
@@ -511,7 +515,8 @@ function Products() {
                         tradeprice: tradePrice,
                         tradepriceuzs: tradePriceUzs,
                         minimumcount: minimumCount,
-                        packcount: packcount
+                        packcount: packcount,
+                        isUsd: isUsd
                     },
                 }
                 dispatch(addProduct(body)).then(({ error }) => {
@@ -609,6 +614,7 @@ function Products() {
                     tradepriceuzs: tradePriceUzs,
                     minimumcount: minimumCount,
                     packcount: packcount,
+                    isUsd: isUsd
                 },
                 currentPage,
                 countPage: showByTotal,
@@ -936,6 +942,7 @@ function Products() {
                 category,
                 minimumcount,
                 packcount,
+                isUsd,
                 price: {
                     sellingprice,
                     incomingprice,
@@ -947,6 +954,8 @@ function Products() {
             } = currentProduct
             setCodeOfProduct(code)
             setNameOfProduct(name)
+            console.log(isUsd);
+            setIsUsd(isUsd)
             setNumberOfProduct(total)
             setUnitOfProduct({
                 value: unit._id,
@@ -1071,11 +1080,9 @@ function Products() {
                 priceOfProduct={
                     currencyType === 'UZS' ? priceOfProduct : priceOfProductUsd
                 }
-                sellingPriceOfProduct={
-                    currencyType === 'UZS'
-                        ? sellingPriceOfProduct
-                        : sellingPriceOfProductUsd
-                }
+                sellingPriceOfProduct={sellingPriceOfProduct}
+                sellingPriceOfProductUsd={sellingPriceOfProductUsd}
+                handleChangeSellingPriceOfProductUsd={handleChangeSellingPriceOfProductUsd}
                 sellingPriceOfProcient={sellingPriceOfProcient}
                 numberOfProduct={numberOfProduct}
                 handleChangeSellingPriceOfProduct={
@@ -1104,6 +1111,8 @@ function Products() {
                 handleChangeTradePrice={handleChangeTradePrice}
                 packcount={packcount}
                 handleChangePackount={handleChangePackount}
+                isUsd={isUsd}
+                setIsUsd={setIsUsd}
             />
             <div className={'flex justify-between items-center mainPadding'}>
                 <div className={'flex gap-[1.5rem]'}>

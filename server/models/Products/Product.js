@@ -15,6 +15,7 @@ const product = new Schema(
     brand: { type: Schema.Types.ObjectId, ref: "Brand" },
     market: { type: Schema.Types.ObjectId, ref: "Market", required: true },
     packcount: {type: Number},
+    isUsd: {type: Boolean, default: false},
     connections: [{ type: Schema.Types.ObjectId, ref: "Market" }],
     isArchive: { type: Boolean, default: false },
   },
@@ -41,6 +42,7 @@ function validateProduct(product) {
     barcode: Joi.string(),
     tradeprice: Joi.number(),
     tradepriceuzs: Joi.number(),
+    isUsd: Joi.boolean(),
     packcount: Joi.number().optional()
   });
 

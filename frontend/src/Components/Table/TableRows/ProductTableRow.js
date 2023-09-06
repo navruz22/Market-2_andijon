@@ -53,16 +53,17 @@ export const ProductTableRow = ({
                                 ))}{' '}
                         {currencyType}
                     </td>
-                    <td className='td text-right'>
-                        {product.price &&
-                            (currency === 'UZS'
-                                ? product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
+                    <td className={`td text-right`}>
+                        {product.price && product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
                                     'ru-RU'
-                                )
-                                : product?.price?.sellingprice && product?.price?.sellingprice.toLocaleString(
+                                )} {' '}
+                        UZS
+                    </td>
+                    <td style={{color: product?.isUsd && "rgb(34 197 94)"}} className={`td text-right`}>
+                        {product.price && product?.price?.sellingprice && product?.price?.sellingprice.toLocaleString(
                                     'ru-RU'
-                                ))}{' '}
-                        {currencyType}
+                                )} {' '}
+                        USD
                     </td>
                     <td className='td text-right'>
                         {product.price?.tradepriceuzs ? (

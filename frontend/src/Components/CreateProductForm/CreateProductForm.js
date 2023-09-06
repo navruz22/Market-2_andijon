@@ -1,6 +1,9 @@
 import FieldContainer from '../FieldContainer/FieldContainer'
 import Button from '../Buttons/BtnAddRemove'
 import { useTranslation } from 'react-i18next'
+import ProductCheckbox from '../Checkbox/ProductCheckBox'
+import Checkbox from '../Checkbox/Checkbox'
+import { IoCheckmark } from 'react-icons/io5'
 
 function CreateProductForm({
     searchBarcode,
@@ -16,6 +19,7 @@ function CreateProductForm({
     handleChangePriceOfProduct,
     priceOfProduct,
     sellingPriceOfProduct,
+    sellingPriceOfProductUsd,
     handleChangeSellingPriceOfProduct,
     handleEdit,
     addNewProduct,
@@ -36,7 +40,10 @@ function CreateProductForm({
     sellingPriceOfProcient,
     handleChangeSellingPriceOfProcient,
     handleChangeTradePriceProcient,
-    tradePriceProcient
+    tradePriceProcient,
+    handleChangeSellingPriceOfProductUsd,
+    isUsd,
+    setIsUsd
 }) {
     const { t } = useTranslation(['common'])
     return (
@@ -134,6 +141,35 @@ function CreateProductForm({
                             placeholder={`${t('misol')}: 200`}
                             type={'text'}
                         />
+                        <div className='flex gap-2'>
+                            <FieldContainer
+                                value={sellingPriceOfProductUsd}
+                                onChange={handleChangeSellingPriceOfProductUsd}
+                                label={t('Sotish narxi USD')}
+                                placeholder={`${t('misol')}: 200`}
+                                type={'text'}
+                            />
+                            <div className={'checkbox-card sale-toggle-container'}>
+                                <input
+                                    className={'cursor-pointer'}
+                                    type='checkbox'
+                                    checked={isUsd}
+                                    onChange={() => setIsUsd(!isUsd)}
+                                />
+                            </div>
+                            {/* <div className={'checkbox'}>
+                                <input
+                                    type='checkbox'
+                                    className={'hidden'}
+                                    id={'usd'}
+                                    value={isUsd === 'usd' ? true : false}
+                                    onChange={() => setIsUsd(isUsd === 'usd' ? 'uzs' : 'usd')}
+                                />
+                                <label htmlFor={'usd'}>
+                                    <span className={'checkbox-icon'}><IoCheckmark size={'1rem'} /></span>
+                                </label>
+                            </div> */}
+                        </div>
 
                         {/* -- sotish foizi -- */}
 

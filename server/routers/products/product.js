@@ -252,7 +252,8 @@ module.exports.register = async (req, res) => {
       tradeprice,
       tradepriceuzs,
       minimumcount,
-      packcount
+      packcount,
+      isUsd
     } = req.body.product;
     const marke = await Market.findById(market);
 
@@ -307,7 +308,7 @@ module.exports.register = async (req, res) => {
       category,
       unit,
       market,
-      barcode,
+      barcode
     });
     await newProductData.save();
 
@@ -318,7 +319,8 @@ module.exports.register = async (req, res) => {
       unit,
       minimumcount,
       total: Math.round(total * 100) / 100,
-      packcount
+      packcount,
+      isUsd
     });
 
     const newPrice = new ProductPrice({
@@ -492,7 +494,7 @@ module.exports.register = async (req, res) => {
       market,
     })
       .sort({ code: -1 })
-      .select("total market category minimumcount")
+      .select("total market category minimumcount packcount isUsd")
       .populate(
         "price",
         "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
@@ -547,7 +549,8 @@ module.exports.update = async (req, res) => {
       productdata,
       barcode,
       minimumcount,
-      packcount
+      packcount,
+      isUsd
     } = req.body.product;
 
     const { currentPage, countPage, search } = req.body;
@@ -627,6 +630,7 @@ module.exports.update = async (req, res) => {
     });
     product.unit = unit;
     product.total = total;
+    product.isUsd = isUsd;
     product.packcount = packcount;
 
     const productData = await ProductData.findById(productdata);
@@ -768,7 +772,7 @@ module.exports.update = async (req, res) => {
       market,
     })
       .sort({ code: 1 })
-      .select("total market category minimumcount")
+      .select("total market category minimumcount packcount isUsd")
       .populate(
         "price",
         "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
@@ -993,7 +997,7 @@ module.exports.getProducts = async (req, res) => {
       market: id,
     })
       .sort({ code: 1 })
-      .select("total market category minimumcount connections packcount")
+      .select("total market category minimumcount connections packcount isUsd")
       .populate(
         "price",
         "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
