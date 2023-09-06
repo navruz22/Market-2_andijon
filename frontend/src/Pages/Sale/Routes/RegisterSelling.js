@@ -454,8 +454,6 @@ const RegisterSelling = () => {
                 if (all <= maxSumUzs) {
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
-                    setPaymentCash(allPayment - Number(value))
-                    setPaymentCashUzs(allPaymentUzs - Number(UsdToUzs(value, exchangerate)))
                     setPaid(allUsd)
                     setPaidUzs(all)
                     setPaymentUsd(value)
