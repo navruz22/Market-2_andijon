@@ -42,6 +42,8 @@ function CreateProductForm({
     handleChangeTradePriceProcient,
     tradePriceProcient,
     handleChangeSellingPriceOfProductUsd,
+    priceOfProductUsd,
+    handleChangePriceOfProductUsd,
     isUsd,
     setIsUsd
 }) {
@@ -129,6 +131,13 @@ function CreateProductForm({
                             value={priceOfProduct}
                             onChange={handleChangePriceOfProduct}
                             label={t('Keltirilgan narxi')}
+                            placeholder={`${t('misol')}: 100`}
+                            type={'text'}
+                        />
+                        <FieldContainer
+                            value={priceOfProductUsd}
+                            onChange={handleChangePriceOfProductUsd}
+                            label={t('Keltirilgan narxi USD')}
                             placeholder={`${t('misol')}: 100`}
                             type={'text'}
                         />

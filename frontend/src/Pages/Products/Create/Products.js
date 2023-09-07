@@ -232,23 +232,26 @@ function Products() {
     const handleChangePriceOfProduct = (e) => {
         let val = e.target.value
         if (regexForTypeNumber.test(val)) {
-            if (currencyType === 'UZS') {
-                setPriceOfProduct(val)
-                setPriceOfProductsUsd(UzsToUsd(val, currency))
-                setProcient(
-                    UzsToUsd(val, currency),
-                    Number(val),
-                    Number(sellingPriceOfProcient)
-                )
-            } else {
-                setPriceOfProductsUsd(val)
-                setPriceOfProduct(UsdToUzs(val, currency))
-                setProcient(
-                    Number(val),
-                    UsdToUzs(val, currency),
-                    Number(sellingPriceOfProcient)
-                )
-            }
+            setPriceOfProduct(val)
+            setPriceOfProductsUsd(UzsToUsd(val, currency))
+            // setProcient(
+            //     UzsToUsd(val, currency),
+            //     Number(val),
+            //     Number(sellingPriceOfProcient)
+            // )
+        }
+    }
+
+    const handleChangePriceOfProductUsd = (e) => {
+        let val = e.target.value
+        if (regexForTypeNumber.test(val)) {
+            setPriceOfProductsUsd(val)
+            setPriceOfProduct(UsdToUzs(val, currency))
+            // setProcient(
+            //     Number(val),
+            //     UsdToUzs(val, currency),
+            //     Number(sellingPriceOfProcient)
+            // )
         }
     }
     const handleChangeSellingPriceOfProduct = (e) => {
@@ -1079,9 +1082,8 @@ function Products() {
                 tradePriceProcient={tradePriceProcient}
                 handleChangeTradePriceProcient={handleChangeTradePriceProcient}
                 handleChangeCheckOfProduct={handleChangeCheckOfProduct}
-                priceOfProduct={
-                    currencyType === 'UZS' ? priceOfProduct : priceOfProductUsd
-                }
+                priceOfProduct={priceOfProduct}
+                priceOfProductUsd={priceOfProductUsd}
                 sellingPriceOfProduct={sellingPriceOfProduct}
                 sellingPriceOfProductUsd={sellingPriceOfProductUsd}
                 handleChangeSellingPriceOfProductUsd={handleChangeSellingPriceOfProductUsd}
@@ -1106,6 +1108,7 @@ function Products() {
                 pageName={'products'}
                 unitOptions={unitOptions}
                 categoryOptions={categoryOptions}
+                handleChangePriceOfProductUsd={handleChangePriceOfProductUsd}
                 searchBarcode={searchBarcode}
                 minimumCount={minimumCount}
                 handleChangeMinimumCount={handleChangeMinimumCount}
