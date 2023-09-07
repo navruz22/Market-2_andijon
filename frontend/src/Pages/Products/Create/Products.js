@@ -118,10 +118,6 @@ function Products() {
     const headers = [
         { title: t('№') },
         {
-            filter: 'productdata.barcode',
-            title: t('Shtrix kodi'),
-        },
-        {
             title: t('Kategoriyasi'),
             filter: t('category.code'),
         },
@@ -137,10 +133,11 @@ function Products() {
         },
         {
             title: t('Olish'),
-            filter:
-                currencyType === 'UZS'
-                    ? 'price.incomingpriceuzs'
-                    : 'price.incomingprice',
+            filter: 'price.incomingpriceuzs'
+        },
+        {
+            title: t('Olish USD'),
+            filter: 'price.incomingprice'
         },
         {
             title: t('Sotish'),
@@ -151,20 +148,13 @@ function Products() {
             filter: 'price.sellingprice',
         },
         {
-            title: 'Optom',
-            filter:
-                currencyType === 'UZS'
-                    ? 'price.tradeprice'
-                    : 'price.tradepriceuzs',
-        },
-        {
             title: 'Minimum qiymat',
             filter: 'minimumcount',
             styles: 'w-[5%]',
         },
         { title: '' },
     ]
-    console.log(priceOfProductUsd);
+    
     const importHeaders = [
         { name: 'Shtrix kodi', value: 'barcode' },
         { name: 'Kategoriyasi', value: 'category' },
@@ -484,10 +474,10 @@ function Products() {
                     value: sellingPriceOfProduct,
                     message: t('Maxsulot sotish narxi'),
                 },
-                {
-                    value: tradePrice,
-                    message: t('Maxsulot optom narxi'),
-                },
+                // {
+                //     value: tradePrice,
+                //     message: t('Maxsulot optom narxi'),
+                // },
                 {
                     value: minimumCount,
                     message: t('Maxsulot minimal miqdori'),
@@ -517,8 +507,8 @@ function Products() {
                         incomingpriceuzs: priceOfProduct,
                         sellingpriceuzs: sellingPriceOfProduct,
                         barcode: checkOfProduct,
-                        tradeprice: tradePrice,
-                        tradepriceuzs: tradePriceUzs,
+                        // tradeprice: tradePrice,
+                        // tradepriceuzs: tradePriceUzs,
                         minimumcount: minimumCount,
                         packcount: packcount,
                         isUsd: isUsd
@@ -615,8 +605,8 @@ function Products() {
                     sellingpriceuzs: sellingPriceOfProduct,
                     total: numberOfProduct,
                     barcode: checkOfProduct,
-                    tradeprice: tradePrice,
-                    tradepriceuzs: tradePriceUzs,
+                    // tradeprice: tradePrice,
+                    // tradepriceuzs: tradePriceUzs,
                     minimumcount: minimumCount,
                     packcount: packcount,
                     isUsd: isUsd

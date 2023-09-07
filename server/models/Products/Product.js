@@ -40,8 +40,6 @@ function validateProduct(product) {
     brand: Joi.string(),
     market: Joi.string().required(),
     barcode: Joi.string(),
-    tradeprice: Joi.number(),
-    tradepriceuzs: Joi.number(),
     isUsd: Joi.boolean(),
     packcount: Joi.number().optional()
   });
@@ -62,8 +60,6 @@ function validateProductExcel(product) {
     sellingprice: Joi.number(),
     incomingpriceuzs: Joi.number(),
     sellingpriceuzs: Joi.number(),
-    tradeprice: Joi.number(),
-    tradepriceuzs: Joi.number(),
     minimumcount: Joi.number(),
     total: Joi.number(),
   });

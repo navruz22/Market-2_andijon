@@ -249,8 +249,8 @@ module.exports.register = async (req, res) => {
       sellingprice,
       incomingpriceuzs,
       sellingpriceuzs,
-      tradeprice,
-      tradepriceuzs,
+      // tradeprice,
+      // tradepriceuzs,
       minimumcount,
       packcount,
       isUsd
@@ -334,8 +334,8 @@ module.exports.register = async (req, res) => {
       sellingpriceuzs: sellingpriceuzs
         ? Math.round(sellingpriceuzs * 1) / 1
         : 0,
-      tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
-      tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
+      // tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
+      // tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
       market,
     });
 
@@ -447,8 +447,8 @@ module.exports.register = async (req, res) => {
           sellingpriceuzs: sellingpriceuzs
             ? Math.round(sellingpriceuzs * 1) / 1
             : 0,
-          tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
-          tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
+          // tradeprice: tradeprice ? Math.round(tradeprice * 10) / 10 : 0,
+          // tradepriceuzs: tradepriceuzs ? Math.round(tradepriceuzs * 1) / 1 : 0,
           market: filialId,
         });
 
@@ -497,7 +497,7 @@ module.exports.register = async (req, res) => {
       .select("total market category minimumcount packcount isUsd")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       )
       .populate({
         path: "productdata",
@@ -543,8 +543,8 @@ module.exports.update = async (req, res) => {
       sellingprice,
       incomingpriceuzs,
       sellingpriceuzs,
-      tradeprice,
-      tradepriceuzs,
+      // tradeprice,
+      // tradepriceuzs,
       total,
       productdata,
       barcode,
@@ -625,8 +625,8 @@ module.exports.update = async (req, res) => {
             ? sellingpriceuzs
             : exchangerate.exchangerate * sellingprice) * 1
         ) / 1,
-      tradeprice: Math.round(tradeprice * 10) / 10,
-      tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
+      // tradeprice: Math.round(tradeprice * 10) / 10,
+      // tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
     });
     product.unit = unit;
     product.total = total;
@@ -704,8 +704,8 @@ module.exports.update = async (req, res) => {
                 ? sellingpriceuzs
                 : exchangerate.exchangerate * sellingprice) * 1
             ) / 1,
-          tradeprice: Math.round(tradeprice * 10) / 10,
-          tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
+          // tradeprice: Math.round(tradeprice * 10) / 10,
+          // tradepriceuzs: Math.round(tradepriceuzs * 1) / 1,
         });
 
         const filialunitt = await Unit.findOne({
@@ -775,7 +775,7 @@ module.exports.update = async (req, res) => {
       .select("total market category minimumcount packcount isUsd")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       )
       .populate({
         path: "productdata",
@@ -964,7 +964,7 @@ module.exports.getAll = async (req, res) => {
       .populate("brand", "name")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       );
 
     res.send(products);
@@ -1000,7 +1000,7 @@ module.exports.getProducts = async (req, res) => {
       .select("total market category minimumcount connections packcount isUsd")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       )
       .populate({
         path: "productdata",
@@ -1055,7 +1055,7 @@ module.exports.getPartnerProducts = async (req, res) => {
       .select("total market category minimumcount connections")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       )
       .populate({
         path: "productdata",
@@ -1159,7 +1159,7 @@ module.exports.getProductExcel = async (req, res) => {
       .select("total unit price productdata category minimumcount")
       .populate(
         "price",
-        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs tradeprice tradepriceuzs"
+        "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
       )
       .populate("unit", "name")
       .populate({

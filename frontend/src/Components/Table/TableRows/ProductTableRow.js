@@ -26,9 +26,6 @@ export const ProductTableRow = ({
                             : currentPage * countPage + 1 + index}
                     </td>
                     <td className='td text-center'>
-                        {product.productdata?.barcode}
-                    </td>
-                    <td className='td text-center'>
                         {product?.category?.code}{' '}
                         {product?.category?.name && `- ${product?.category?.name}`}
                     </td>
@@ -44,15 +41,10 @@ export const ProductTableRow = ({
                         {product?.packcount}
                     </td>
                     <td className='td text-right'>
-                        {product.price &&
-                            (currency === 'UZS'
-                                ? product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString(
-                                    'ru-RU'
-                                )
-                                : product?.price?.incomingprice && product?.price?.incomingprice.toLocaleString(
-                                    'ru-RU'
-                                ))}{' '}
-                        {currencyType}
+                        {product.price && product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString('ru-RU')}{' '} UZS
+                    </td>
+                    <td className='td text-right'>
+                        {product.price && product?.price?.incomingprice && product?.price?.incomingprice.toLocaleString('ru-RU')}{' '} USD
                     </td>
                     <td className={`td text-right`}>
                         {product.price && product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
@@ -65,22 +57,6 @@ export const ProductTableRow = ({
                                     'ru-RU'
                                 )} {' '}
                         USD
-                    </td>
-                    <td className='td text-right'>
-                        {product.price?.tradepriceuzs ? (
-                            <>
-                                {currency === 'UZS'
-                                    ? product?.price?.tradepriceuzs && product?.price?.tradepriceuzs.toLocaleString(
-                                        'ru-RU'
-                                    )
-                                    : product?.price?.tradeprice && product?.price?.tradeprice.toLocaleString(
-                                        'ru-RU'
-                                    )}{' '}
-                                {currencyType}
-                            </>
-                        ) : (
-                            ''
-                        )}
                     </td>
                     <td
                         className={`td text-right ${(productminimumpage &&
