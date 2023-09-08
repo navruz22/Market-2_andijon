@@ -140,32 +140,17 @@ const ReportPage = () => {
     const convertToUsd = (value) => Math.round(value * 1000) / 1000
     const convertToUzs = (value) => Math.round(value)
     const handleClickPayment = (debt) => {
-        if (debt?.debtusd > 0) {
-            const all = debt.debt
-            const allUzs = debt.debtuzs
-            setAllPayment(all)
-            setAllPaymentUzs(allUzs) 
-            // setPaymentCash(all)
-            // setPaymentCashUzs(allUzs)
-            setPaymentUsd(all)
-            setDebtType('dollar')
-            setPaid(all)
-            setPaidUzs(allUzs)
-            setSaleConnectorId(debt._id)
-            setPaymentModalVisible(true)
-        } else {
-            const all = debt.debt
-            const allUzs = debt.debtuzs
-            setAllPayment(all)
-            setAllPaymentUzs(allUzs)
-            setPaymentCash(all)
-            setPaymentCashUzs(allUzs)
-            setDebtType('sum')
-            setPaid(all)
-            setPaidUzs(allUzs)
-            setSaleConnectorId(debt._id)
-            setPaymentModalVisible(true)
-        }
+        const all = debt.debtusd || 0
+        const allUzs = debt.debtuzs || 0
+        setAllPayment(all)
+        setAllPaymentUzs(allUzs) 
+        setPaymentCash(UzsToUsd(allUzs, currency))
+        setPaymentCashUzs(allUzs)
+        setPaymentUsd(all)
+        setPaid(all)
+        setPaidUzs(allUzs)
+        setSaleConnectorId(debt._id)
+        setPaymentModalVisible(true)
         setDebtId(debt?.debtId)
     }
     const handleChangePaymentType = (type) => {
@@ -228,91 +213,15 @@ const ReportPage = () => {
         }
     }
     const writePayment = (value, type) => {
-        const maxSum = Math.abs(allPayment) - Number(paymentDiscount)
-        const maxSumUzs = Math.abs(allPaymentUzs) - Number(paymentDiscountUzs)
-        if (currencyType === 'USD') {
+        const maxSum = Math.abs(allPayment)
+        const maxSumUzs = Math.abs(allPaymentUzs)
             if (type === 'cash') {
-                const all =
-                    Number(value) +
-                    Number(paymentUsd)
-                const allUzs =
-                    Number(UsdToUzs(value, currency)) +
-                    Number(UsdToUzs(paymentUsd, currency))
-                if (all <= maxSum) {
-                    setPaymentCash(value)
-                    setPaymentCashUzs(UsdToUzs(value, currency))
-                    setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
-                    setPaid(all)
-                    setPaidUzs(allUzs)
-                } else {
-                    warningMorePayment()
-                }
-            } else if (type === 'usd') {
-                const all =
-                    Number(value) +
-                    Number(paymentCash)
-                const allUzs =
-                    Number(UsdToUzs(value, currency)) +
-                    Number(paymentCashUzs)
-                if (all <= maxSum) {
-                    setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
-                    setPaid(all)
-                    setPaidUzs(allUzs)
-                    setPaymentUsd(value)
-                } else {
-                    warningMorePayment()
-                }
-            } else if (type === 'card') {
-                const all =
-                    Number(value) +
-                    Number(paymentCash) +
-                    Number(paymentTransfer)
-                const allUzs =
-                    Number(paymentCashUzs) +
-                    Number(UsdToUzs(value, currency)) +
-                    Number(paymentTransferUzs)
-                if (all <= maxSum) {
-                    setPaymentCard(value)
-                    setPaymentCardUzs(UsdToUzs(value, currency))
-                    setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
-                    setPaid(all)
-                    setPaidUzs(allUzs)
-                } else {
-                    warningMorePayment()
-                }
-            } else {
-                const all =
-                    Number(value) + Number(paymentCash) + Number(paymentCard)
-                const allUzs =
-                    Number(paymentCashUzs) +
-                    Number(paymentCardUzs) +
-                    Number(UsdToUzs(value, currency))
-                if (all <= maxSum) {
-                    setPaymentTransfer(value)
-                    setPaymentTransferUzs(UsdToUzs(value, currency))
-                    setPaymentDebt(convertToUsd(maxSum - all))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - allUzs))
-                    setPaid(all)
-                    setPaidUzs(allUzs)
-                } else {
-                    warningMorePayment()
-                }
-            }
-        } else {
-            if (type === 'cash') {
-                const all =
-                    Number(value) +
-                    Number(UsdToUzs(paymentUsd, currency))
-                const allUsd =
-                    Number(UzsToUsd(value, currency)) +
-                    Number(paymentUsd)
+                const all = Number(value) 
+                const allUsd = Number(UzsToUsd(value, currency)) 
+
                 if (all <= maxSumUzs) {
-                    setPaymentCashUzs(value)
-                    setPaymentCash(UzsToUsd(value, currency))
-                    setPaymentDebt(convertToUsd(maxSum - allUsd))
+                    setPaymentCashUzs(all)
+                    setPaymentCash(allUsd)
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
                     setPaidUzs(all)
@@ -320,14 +229,11 @@ const ReportPage = () => {
                     warningMorePayment()
                 }
             } else if (type === 'usd') {
-                const all =
-                    Number(paymentCashUzs) +
-                    Number(UsdToUzs(value, currency))
-                const allUsd =
-                    Number(value) + paymentCash
-                if (all <= maxSumUzs) {
+                const all = Number(UsdToUzs(value, currency))
+                const allUsd = Number(value)
+                    // console.log(all);
+                if (allUsd <= maxSum) {
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
                     setPaidUzs(all)
                     setPaymentUsd(value)
@@ -373,7 +279,6 @@ const ReportPage = () => {
                     warningMorePayment()
                 }
             }
-        }
     }
     const handleChangeDiscount = (value) => {
         const allPaymentAfterDiscount =
@@ -1003,6 +908,7 @@ const ReportPage = () => {
                     paymentUsd={paymentUsd}
                     setPaymentUsd={setPaymentUsd}
                     debtType={debtType}
+                    setDebtType={setDebtType}
                 />
             </div>
             <UniversalModal

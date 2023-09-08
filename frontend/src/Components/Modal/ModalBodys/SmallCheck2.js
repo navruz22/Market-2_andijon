@@ -116,7 +116,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                     {' '}
                     To'langan USD:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {product?.payment?.usdpayment.toLocaleString('ru-Ru')}{' '}
+                        {product?.payment?.usdpayment && product?.payment?.usdpayment || 0}{' '}
                         USD
                     </span>
                 </h3>

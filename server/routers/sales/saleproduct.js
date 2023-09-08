@@ -22,7 +22,7 @@ const {
   WarhouseProduct,
 } = require("../../models/WarhouseProduct/WarhouseProduct");
 
-const convertToUsd = (value) => Math.round(value * 10) / 10;
+const convertToUsd = (value) => Math.round(value * 100) / 100;
 const convertToUzs = (value) => Math.round(value);
 
 const transferWarhouseProducts = async (products) => {
@@ -226,7 +226,7 @@ module.exports.register = async (req, res) => {
     if (debt.debt > 0) {
       const newDebt = new Debt({
         comment: comment,
-        debt: convertToUsd(debt.debt),
+        debt: debt.debt,
         debtuzs: convertToUzs(debt.debtuzs),
         debtType: debt.debtType,
         totalprice: convertToUsd(totalprice),
@@ -376,8 +376,8 @@ module.exports.addproducts = async (req, res) => {
       Math.round(
         saleproducts.reduce((summ, saleproduct) => {
           return summ + saleproduct.totalprice;
-        }, 0) * 10
-      ) / 10;
+        }, 0) * 100
+      ) / 100;
 
     const totalpriceuzs =
       Math.round(
@@ -386,11 +386,11 @@ module.exports.addproducts = async (req, res) => {
         }, 0) * 1
       ) / 1;
 
-    if (checkPayments(totalprice, payment, discount, debt)) {
-      return res.status(400).json({
-        message: `Diqqat! To'lov hisobida xatolik yuz bergan!`,
-      });
-    }
+    // if (checkPayments(totalprice, payment, discount, debt)) {
+    //   return res.status(400).json({
+    //     message: `Diqqat! To'lov hisobida xatolik yuz bergan!`,
+    //   });
+    // }
 
     let all = [];
 
@@ -498,19 +498,22 @@ module.exports.addproducts = async (req, res) => {
       }
     }
 
+    let debtid = null
     if (debt.debt > 0) {
       const newDebt = new Debt({
         comment: comment,
         debt: debt.debt,
-        debtuzs: debt.debtuzs,
-        totalprice,
-        totalpriceuzs,
+        debtuzs: convertToUzs(debt.debtuzs),
+        debtType: debt.debtType,
+        totalprice: convertToUsd(totalprice),
+        totalpriceuzs: convertToUzs(totalpriceuzs),
         market,
         user,
         saleconnector: saleconnector._id,
         products,
       });
       await newDebt.save();
+      debtid = newDebt._id
       saleconnector.debts.push(newDebt._id);
       dailysaleconnector.debt = newDebt._id;
     }
@@ -518,17 +521,18 @@ module.exports.addproducts = async (req, res) => {
     if (payment.totalprice > 0) {
       const newPayment = new Payment({
         comment: payment.comment,
-        payment: payment.card + payment.cash + payment.transfer,
-        paymentuzs: payment.carduzs + payment.cashuzs + payment.transferuzs,
+        payment: convertToUsd(payment.card + payment.cash + payment.transfer),
+        paymentuzs: convertToUzs(
+          payment.carduzs + payment.cashuzs + payment.transferuzs
+        ),
         card: payment.card,
         cash: payment.cash,
         transfer: payment.transfer,
         carduzs: payment.carduzs,
         cashuzs: payment.cashuzs,
         transferuzs: payment.transferuzs,
-        type: payment.type,
         usdpayment: payment.usdpayment,
-        debtusd: payment.debtusd,
+        type: payment.type,
         totalprice,
         totalpriceuzs,
         market,
@@ -536,6 +540,9 @@ module.exports.addproducts = async (req, res) => {
         saleconnector: saleconnector._id,
         products,
       });
+      if (debtid) {
+        newPayment.debt = debtid;
+      }
       await newPayment.save();
       saleconnector.payments.push(newPayment._id);
       dailysaleconnector.payment = newPayment._id;
@@ -581,17 +588,21 @@ module.exports.addproducts = async (req, res) => {
       .select("-isArchive -updatedAt -market -__v")
       .populate({
         path: "products",
-        select: "totalprice unitprice totalpriceuzs unitpriceuzs pieces isPackcount packcountpieces",
-        options: { sort: { created_at: -1 } },
+        select:
+          "totalprice unitprice totalpriceuzs unitpriceuzs pieces fromFilial isPackcount packcountpieces",
         populate: {
           path: "product",
-          select: "poductdata total",
-          populate: { path: "productdata", select: "code name" },
+          select: "productdata total isUsd",
+          populate: {
+            path: "productdata",
+            select: "code name",
+            options: { sort: { code: 1 } },
+          },
         },
       })
-      .populate("payment", "payment paymentuzs totalprice totalpriceuzs")
+      .populate("payment", "payment paymentuzs usdpayment totalprice totalpriceuzs")
       .populate("discount", "discount discountuzs")
-      .populate("debt", "debt debtuzs")
+      .populate("debt", "debt debtuzs debtType")
       .populate("client", "name")
       .populate("packman", "name")
       .populate("user", "firstname lastname")
@@ -1088,16 +1099,29 @@ module.exports.payment = async (req, res) => {
     }
     await newPayment.save();
 
-    const debt = await Debt.findById(debtId)
-    console.log(debt);
-    if (payment.debtType === 'dollar') {
-      debt.debt = debt.debt - payment.usdpayment
-    } else {
-      debt.debt = debt.debt - (payment.cash + payment.card + payment.transfer)
-      debt.debtuzs = debt.debtuzs - (payment.cashuzs + payment.carduzs + payment.transferuzs)
-    }
-    await debt.save();
+    // const debt = await Debt.findById(debtId)
+    // console.log(debt);
+    // if (payment.debtType === 'dollar') {
+    //   debt.debt = debt.debt - payment.usdpayment
+    // } else {
+    //   debt.debt = debt.debt - (payment.cash + payment.card + payment.transfer)
+    //   debt.debtuzs = debt.debtuzs - (payment.cashuzs + payment.carduzs + payment.transferuzs)
+    // }
+    // await debt.save();
 
+    const debt = new Debt({
+      comment: "",
+      debt: -1 * payment.usdpayment,
+      debtuzs: -1 * (payment.cashuzs || payment.carduzs || payment.transfer),
+      debtType: payment.debtType,
+      totalprice: payment.totalprice,
+      totalpriceuzs: payment.totalpriceuzs,
+      market,
+      user,
+      saleconnector: saleconnector._id,
+    })
+    await debt.save()
+    saleconnector.debts.push(debt._id); 
     saleconnector.payments.push(newPayment._id);
     await saleconnector.save();
     const returnpayment = await Payment.findById(newPayment._id).populate({

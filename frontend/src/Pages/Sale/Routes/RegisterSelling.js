@@ -198,10 +198,14 @@ const RegisterSelling = () => {
                 const allUsd = tableProducts.reduce(
                     (prev, el) => prev + (el.isUsd && el.totalprice || 0),
                 0 )
+
+                const allUsd2 = tableProducts.reduce(
+                    (prev, el) => prev + (!el.isUsd && el.totalprice || 0),
+                0 )
                 setAllPayment(all)
                 setAllPaymentUzs(allUzs)
                 setPaymentUsd(allUsd)
-                setPaymentCash(all)
+                setPaymentCash(allUsd2)
                 setPaymentCashUzs(allUzs2)
                 setPaid(all)
                 setPaidUzs(allUzs)
@@ -352,10 +356,10 @@ const RegisterSelling = () => {
             }
         }
     }
-
+    console.log(paymentCash);
     const writePayment = (value, type) => {
-        const maxSum = Math.abs(allPayment) - Number(paymentDiscount)
-        const maxSumUzs = Math.abs(allPaymentUzs) - Number(paymentDiscountUzs)
+        const maxSum = Math.abs(allPayment) 
+        const maxSumUzs = Math.abs(allPaymentUzs)
         if (currencyType === 'USD') {
             if (type === 'cash') {
                 const all =
@@ -452,6 +456,7 @@ const RegisterSelling = () => {
                 const allUsd =
                     Number(value) + paymentCash 
                 if (all <= maxSumUzs) {
+                    console.log(maxSum, allUsd);
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)
@@ -1061,7 +1066,7 @@ const RegisterSelling = () => {
         )[0]
         if (client && client.hasOwnProperty('packman')) {
             setPackmanValue({
-                label: client.packman.name,
+                label: client?.packman?.name,
                 value: client.packman._id,
             })
         }

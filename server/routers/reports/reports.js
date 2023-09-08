@@ -744,7 +744,7 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate("client", "name")
       .populate(
         "payments",
-        "payment paymentuzs usdpayment comment totalprice totalpriceuzs"
+        "payment paymentuzs cashuzs carduzs transferuzs usdpayment comment totalprice totalpriceuzs"
       )
       .populate("debts")
       .populate(
@@ -760,10 +760,12 @@ module.exports.getDebtsReport = async (req, res) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
         
-        
+        if (sale.client && sale.client.name === '2222') {
+          console.log(sale.debts);
+        }
         const debt = sale.debts.reduce((prev, debt) => prev + debt?.debt, 0)
-        const debtuzs = sale.debts.reduce((prev, debt) => prev + debt?.debtuzs, 0)
-        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'dollar' ? debt?.debt : 0), 0) 
+        const debtuzs = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'sum' ? debt?.debtuzs : 0), 0)
+        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'dollar' ? debt?.debt : 0), 0)
 
         const debtComment =
           sale.debts.length > 0
@@ -771,7 +773,7 @@ module.exports.getDebtsReport = async (req, res) => {
             : "";
         const debtId =
           sale.debts.length > 0 ? sale.debts[sale.debts.length - 1]._id : "";
-        console.log(sale.debts);
+        // console.log(paymentsuzs);
         return {
           _id: sale._id,
           id: sale.id,
@@ -787,7 +789,7 @@ module.exports.getDebtsReport = async (req, res) => {
           saleconnector: { ...sale },
         };
       })
-      .filter((sales) => sales.debt > 0);
+      .filter((sales) => sales.debtusd > 0 || sales.debtuzs > 0);
 
     res.status(201).json({ data: debtsreport });
   } catch (error) {

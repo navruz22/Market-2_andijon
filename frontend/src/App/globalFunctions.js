@@ -22,7 +22,7 @@ export const universalSort = (data, setData, key, sort, prevData) => {
 export const UsdToUzs = (val, currency) => Math.round(val * currency)
 
 export const UzsToUsd = (val, currency) =>
-    Math.round((val / currency) * 10) / 10
+    Math.round((val / currency) * 100) / 100
 
 // check empty string
 export const checkEmptyString = (values) => {

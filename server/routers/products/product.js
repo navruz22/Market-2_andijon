@@ -119,9 +119,9 @@ module.exports.registerAll = async (req, res) => {
       // Create Price
       const newPrice = new ProductPrice({
         incomingprice: incomingprice
-          ? Math.round(incomingprice * 10) / 10
+          ? Math.round(incomingprice * 100) / 100
           : 0,
-        sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
+        sellingprice: sellingprice ? Math.round(sellingprice * 100) / 100 : 0,
         incomingpriceuzs: incomingpriceuzs
           ? Math.round(incomingpriceuzs * 1) / 1
           : 0,
@@ -325,9 +325,9 @@ module.exports.register = async (req, res) => {
 
     const newPrice = new ProductPrice({
       incomingprice: incomingprice
-        ? Math.round(incomingprice * 10) / 10
+        ? Math.round(incomingprice * 100) / 100
         : 0,
-      sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
+      sellingprice: sellingprice ? Math.round(sellingprice * 100) / 100 : 0,
       incomingpriceuzs: incomingpriceuzs
         ? Math.round(incomingpriceuzs * 1) / 1
         : 0,
@@ -438,9 +438,9 @@ module.exports.register = async (req, res) => {
 
         const newFilialPrice = new ProductPrice({
           incomingprice: incomingprice
-            ? Math.round(incomingprice * 10) / 10
+            ? Math.round(incomingprice * 100) / 100
             : 0,
-          sellingprice: sellingprice ? Math.round(sellingprice * 10) / 10 : 0,
+          sellingprice: sellingprice ? Math.round(sellingprice * 100) / 100 : 0,
           incomingpriceuzs: incomingpriceuzs
             ? Math.round(incomingpriceuzs * 1) / 1
             : 0,
@@ -611,8 +611,8 @@ module.exports.update = async (req, res) => {
       .sort({ _id: -1 });
 
     await ProductPrice.findByIdAndUpdate(priceid, {
-      incomingprice: Math.round(incomingprice * 10) / 10,
-      sellingprice: Math.round(sellingprice * 10) / 10,
+      incomingprice: Math.round(incomingprice * 100) / 100,
+      sellingprice: Math.round(sellingprice * 100) / 100,
       incomingpriceuzs:
         Math.round(
           (incomingpriceuzs
@@ -690,8 +690,8 @@ module.exports.update = async (req, res) => {
           });
 
         await ProductPrice.findByIdAndUpdate(filialproduct.price, {
-          incomingprice: Math.round(incomingprice * 10) / 10,
-          sellingprice: Math.round(sellingprice * 10) / 10,
+          incomingprice: Math.round(incomingprice * 100) / 100,
+          sellingprice: Math.round(sellingprice * 100) / 100,
           incomingpriceuzs:
             Math.round(
               (incomingpriceuzs

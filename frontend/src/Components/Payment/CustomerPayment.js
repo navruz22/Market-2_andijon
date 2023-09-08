@@ -6,6 +6,7 @@ import PaymentInput from './PaymentInput/PaymentInput.js'
 import { t } from 'i18next'
 import { useLocation } from 'react-router-dom'
 import Checkbox from '../Checkbox/Checkbox.js'
+import { roundUsd } from '../../App/globalFunctions.js'
 
 function CustomerPayment({
     returned,
@@ -85,22 +86,27 @@ function CustomerPayment({
                 ))
             default:
                 return location.pathname.includes('/kassa/debts') ?
-                    debtType === 'dollar' ? <PaymentInput
-                        key={'sale-usd'}
-                        value={paymentUsd}
-                        onChange={onChange}
-                        keyInput={'usd'}
-                        onClose={onClose}
-                        label={t('USD')}
-                    /> : <PaymentInput
-                        key={'sale-cash'}
-                        value={cash}
-                        onChange={onChange}
-                        keyInput={type}
-                        onClose={onClose}
-                        label={t('Naqd')}
-                    />
-                    : <>
+                    (
+                        debtType === 'sum' ?
+                            <PaymentInput
+                                key={'sale-cash'}
+                                value={cash}
+                                onChange={onChange}
+                                keyInput={type}
+                                onClose={onClose}
+                                label={t('Naqd')}
+                            /> :
+                            <PaymentInput
+                                key={'sale-usd'}
+                                value={paymentUsd}
+                                onChange={onChange}
+                                keyInput={'usd'}
+                                onClose={onClose}
+                                label={t('USD')}
+                            />
+                    )
+                    :
+                    <>
                         <PaymentInput
                             key={'sale-usd'}
                             value={paymentUsd}
@@ -177,32 +183,38 @@ function CustomerPayment({
                             />
                         )}
                         {location.pathname.includes('/kassa/debts') ?
-                            (debtType === 'dollar' ?
-                                <li className='custom-payment-ul-li'>
-                                    <span className='custom-payment-text-style'>
-                                        {t('Qarzlar')} :{' '}
-                                    </span>
-                                    <h3 className='text-error-500 text-[1rem]'>
-                                        {debt} USD
-                                    </h3>
-                                </li> : <li className='custom-payment-ul-li'>
-                                    <span className='custom-payment-text-style'>
-                                        {t('Qarzlar')} :{' '}
-                                    </span>
-                                    <h3 className='text-error-500 text-[1rem]'>
-                                        {debtuzs} UZS
-                                    </h3>
-                                </li>)
-                            : <li className='custom-payment-ul-li'>
+                            (
+                                debtType === 'sum' ?
+                                    <li className='custom-payment-ul-li'>
+                                        <span className='custom-payment-text-style'>
+                                            {t('Qarzlar')} :{' '}
+                                        </span>
+                                        <h3 className='text-error-500 text-[1rem]'>
+                                            {debtuzs} UZS
+                                        </h3>
+                                    </li>
+                                    :
+                                    <li className='custom-payment-ul-li'>
+                                        <span className='custom-payment-text-style'>
+                                            {t('Qarzlar')} :{' '}
+                                        </span>
+                                        <h3 className='text-error-500 text-[1rem]'>
+                                            {roundUsd(debt)} USD <br /><br />
+                                        </h3>
+                                    </li>
+                            )
+                            :
+                            <li className='custom-payment-ul-li'>
                                 <span className='custom-payment-text-style'>
                                     {t('Qarzlar')} :{' '}
                                 </span>
                                 <h3 className='text-error-500 text-[1rem]'>
-                                    {debt} USD <br /><br />
+                                    {roundUsd(debt)} USD <br /><br />
                                     {debtuzs} UZS
                                 </h3>
-                            </li>}
-                        {!location.pathname.includes('/kassa/debts') && <li className='custom-payment-ul-li'>
+                            </li>
+                        }
+                        <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {t('Qarz')} :{' '}
                             </span>
@@ -220,7 +232,7 @@ function CustomerPayment({
                                     label={t('UZS')}
                                 />
                             </h3>
-                        </li>}
+                        </li>
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
