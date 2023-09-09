@@ -137,17 +137,17 @@ const ReportPage = () => {
         setModalBody(null)
     }
 
-    const convertToUsd = (value) => Math.round(value * 1000) / 1000
+    const convertToUsd = (value) => Math.round(value * 100) / 100
     const convertToUzs = (value) => Math.round(value)
     const handleClickPayment = (debt) => {
         const all = debt.debtusd || 0
         const allUzs = debt.debtuzs || 0
-        setAllPayment(all)
+        setAllPayment(roundUsd(all))
         setAllPaymentUzs(allUzs) 
         setPaymentCash(UzsToUsd(allUzs, currency))
         setPaymentCashUzs(allUzs)
-        setPaymentUsd(all)
-        setPaid(all)
+        setPaymentUsd(roundUsd(all))
+        setPaid(roundUsd(all))
         setPaidUzs(allUzs)
         setSaleConnectorId(debt._id)
         setPaymentModalVisible(true)
@@ -221,9 +221,9 @@ const ReportPage = () => {
 
                 if (all <= maxSumUzs) {
                     setPaymentCashUzs(all)
-                    setPaymentCash(allUsd)
+                    setPaymentCash(roundUsd(allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
-                    setPaid(allUsd)
+                    setPaid(roundUsd(allUsd))
                     setPaidUzs(all)
                 } else {
                     warningMorePayment()
@@ -234,9 +234,9 @@ const ReportPage = () => {
                     // console.log(all);
                 if (allUsd <= maxSum) {
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
-                    setPaid(allUsd)
+                    setPaid(roundUsd(allUsd))
                     setPaidUzs(all)
-                    setPaymentUsd(value)
+                    setPaymentUsd(roundUsd(value))
                 } else {
                     warningMorePayment()
                 }
@@ -772,7 +772,7 @@ const ReportPage = () => {
                                 } td py-[0.625rem] font-bold`}
                         >
                             {[...currentData].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS <br/>
-                            {[...currentData].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)} USD
+                            {Math.round([...currentData].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0) * 100) / 100} USD
                         </li>
                     </ul>
                 )}

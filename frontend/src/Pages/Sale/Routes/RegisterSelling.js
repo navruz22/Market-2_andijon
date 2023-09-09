@@ -21,7 +21,7 @@ import { deleteSavedPayment } from '../Slices/savedSellingsSlice.js'
 import { getAllPackmans } from '../../Clients/clientsSlice.js'
 import SearchInput from '../../../Components/Inputs/SearchInput.js'
 import UniversalModal from '../../../Components/Modal/UniversalModal.js'
-import { UsdToUzs, UzsToUsd } from '../../../App/globalFunctions.js'
+import { roundUsd, UsdToUzs, UzsToUsd } from '../../../App/globalFunctions.js'
 import {
     universalToast,
     warningCountSellPayment,
@@ -158,7 +158,7 @@ const RegisterSelling = () => {
         setModalData(null)
     }
 
-    const convertToUsd = (value) => Math.round(value * 10) / 10
+    const convertToUsd = (value) => Math.round(value * 100) / 100
 
     const convertToUzs = (value) => Math.round(value)
 
@@ -202,12 +202,12 @@ const RegisterSelling = () => {
                 const allUsd2 = tableProducts.reduce(
                     (prev, el) => prev + (!el.isUsd && el.totalprice || 0),
                 0 )
-                setAllPayment(all)
+                setAllPayment(roundUsd(all))
                 setAllPaymentUzs(allUzs)
-                setPaymentUsd(allUsd)
-                setPaymentCash(allUsd2)
+                setPaymentUsd(roundUsd(allUsd))
+                setPaymentCash(roundUsd(allUsd2))
                 setPaymentCashUzs(allUzs2)
-                setPaid(all)
+                setPaid(roundUsd(all))
                 setPaidUzs(allUzs)
                 setPaymentModalVisible(true)
                 currentEchangerate(allUzs, all)
@@ -356,7 +356,7 @@ const RegisterSelling = () => {
             }
         }
     }
-    console.log(paymentCash);
+    
     const writePayment = (value, type) => {
         const maxSum = Math.abs(allPayment) 
         const maxSumUzs = Math.abs(allPaymentUzs)
