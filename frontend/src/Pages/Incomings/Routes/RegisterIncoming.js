@@ -12,6 +12,7 @@ import {
     getProducts,
     getAllSuppliers,
 } from '../incomingSlice'
+import BarcodeReader from 'react-barcode-reader'
 import { ConfirmBtn, SaveBtn } from '../../../Components/Buttons/SaveConfirmBtn'
 import UniversalModal from '../../../Components/Modal/UniversalModal'
 import {
@@ -55,7 +56,7 @@ const RegisterIncoming = () => {
     const [temporaryIncomings, setTemporaryIncomings] = useState([])
     const [selectSupplierValue, setSelectSupplierValue] = useState('')
     const [selectProductValue, setSelectProductValue] = useState('')
-
+    
     // sale states
     const [paymentModalVisible, setPaymentModalVisible] = useState(false)
     const [paymentType, setPaymentType] = useState('cash')
@@ -101,6 +102,14 @@ const RegisterIncoming = () => {
         }
     }
 
+    const handleScan = (data) => {
+        const product = [...products].filter(item => item.productdata.barcode === data)[0]
+        selectProduct({
+            value: product._id,
+            label: product.productdata.name
+        })
+    }
+
     const selectProduct = (e) => {
         setSelectProductValue({
             label: e.label,
@@ -120,7 +129,7 @@ const RegisterIncoming = () => {
     }
 
     // add to product to modalincoming. function
-    const addIncomingToModal = (value) => {
+    const addIncomingToModal = (value, barcode) => {
         const product = [
             ...filter([...products], (product) => product._id === value),
         ][0]
@@ -223,6 +232,10 @@ const RegisterIncoming = () => {
         }
     }
 
+    const handleError = () => {
+        universalToast(t("Mahsulot kodi o'qilmadi!"), 'warning')
+    }
+
     // change datas for react-select //
     const changeSuppliersData = (data) => {
         const suppliers = map(data, (supplier) => {
@@ -240,6 +253,7 @@ const RegisterIncoming = () => {
                 label:
                     product.productdata.code + ' - ' + product.productdata.name,
                 value: product._id,
+                barcode: product.productdata.barcode,
             }
         })
         setProductsData(products)
@@ -791,6 +805,7 @@ const RegisterIncoming = () => {
                     currency={currencyType}
                 />
             </div>
+            <BarcodeReader onError={handleError} onScan={handleScan} />
         </>
     )
 }

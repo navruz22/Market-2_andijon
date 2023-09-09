@@ -346,7 +346,7 @@ module.exports.getClients = async (req, res) => {
         },
       })
         .select("-isArchive -market -__v")
-        .sort({ createdAt: -1 })
+        .sort({ updatedAt: -1 })
         .populate({
           path: "products",
           select: "user",
@@ -357,35 +357,57 @@ module.exports.getClients = async (req, res) => {
         })
         .populate({
           path: "products",
-          select: "price",
+          select: "product",
           populate: {
-            path: "price",
-            select: "incomingprice incomingpriceuzs",
+            path: "product",
+            select: "category",
+            populate: { path: "category", select: "code" },
           },
         })
         .populate({
           path: "products",
           select:
-            "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+            "totalprice unitprice totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces createdAt discount saleproducts product fromFilial",
           options: { sort: { createdAt: -1 } },
           populate: {
             path: "product",
-            select: "productdata",
-            populate: { path: "productdata", select: "name code" },
+            select: "productdata packcount isUsd",
+            populate: {
+              path: "productdata",
+              select: "name code",
+              // match: {name: product}
+            },
           },
         })
-        .populate(
-          "payments",
-          "payment paymentuzs comment totalprice totalpriceuzs createdAt"
-        )
+        .populate({
+          path: "products",
+          select:
+            "totalprice unitprice totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces pieces createdAt discount saleproducts product fromFilial",
+          options: { sort: { createdAt: -1 } },
+          populate: {
+            path: "saleproducts",
+            select: "pieces totalprice totalpriceuzs",
+          },
+        })
+        .populate({
+          path: "payments",
+          select:
+            "payment paymentuzs comment totalprice usdpayment totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs",
+          populate: {
+            path: "debt",
+            select: "debt debtuzs debtType",
+          },
+        })
+        .populate('debts', "debt debtuzs debtType")
         .populate(
           "discounts",
           "discount discountuzs procient products totalprice totalpriceuzs"
         )
-        .populate({ path: "client", select: "name" })
+        .populate({ path: "client", match: { name: name }, select: "name" })
         .populate("packman", "name")
         .populate("user", "firstname lastname")
-        .populate("dailyconnectors", "comment");
+        .populate("dailyconnectors", "comment")
+        .lean()
 
       let s = null;
       if (saleconnectors.length > 0) {

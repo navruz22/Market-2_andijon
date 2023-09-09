@@ -74,6 +74,7 @@ module.exports.getReport = async (req, res) => {
     })
       .select("-isArchive -updatedAt -user -market -__v")
       .populate("products", "totalprice totalpriceuzs")
+      .populate("debts", "debt debtuzs debtType")
       .populate(
         "payments",
         "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs"
@@ -238,20 +239,16 @@ module.exports.getReport = async (req, res) => {
     }, 0);
 
     reports.debts.debts = saleconnector.reduce((prev, sale) => {
-      let totalprice = reducecount(sale.products, "totalprice");
-      let payment = reducecount(sale.payments, "payment");
-      let discount = reducecount(sale.discounts, "discount");
-      return prev + (totalprice - payment - discount);
+      const debts = sale.debts.reduce((prev, debt) => prev + (debt.debtType === 'dollar' && debt.debt || 0), 0)
+      return prev + debts
     }, 0);
 
     reports.debts.debtsuzs = saleconnector.reduce((prev, sale) => {
-      let totalpriceuzs = reducecount(sale.products, "totalpriceuzs");
-      let paymentuzs = reducecount(sale.payments, "paymentuzs");
-      let discountuzs = reducecount(sale.discounts, "discountuzs");
-      return prev + (totalpriceuzs - paymentuzs - discountuzs);
+      const debts = sale.debts.reduce((prev, debt) => prev + (debt.debtType === 'sum' && debt.debtuzs || 0), 0)
+      return prev + debts
     }, 0);
 
-    reports.debts.debts = Math.round(reports.debts.debts * 1000) / 1000;
+    reports.debts.debts = Math.round(reports.debts.debts * 100) / 100;
     reports.debts.debtsuzs = Math.round(reports.debts.debtsuzs * 1) / 1;
     // Get debts report functions  END
 
@@ -281,6 +278,7 @@ module.exports.getReport = async (req, res) => {
 
     res.status(201).send(reports);
   } catch (error) {
+    console.log(error);
     res
       .status(400)
       .json({ error: "Serverda xatolik yuz berdi...", message: error.message });
@@ -551,7 +549,7 @@ module.exports.getPayment = async (req, res) => {
       })
       .populate({
         path: "saleconnector",
-        select: "id client createdAt products payments user dailyconnectors",
+        select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "user",
           select: "firstname lastname",
@@ -559,7 +557,7 @@ module.exports.getPayment = async (req, res) => {
       })
       .populate({
         path: "saleconnector",
-        select: "id client createdAt products payments user dailyconnectors",
+        select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "payments",
           select:
@@ -568,14 +566,14 @@ module.exports.getPayment = async (req, res) => {
       })
       .populate({
         path: "saleconnector",
-        select: "id client createdAt products payments user dailyconnectors",
+        select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "products",
           select:
-            "totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user",
+            "totalprice totalpriceuzs pieces isPackcount packcountpieces price unitprice unitpriceuzs product createdAt user",
           populate: {
             path: "product",
-            select: "productdata",
+            select: "productdata packcount isUsd",
             populate: {
               path: "productdata",
               select: "name code",
@@ -585,11 +583,11 @@ module.exports.getPayment = async (req, res) => {
       })
       .populate({
         path: "saleconnector",
-        select: "id client createdAt products payments user dailyconnectors",
+        select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "products",
           select:
-            "totalprice totalpriceuzs pieces price unitprice unitpriceuzs product createdAt user",
+            "totalprice totalpriceuzs pieces isPackcount packcountpieces price unitprice unitpriceuzs product createdAt user",
           populate: {
             path: "user",
             select: "firstname lastname",
@@ -598,10 +596,18 @@ module.exports.getPayment = async (req, res) => {
       })
       .populate({
         path: "saleconnector",
-        select: "id client createdAt products payments user dailyconnectors",
+        select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "dailyconnectors",
           select: "payment",
+        },
+      })
+      .populate({
+        path: "saleconnector",
+        select: "id client createdAt products payments user dailyconnectors debts",
+        populate: {
+          path: "debts",
+          select: "debt debtuzs debtType",
         },
       })
       .lean();
@@ -723,18 +729,18 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+          "totalprice unitprice totalpriceuzs isPackcount packcountpieces unitpriceuzs pieces createdAt discount saleproducts product",
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "product",
-          select: "productdata",
+          select: "productdata packcount isUsd",
           populate: { path: "productdata", select: "name code" },
         },
       })
       .populate({
         path: "products",
         select:
-          "totalprice unitprice totalpriceuzs unitpriceuzs pieces createdAt discount saleproducts product",
+          "totalprice unitprice totalpriceuzs unitpriceuzs pieces packcountpieces createdAt discount saleproducts product",
         options: { sort: { createdAt: -1 } },
         populate: {
           path: "user",

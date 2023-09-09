@@ -258,7 +258,10 @@ export const SalesListTableRow = ({
                         {currency}
                     </td> */}
                     <td className='text-error-500 text-right td'>
-                        {calculateDebtUsd(saleconnector.payments) > 0 ? calculateDebtUsd(saleconnector.payments) + ' ' + 'USD' : calculateDebt(saleconnector.payments) + ' ' + 'USD'}
+                        {saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS
+                    </td>
+                    <td className='text-error-500 text-right td'>
+                        {saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)} USD
                     </td>
                     <td className='text-left td  '>
                         {saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (

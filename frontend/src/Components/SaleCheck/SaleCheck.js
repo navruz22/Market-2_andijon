@@ -111,7 +111,7 @@ export const SaleCheck = forwardRef((props, ref) => {
                                         {item?.isPackcount && item?.packcountpieces > 0 ? item?.packcountpieces : ""}
                                     </td>}
                                     <td className='check-table-body'>
-                                        {item?.product?.isUsd 
+                                        {item?.product?.isUsd
                                             ? item?.unitprice
                                             : item?.unitpriceuzs}{' '}
                                         {item?.product?.isUsd ? "USD" : "UZS"}
@@ -128,16 +128,18 @@ export const SaleCheck = forwardRef((props, ref) => {
                     </tbody>
                 </table>
             </div>
-            <div className='border-t-[0.8px] border-black-700 w-full my-[1rem]'></div>
+            <div className='border-t-[0.8px] border-black-700 w-full mt-[1rem]'></div>
             <ul>
-                <li className='check-ul-li-foot border-t-0'>
+                <li className='check-ul-li-foot border-t-0 text-[#000] text-[18px] font-bold'>
                     Jami:{' '}
-                    <span className='font-bold'>
-                        {currencyType === 'USD'
-                            ? product?.payment?.totalprice
-                            : product?.payment?.totalpriceuzs}{' '}
-                        {currencyType}
-                    </span>
+                    <div className='flex gap-2'>
+                        <span className='font-bold text-[#000]'>
+                            {[...products].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)} USD <br />
+                        </span>
+                        <span className='font-bold text-[#000]'>
+                            {[...products].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)} UZS
+                        </span>
+                    </div>
                 </li>
                 <li className='check-ul-li-foot'>
                     {' '}

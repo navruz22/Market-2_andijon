@@ -1067,7 +1067,7 @@ const RegisterSelling = () => {
         if (client && client.hasOwnProperty('packman')) {
             setPackmanValue({
                 label: client?.packman?.name,
-                value: client.packman._id,
+                value: client?.packman?._id,
             })
         }
         option.value ? setUserValue(option.label) : setUserValue('')

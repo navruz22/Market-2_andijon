@@ -771,8 +771,8 @@ const ReportPage = () => {
                             className={`col-span-4 ${currentData.length === 0 && 'border-t-2'
                                 } td py-[0.625rem] font-bold`}
                         >
-                            {roundUzs(totalDebt.uzs)} UZS <br/>
-                            {roundUsd(totalDebt.usd)} USD
+                            {[...currentData].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS <br/>
+                            {[...currentData].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)} USD
                         </li>
                     </ul>
                 )}

@@ -724,6 +724,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           select: "debt debtuzs debtType",
         },
       })
+      .populate('debts', "debt debtuzs debtType")
       .populate(
         "discounts",
         "discount discountuzs procient products totalprice totalpriceuzs"

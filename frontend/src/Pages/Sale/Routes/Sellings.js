@@ -50,6 +50,9 @@ const Sellings = ({id}) => {
             title: t('Qarz'),
         },
         {
+            title: t('Qarz USD'),
+        },
+        {
             title: t('Izoh'),
         },
         {
