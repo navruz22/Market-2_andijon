@@ -803,12 +803,6 @@ const ReportPage = () => {
                                 {currencyType === 'USD' ? roundUsd(totalpayment.payment.transfer).toLocaleString('ru-RU') : roundUzs(totalpayment.payment.transferuzs).toLocaleString('ru-RU')}{' '}{currencyType}
                             </div>
                         </div>
-                        <div className='text-[18px] font-semibold w-[200px] flex justify-end'>
-                            {currencyType === 'USD' ?
-                                roundUsd(totalpayment.payment.cash + totalpayment.payment.card + totalpayment.payment.transfer).toLocaleString('ru-RU') :
-                                roundUzs(totalpayment.payment.cashuzs + totalpayment.payment.carduzs + totalpayment.payment.transferuzs).toLocaleString('ru-RU')}{' '}
-                            {currencyType}
-                        </div>
                     </div>
                     <div className='flex flex-col items-start gap-2'>
                         <div className='text-[18px] font-bold mb-2'>Qaytarilganlar</div>
@@ -835,12 +829,6 @@ const ReportPage = () => {
                                 : roundUzs(totalpayment.back.transferuzs).toLocaleString('ru-RU')}{' '}
                                 {currencyType}</span>
                         </div>
-                        <div className='text-[18px] font-semibold w-[200px] flex justify-end'>
-                            {currencyType === 'USD' ?
-                                roundUsd(totalpayment.back.cash + totalpayment.back.card + totalpayment.back.transfer).toLocaleString('ru-RU') :
-                                roundUzs(totalpayment.back.cashuzs + totalpayment.back.carduzs + totalpayment.back.transferuzs).toLocaleString('ru-RU')}{' '}
-                            {currencyType}
-                        </div>
                     </div>
                     <div className='flex flex-col items-start gap-2'>
                         <div className='text-[18px] font-bold mb-2'>Kassadagi qoldiq</div>
@@ -858,12 +846,6 @@ const ReportPage = () => {
                         <div className='font-semibold w-[200px] flex justify-between'>
                             <div>O'tkazma:</div>
                             <span>{currencyType === 'USD' ? roundUsd(totalpayment.result.transfer).toLocaleString('ru-RU') : roundUzs(totalpayment.result.transferuzs).toLocaleString('ru-RU')}{' '}{currencyType}</span></div>
-                        <div className='text-[18px] font-semibold w-[200px] flex justify-end'>
-                            {currencyType === 'USD' ?
-                                roundUsd(totalpayment.result.cash + totalpayment.result.card + totalpayment.result.transfer).toLocaleString('ru-RU') :
-                                roundUzs(totalpayment.result.cashuzs + totalpayment.result.carduzs + totalpayment.result.transferuzs).toLocaleString('ru-RU')}{' '}
-                            {currencyType}
-                        </div>
                     </div>
                 </div>}
             </div>
