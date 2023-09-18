@@ -158,7 +158,7 @@ const RegisterSelling = () => {
         setModalData(null)
     }
 
-    const convertToUsd = (value) => Math.round(value * 100) / 100
+    const convertToUsd = (value) => Math.round(value * 1000) / 1000
 
     const convertToUzs = (value) => Math.round(value)
 
@@ -1181,7 +1181,7 @@ const RegisterSelling = () => {
             i === index
                 ? {
                     ...prevProduct,
-                    pieces: prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : Number(value),
+                    pieces: prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : value,
                     packcountpieces: prevProduct?.isPackcount ? Number(value) : 0,
                     totalprice: convertToUsd(
                         (prevProduct?.isPackcount ? Number(value) * prevProduct?.packcount : Number(value)) *

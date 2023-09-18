@@ -40,7 +40,10 @@ const RegisterproductModal = ({
                                 <span>{t('Jami')}</span>
                             </th>
                             <th scope='col' className='th w-[15%]'>
-                                <span>{t('Sotish')}</span>
+                                <span>{t('Sotish UZS')}</span>
+                            </th>
+                            <th scope='col' className='th w-[15%]'>
+                                <span>{t('Sotish USD')}</span>
                             </th>
                             <th scope='col' className='th w-[15%]'>
                                 <span>{t('Sotish')} %</span>
@@ -65,7 +68,7 @@ const RegisterproductModal = ({
                                         changeProduct(e, 'unitprice')
                                     }
                                     type={'number'}
-                                    value={product.unitpriceuzs}
+                                    value={product.unitpriceuzs || ''}
                                 />
                             </td>
                             <td className='py-1 td'>
@@ -99,12 +102,16 @@ const RegisterproductModal = ({
                                         changeProduct(e, 'sellingprice')
                                     }
                                     type={'number'}
-                                    value={
-                                        current(
-                                            product.sellingprice,
-                                            product.sellingpriceuzs
-                                        ) || ''
+                                    value={product.sellingpriceuzs}
+                                />
+                            </td>
+                            <td className='py-1 td'>
+                                <TableInput
+                                    onChange={(e) =>
+                                        changeProduct(e, 'sellingpriceusd')
                                     }
+                                    type={'number'}
+                                    value={product.sellingprice}
                                 />
                             </td>
                             <td className='py-1 td'>

@@ -189,22 +189,28 @@ const RegisterIncoming = () => {
         }
 
         const changeunitprice = (obj) => {
-            obj.unitprice = countUsd
-            obj.unitpriceuzs = countUzs
-            obj.totalprice = roundUsd(countUsd * obj.pieces)
-            obj.totalpriceuzs = roundUzs(countUzs * obj.pieces)
+            obj.unitprice = UzsToUsd(target, currency)
+            obj.unitpriceuzs = target
+            obj.totalprice = roundUsd(UzsToUsd(target, currency) * obj.pieces)
+            obj.totalpriceuzs = roundUzs(target * obj.pieces)
         }
 
         const changeunitpriceusd = (obj) => {
-            obj.unitprice = target
-            obj.unitpriceuzs = UsdToUzs(target, currency)
-            obj.totalprice = roundUsd(target * obj.pieces)
-            obj.totalpriceuzs = roundUzs(UsdToUzs(target, currency) * obj.pieces)
+            obj.unitprice = e.target.value
+            obj.unitpriceuzs = UsdToUzs(e.target.value, currency)
+            obj.totalprice = roundUsd(e.target.value * obj.pieces)
+            obj.totalpriceuzs = roundUzs(UsdToUzs(e.target.value, currency) * obj.pieces)
         }
 
         const changesellingprice = (obj) => {
-            obj.sellingprice = countUsd
-            obj.sellingpriceuzs = countUzs
+            obj.sellingprice = UzsToUsd(e.target.value, currency)
+            obj.sellingpriceuzs = e.target.value
+            obj.procient = 0
+        }
+
+        const changesellingpriceusd = (obj) => {
+            obj.sellingprice = e.target.value
+            obj.sellingpriceuzs = UsdToUzs(e.target.value, currency)
             obj.procient = 0
         }
 
@@ -223,6 +229,7 @@ const RegisterIncoming = () => {
         check('unitprice') && changeunitprice(product)
         check('unitpriceusd') && changeunitpriceusd(product)
         check('sellingprice') && changesellingprice(product)
+        check('sellingpriceusd') && changesellingpriceusd(product)
         check('procient') && changeProcient(product)
         check('tradeprice') && changetradeprice(product)
 

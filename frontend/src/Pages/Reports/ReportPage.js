@@ -456,6 +456,7 @@ const ReportPage = () => {
     }
 
     const handleClickPrint = (saleconnector) => {
+        console.log(saleconnector);
         if (id === 'debts') {
             setModalData(saleconnector)
             setModalBody('allChecks')

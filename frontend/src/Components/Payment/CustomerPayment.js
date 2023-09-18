@@ -107,7 +107,7 @@ function CustomerPayment({
                     )
                     :
                     <>
-                        {type === 'mixed' && <PaymentInput
+                        {type !== 'mixed' && <PaymentInput
                             key={'sale-usd'}
                             value={paymentUsd}
                             onChange={onChange}
