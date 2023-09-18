@@ -348,6 +348,7 @@ const RegisterSelling = () => {
                     setPaymentTransferUzs('')
                     setPaid(0)
                     setPaidUzs(0)
+                    setPaymentUsd('')
                     setPaymentDebt(allPayment - Number(paymentDiscount))
                     setPaymentDebtUzs(
                         allPaymentUzs - Number(paymentDiscountUzs)
@@ -435,10 +436,14 @@ const RegisterSelling = () => {
             if (type === 'cash') {
                 const all =
                     Number(value) +
-                    Number(UsdToUzs(paymentUsd, exchangerate))
+                    Number(UsdToUzs(paymentUsd, exchangerate)) +
+                    Number(paymentTransferUzs) +
+                    Number(paymentCardUzs)
                 const allUsd =
                     Number(UzsToUsd(value, exchangerate)) +
-                    Number(paymentUsd)
+                    Number(paymentUsd) +
+                    Number(paymentTransfer) +
+                    Number(paymentCard)
                 if (all <= maxSumUzs) {
                     setPaymentCashUzs(value)
                     setPaymentCash(UzsToUsd(value, exchangerate))
@@ -456,7 +461,7 @@ const RegisterSelling = () => {
                 const allUsd =
                     Number(value) + paymentCash 
                 if (all <= maxSumUzs) {
-                    console.log(maxSum, allUsd);
+                    // console.log(maxSum, allUsd);
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
                     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
                     setPaid(allUsd)

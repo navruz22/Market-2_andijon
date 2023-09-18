@@ -107,14 +107,14 @@ function CustomerPayment({
                     )
                     :
                     <>
-                        <PaymentInput
+                        {type === 'mixed' && <PaymentInput
                             key={'sale-usd'}
                             value={paymentUsd}
                             onChange={onChange}
                             keyInput={'usd'}
                             onClose={onClose}
                             label={t('USD')}
-                        />
+                        />}
                         <PaymentInput
                             key={'sale-cash'}
                             value={cash}
@@ -266,13 +266,13 @@ function CustomerPayment({
                             active={type === 'transfer'}
                             onClick={changePaymentType}
                         />
-                        {/* {!returned && <SaleBtn
+                        {!returned && <SaleBtn
                             text={t(`Aralash`)}
                             type='mixed'
                             active={type === 'mixed'}
                             onClick={changePaymentType}
                         />}
-                        {location.pathname.includes('/kassa/debts') && <SaleBtn
+                        {/* {location.pathname.includes('/kassa/debts') && <SaleBtn
                             text={t(`Aralash`)}
                             type='mixed'
                             active={type === 'mixed'}

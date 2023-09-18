@@ -28,7 +28,10 @@ const RegisterproductModal = ({
                                 <span>{t('Soni')}</span>
                             </th>
                             <th scope='col' className='th w-[15%]'>
-                                <span>{t('Kelish')}</span>
+                                <span>{t('Kelish UZS')}</span>
+                            </th>
+                            <th scope='col' className='th w-[15%]'>
+                                <span>{t('Kelish USD')}</span>
                             </th>
                             <th scope='col' className='th'>
                                 <span>{t('Avvalgi')}</span>
@@ -62,12 +65,16 @@ const RegisterproductModal = ({
                                         changeProduct(e, 'unitprice')
                                     }
                                     type={'number'}
-                                    value={
-                                        current(
-                                            product.unitprice,
-                                            product.unitpriceuzs
-                                        ) || ''
+                                    value={product.unitpriceuzs}
+                                />
+                            </td>
+                            <td className='py-1 td'>
+                                <TableInput
+                                    onChange={(e) =>
+                                        changeProduct(e, 'unitpriceusd')
                                     }
+                                    type={'number'}
+                                    value={product.unitprice}
                                 />
                             </td>
                             <td className='py-0 td text-error-500 text-right'>

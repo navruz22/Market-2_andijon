@@ -195,6 +195,13 @@ const RegisterIncoming = () => {
             obj.totalpriceuzs = roundUzs(countUzs * obj.pieces)
         }
 
+        const changeunitpriceusd = (obj) => {
+            obj.unitprice = target
+            obj.unitpriceuzs = UsdToUzs(target, currency)
+            obj.totalprice = roundUsd(target * obj.pieces)
+            obj.totalpriceuzs = roundUzs(UsdToUzs(target, currency) * obj.pieces)
+        }
+
         const changesellingprice = (obj) => {
             obj.sellingprice = countUsd
             obj.sellingpriceuzs = countUzs
@@ -214,6 +221,7 @@ const RegisterIncoming = () => {
 
         check('pieces') && changepieces(product)
         check('unitprice') && changeunitprice(product)
+        check('unitpriceusd') && changeunitpriceusd(product)
         check('sellingprice') && changesellingprice(product)
         check('procient') && changeProcient(product)
         check('tradeprice') && changetradeprice(product)
