@@ -53,7 +53,7 @@ export const RegisterSaleTableRow = (
                         />
                         </div>
                     </td>
-                    <td className='text-right td font-bold'>{product?.isPackcount ? (product?.totalpackcount % 1 === 0 ? product?.totalpackcount.toFixed(0) : product?.totalpackcount.toFixed(2)) : product?.total}</td>
+                    <td className='text-right td font-bold'>{product?.isPackcount ? (product?.totalpackcount % 1 === 0 ? product?.totalpackcount.toFixed(0) : product?.totalpackcount.toFixed(2)) : product?.total.toFixed(2)}</td>
                     <td className='text-left td'>{product.product.name}</td>
                     <td className='text-right td'>
                         <span className={'flex gap-[0.6rem] items-center'}>
@@ -89,7 +89,7 @@ export const RegisterSaleTableRow = (
                     </td>
                     <td style={{color: product?.isUsd && "rgb(34 197 94)"}} className='text-right td'>
                         {product?.isUsd
-                            ? product.totalprice.toLocaleString('ru-Ru')
+                            ? product.totalprice
                             : product.totalpriceuzs.toLocaleString(
                                 'ru-Ru'
                             )}{' '}

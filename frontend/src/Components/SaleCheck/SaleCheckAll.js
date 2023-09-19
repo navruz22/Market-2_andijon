@@ -141,14 +141,14 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                             Sotuv: <span className={'ml-2 font-bold'}>{product?.id}</span>
                         </h2>
                     </div>
-                    <div className='check-ul-li justify-end'>
+                    {/* <div className='check-ul-li justify-end'>
                         <p>
                             Sotuvchi:{' '}
                             <span className='check-ul-li-span font-bold'>
                                 {userInfo?.firstname} {userInfo?.lastname}
                             </span>
                         </p>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             {selled?.length > 0 && (

@@ -51,9 +51,7 @@ const ClientsPage = () => {
             new Date().getDate()
         )
     )
-    const [endDate, setEndDate] = useState(
-        new Date(new Date().setHours(23, 59, 59, 0)).toISOString()
-    )
+    const [endDate, setEndDate] = useState(new Date())
 
     // states
     const [packmanOptions, setPackmanOptions] = useState([])

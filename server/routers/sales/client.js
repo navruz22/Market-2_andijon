@@ -340,9 +340,9 @@ module.exports.getClients = async (req, res) => {
       const saleconnectors = await SaleConnector.find({
         market,
         client: client._id,
-        createdAt: {
+        updatedAt: {
           $gte: startDate,
-          $lt: endDate,
+          $lte: endDate,
         },
       })
         .select("-isArchive -market -__v")
@@ -403,12 +403,12 @@ module.exports.getClients = async (req, res) => {
           "discounts",
           "discount discountuzs procient products totalprice totalpriceuzs"
         )
-        .populate({ path: "client", match: { name: name }, select: "name" })
+        .populate('client', 'name')
         .populate("packman", "name")
         .populate("user", "firstname lastname")
         .populate("dailyconnectors", "comment")
         .lean()
-
+        // console.log(saleconnectors);
       let s = null;
       if (saleconnectors.length > 0) {
         const payments = reduceForSales(saleconnectors, "payments");
@@ -452,6 +452,7 @@ module.exports.getClients = async (req, res) => {
           profit: totalsales - incomings,
           profituzs: totalsalesuzs - incomingsuzs,
           id: saleconnectors[0].id,
+          client: saleconnectors[0].client,
         };
       }
       const newClient = {

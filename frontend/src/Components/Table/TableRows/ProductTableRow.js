@@ -44,7 +44,7 @@ export const ProductTableRow = ({
                         {product.price && product?.price?.incomingpriceuzs && product?.price?.incomingpriceuzs.toLocaleString('ru-RU')}{' '} UZS
                     </td>
                     <td className='td text-right'>
-                        {product.price && product?.price?.incomingprice && product?.price?.incomingprice.toLocaleString('ru-RU')}{' '} USD
+                        {product.price && product?.price?.incomingprice && roundUsd(product?.price?.incomingprice)}{' '} USD
                     </td>
                     <td className={`td text-right`}>
                         {product.price && product?.price?.sellingpriceuzs && product?.price?.sellingpriceuzs.toLocaleString(
@@ -53,9 +53,7 @@ export const ProductTableRow = ({
                         UZS
                     </td>
                     <td style={{color: product?.isUsd && "rgb(34 197 94)"}} className={`td text-right`}>
-                        {product.price && product?.price?.sellingprice && roundUsd(product?.price?.sellingprice).toLocaleString(
-                                    'ru-RU'
-                                )} {' '}
+                        {product.price && product?.price?.sellingprice && roundUsd(product?.price?.sellingprice)} {' '}
                         USD
                     </td>
                     <td

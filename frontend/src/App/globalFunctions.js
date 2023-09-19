@@ -22,7 +22,7 @@ export const universalSort = (data, setData, key, sort, prevData) => {
 export const UsdToUzs = (val, currency) => Math.round(val * currency)
 
 export const UzsToUsd = (val, currency) =>
-    Math.round((val / currency) * 1000) / 1000
+    Math.round((val / currency) * 10000) / 10000
 
 // check empty string
 export const checkEmptyString = (values) => {
@@ -70,7 +70,7 @@ export const exportExcel = (data, fileName, headers) => {
 // round UZS||USD
 export const roundUzs = (val) => Math.round(val * 1) / 1
 
-export const roundUsd = (val) => Math.round(val * 1000) / 1000
+export const roundUsd = (val) => Math.round(val * 10000) / 10000
 
 // reduce
 export const reduceSumm = (arr, key) =>

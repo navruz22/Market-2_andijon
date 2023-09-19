@@ -1,5 +1,6 @@
 import React from 'react'
 import { reduce } from 'lodash'
+import { roundUsd } from '../../../App/globalFunctions'
 
 export const RegisterSaleTableFooter = ({ saleproducts, currency }) => {
 
@@ -21,7 +22,7 @@ export const RegisterSaleTableFooter = ({ saleproducts, currency }) => {
             </th>
             <th colSpan={2} className="py-2">
                 {totalpriceuzs.toLocaleString('ru-RU')}{' '} UZS <br/> <br/>
-                {totalprice.toLocaleString('ru-RU')}{' '} USD
+                {roundUsd(totalprice)}{' '} USD
             </th>
         </tr>
     )

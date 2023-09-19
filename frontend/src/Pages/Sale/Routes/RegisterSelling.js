@@ -158,7 +158,7 @@ const RegisterSelling = () => {
         setModalData(null)
     }
 
-    const convertToUsd = (value) => Math.round(value * 1000) / 1000
+    const convertToUsd = (value) => Math.round(value * 10000) / 10000
 
     const convertToUzs = (value) => Math.round(value)
 

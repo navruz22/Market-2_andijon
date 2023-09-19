@@ -325,9 +325,9 @@ module.exports.register = async (req, res) => {
 
     const newPrice = new ProductPrice({
       incomingprice: incomingprice
-        ? Math.round(incomingprice * 100) / 100
+        ? Math.round(incomingprice * 10000) / 10000
         : 0,
-      sellingprice: sellingprice ? Math.round(sellingprice * 100) / 100 : 0,
+      sellingprice: sellingprice ? Math.round(sellingprice * 10000) / 10000 : 0,
       incomingpriceuzs: incomingpriceuzs
         ? Math.round(incomingpriceuzs * 1) / 1
         : 0,
@@ -438,9 +438,9 @@ module.exports.register = async (req, res) => {
 
         const newFilialPrice = new ProductPrice({
           incomingprice: incomingprice
-            ? Math.round(incomingprice * 100) / 100
+            ? Math.round(incomingprice * 10000) / 10000
             : 0,
-          sellingprice: sellingprice ? Math.round(sellingprice * 100) / 100 : 0,
+          sellingprice: sellingprice ? Math.round(sellingprice * 10000) / 10000 : 0,
           incomingpriceuzs: incomingpriceuzs
             ? Math.round(incomingpriceuzs * 1) / 1
             : 0,
@@ -555,7 +555,7 @@ module.exports.update = async (req, res) => {
 
     const { currentPage, countPage, search } = req.body;
     const marke = await Market.findById(market);
-    console.log(marke);
+    
     if (!marke) {
       return res.status(400).json({
         message: "Diqqat! Do'kon ma'lumotlari topilmadi.",
@@ -611,8 +611,8 @@ module.exports.update = async (req, res) => {
       .sort({ _id: -1 });
 
     await ProductPrice.findByIdAndUpdate(priceid, {
-      incomingprice: Math.round(incomingprice * 100) / 100,
-      sellingprice: Math.round(sellingprice * 100) / 100,
+      incomingprice: Math.round(incomingprice * 10000) / 10000,
+      sellingprice: Math.round(sellingprice * 10000) / 10000,
       incomingpriceuzs:
         Math.round(
           (incomingpriceuzs
@@ -690,8 +690,8 @@ module.exports.update = async (req, res) => {
           });
 
         await ProductPrice.findByIdAndUpdate(filialproduct.price, {
-          incomingprice: Math.round(incomingprice * 100) / 100,
-          sellingprice: Math.round(sellingprice * 100) / 100,
+          incomingprice: Math.round(incomingprice * 10000) / 10000,
+          sellingprice: Math.round(sellingprice * 10000) / 10000,
           incomingpriceuzs:
             Math.round(
               (incomingpriceuzs
