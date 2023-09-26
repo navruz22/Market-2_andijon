@@ -7,7 +7,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
     const {
         product
     } = props
-
+    const { products } = product
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateDebt = (total, payment, discount = 0) => {
@@ -61,7 +61,8 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
                     Sotuvchi:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
-                        {product?.saleconnector?.id}
+                        {product?.user?.firstname}{' '}
+                        {product?.user?.lastname}
                     </span>
                 </div>
             </div>
@@ -89,14 +90,14 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     Jami UZS:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {product?.payment?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}
+                        {[...products].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)}{' '}
                         UZS
                     </span>
                 </h3>
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     Jami USD:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {product?.payment?.totalprice.toLocaleString('ru-Ru')}{' '}
+                        {[...products].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)}{' '}
                         USD
                     </span>
                 </h3>
