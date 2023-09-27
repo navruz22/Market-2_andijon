@@ -6,7 +6,7 @@ import PaymentInput from './PaymentInput/PaymentInput.js'
 import { t } from 'i18next'
 import { useLocation } from 'react-router-dom'
 import Checkbox from '../Checkbox/Checkbox.js'
-import { roundUsd } from '../../App/globalFunctions.js'
+import { roundUsd, UsdToUzs } from '../../App/globalFunctions.js'
 
 function CustomerPayment({
     returned,
@@ -17,6 +17,7 @@ function CustomerPayment({
     card = '',
     transfer = '',
     discount,
+    discountUzs,
     hasDiscount,
     debt,
     allPayment,
@@ -32,6 +33,7 @@ function CustomerPayment({
     handleChangeDiscount,
     exchangerate,
     handleClickPay,
+    allMainPayment,
     saleComment,
     changeComment,
     onDoubleClick,
@@ -126,7 +128,7 @@ function CustomerPayment({
                     </>
         }
     }
-    const { currencyType } = useSelector((state) => state.currency)
+    const { currencyType, currency } = useSelector((state) => state.currency)
     return (
         <section
             className={`absolute transition-all left-0 top-0 right-0 bottom-0 overflow-hidden duration-200 ease-out bg-black-300 backdrop-blur-[3px] z-20 ${active
@@ -159,7 +161,7 @@ function CustomerPayment({
                         </div>
                     )}
                     <div className='mb-[1.25rem] font-medium text-[1.25rem] text-center leading-[23.44px]'>
-                        {location.pathname.includes('/kassa/debts') && debtType === 'dollar' ? allPayment + ' USD' : allPaymentUzs + ' UZS'}
+                        {location.pathname.includes('/kassa/debts') ? (debtType === 'dollar' ? allPayment + ' USD' : allPaymentUzs + ' UZS') : Number(allMainPayment) + ' UZS'}
                     </div>
                     <ul className='w-full pb-[1.25rem]'>
                         {!returned && defineLabel()}
@@ -175,12 +177,24 @@ function CustomerPayment({
                             type={'text'}
                         />
                         {hasDiscount && (
-                            <DiscountInput
-                                value={discount}
-                                onChange={handleChangeDiscount}
-                                option={discountSelectOption}
-                                onSelect={handleChangeDiscountSelectOption}
-                            />
+                            <>
+                                <DiscountInput
+                                    value={discount}
+                                    onChange={handleChangeDiscount}
+                                    option={discountSelectOption}
+                                    onSelect={handleChangeDiscountSelectOption}
+                                    label={'Chegirma USD'}
+                                    type={'usd'}
+                                />
+                                <DiscountInput
+                                    value={discountUzs}
+                                    onChange={handleChangeDiscount}
+                                    option={discountSelectOption}
+                                    onSelect={handleChangeDiscountSelectOption}
+                                    label={'Chegirma UZS'}
+                                    type={'uzs'}
+                                />
+                            </>
                         )}
                         {location.pathname.includes('/kassa/debts') ?
                             (
@@ -279,12 +293,12 @@ function CustomerPayment({
                             onClick={changePaymentType}
                         />} */}
                     </div>
-                    {/* {!returned && (
+                    {!returned && (
                         <DiscountBtn
                             text={t(`Chegirma`)}
                             onClick={handleClickDiscountBtn}
                         />
-                    )} */}
+                    )}
                     <Payment
                         text={t(`To'lash`)}
                         onClick={handleClickPay}

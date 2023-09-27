@@ -13,7 +13,7 @@ function PaymentSelect({value, onChange, option, onSelect}) {
             className={`flex w-[11.75rem] border border-warning-500 rounded-[0.25rem] outline outline-transparent outline-0 focus-within:outline-2 focus-within:outline-warning-500 transition-all ease-in-out duration-100 relative`}
         >
             <input
-                className='w-[8.6875rem] placeholder-blue-200 py-[0.3125rem] px-[.3125rem] rounded-l-[0.25rem] outline-0 text-sm text-right transition-all ease-in-out duration-100'
+                className='w-full placeholder-blue-200 py-[0.3125rem] px-[.3125rem] rounded-[0.25rem] outline-0 text-sm text-right transition-all ease-in-out duration-100'
                 placeholder={'misol: 100 000 000'}
                 type={'number'}
                 value={value}
@@ -23,8 +23,7 @@ function PaymentSelect({value, onChange, option, onSelect}) {
                 onWheel={(e) => e.target.blur()}
                 min={0}
             />
-            />
-            <Select
+            {/* <Select
                 onChange={onSelect}
                 styles={CustomStyle}
                 isSearchable={false}
@@ -34,7 +33,7 @@ function PaymentSelect({value, onChange, option, onSelect}) {
                     IndicatorSeparator: () => null,
                     DropdownIndicator: DropdownIcon
                 }}
-            />
+            /> */}
         </div>
     )
 }

@@ -196,10 +196,17 @@ export const SmallCheck = forwardRef((props, ref) => {
                 </div>
             )}
             <div className='text-black-900  check-ul-li-foot mt-4'>
-                Jami :{' '}
+                Jami UZS:{' '}
                 <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                    {product?.payment?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}
+                {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)}{' '}
                     UZS
+                </span>
+            </div>
+            <div className='text-black-900  check-ul-li-foot mt-4'>
+                Jami USD:{' '}
+                <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)}{' '}
+                    USD
                 </span>
             </div>
             {/* <div className='text-black-900 border-none check-ul-li-foot'>

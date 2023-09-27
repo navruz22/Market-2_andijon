@@ -80,6 +80,7 @@ const RegisterSelling = () => {
     const [paymentDiscount, setPaymentDiscount] = useState('')
     const [paymentDiscountUzs, setPaymentDiscountUzs] = useState('')
     const [paymentDiscountPercent, setPaymentDiscountPercent] = useState('')
+    const [allMainPayment, setAllMainPayment] = useState('')
     const [hasDiscount, setHasDiscount] = useState(false)
     const [discountSelectOption, setDiscountSelectOption] = useState({
         label: '%',
@@ -197,13 +198,14 @@ const RegisterSelling = () => {
                 )
                 const allUsd = tableProducts.reduce(
                     (prev, el) => prev + (el.isUsd && el.totalprice || 0),
-                0 )
+                    0)
 
                 const allUsd2 = tableProducts.reduce(
                     (prev, el) => prev + (!el.isUsd && el.totalprice || 0),
-                0 )
-                setAllPayment(roundUsd(all))
-                setAllPaymentUzs(allUzs)
+                    0)
+                setAllPayment(roundUsd(allUsd))
+                setAllPaymentUzs(allUzs2)
+                setAllMainPayment(allUzs)
                 setPaymentUsd(roundUsd(allUsd))
                 setPaymentCash(roundUsd(allUsd2))
                 setPaymentCashUzs(allUzs2)
@@ -359,8 +361,8 @@ const RegisterSelling = () => {
     }
     
     const writePayment = (value, type) => {
-        const maxSum = Math.abs(allPayment) 
-        const maxSumUzs = Math.abs(allPaymentUzs)
+        const maxSum = (Math.abs(allPayment) + Number(UzsToUsd(allPaymentUzs, exchangerate))) - (Number(UzsToUsd(paymentDiscountUzs, exchangerate)) + Number(paymentDiscount))
+        const maxSumUzs = (Math.abs(allPaymentUzs) + Number(UsdToUzs(allPayment, exchangerate))) - (Number(UsdToUzs(paymentDiscount, exchangerate)) + Number(paymentDiscountUzs))
         if (currencyType === 'USD') {
             if (type === 'cash') {
                 const all =
@@ -438,12 +440,12 @@ const RegisterSelling = () => {
                     Number(value) +
                     Number(UsdToUzs(paymentUsd, exchangerate)) +
                     Number(paymentTransferUzs) +
-                    Number(paymentCardUzs)
+                    Number(paymentCardUzs) 
                 const allUsd =
                     Number(UzsToUsd(value, exchangerate)) +
                     Number(paymentUsd) +
                     Number(paymentTransfer) +
-                    Number(paymentCard)
+                    Number(paymentCard) 
                 if (all <= maxSumUzs) {
                     setPaymentCashUzs(value)
                     setPaymentCash(UzsToUsd(value, exchangerate))
@@ -457,9 +459,14 @@ const RegisterSelling = () => {
             } else if (type === 'usd') {
                 const all =
                     Number(paymentCashUzs) +
-                    Number(UsdToUzs(value, exchangerate)) 
+                    Number(UsdToUzs(value, exchangerate)) +
+                    Number(paymentTransferUzs) +
+                    Number(paymentCardUzs) 
                 const allUsd =
-                    Number(value) + paymentCash 
+                    Number(value) + paymentCash + Number(paymentTransfer) +
+                    Number(paymentCard) 
+                    console.log(all);
+                    console.log(maxSumUzs);
                 if (all <= maxSumUzs) {
                     // console.log(maxSum, allUsd);
                     setPaymentDebt(convertToUsd(maxSum - allUsd))
@@ -474,11 +481,13 @@ const RegisterSelling = () => {
                 const all =
                     Number(value) +
                     Number(paymentCashUzs) +
-                    Number(paymentTransferUzs)
+                    Number(paymentTransferUzs) +
+                    Number(UsdToUzs(paymentUsd, exchangerate))
                 const allUsd =
                     Number(paymentCash) +
                     Number(UzsToUsd(value, exchangerate)) +
-                    Number(paymentTransfer)
+                    Number(paymentTransfer) +
+                    Number(paymentUsd)
                 if (all <= maxSumUzs) {
                     setPaymentCard(UzsToUsd(value, exchangerate))
                     setPaymentCardUzs(value)
@@ -493,11 +502,13 @@ const RegisterSelling = () => {
                 const all =
                     Number(value) +
                     Number(paymentCashUzs) +
-                    Number(paymentCardUzs)
+                    Number(paymentCardUzs) +
+                    Number(UsdToUzs(paymentUsd, exchangerate))
                 const allUsd =
                     Number(paymentCash) +
                     Number(paymentCard) +
-                    Number(UzsToUsd(value, exchangerate))
+                    Number(UzsToUsd(value, exchangerate)) +
+                    Number(paymentUsd) 
                 if (all <= maxSumUzs) {
                     setPaymentTransfer(UzsToUsd(value, exchangerate))
                     setPaymentTransferUzs(value)
@@ -512,95 +523,118 @@ const RegisterSelling = () => {
         }
     }
 
-    const handleChangeDiscount = (value) => {
-        const allPaymentAfterDiscount =
-            Math.round(((allPayment * 30) / 100) * 1000) / 1000
-        const allPaymentUzsAfterDiscount =
-            Math.round(((allPaymentUzs * 30) / 100) * 1) / 1
-        if (discountSelectOption.value === 'USD') {
-            if (value > allPaymentAfterDiscount) {
-                warningMoreDiscount(`${allPaymentAfterDiscount} USD`)
-            } else {
-                setPaymentDiscount(value)
-                setPaymentDiscountUzs(UsdToUzs(value, exchangerate))
-                setPaymentDiscountPercent(
-                    Math.round(((allPayment * value) / 100) * 1000) / 1000
-                )
-                setPaymentDebt(allPayment - value)
-                setPaymentDebtUzs(UsdToUzs(allPayment - value, exchangerate))
-            }
-        } else if (discountSelectOption.value === 'UZS') {
-            if (value > allPaymentUzsAfterDiscount) {
-                warningMoreDiscount(`${allPaymentUzsAfterDiscount} UZS`)
-            } else {
-                setPaymentDiscountUzs(value)
-                setPaymentDiscount(UzsToUsd(value, exchangerate))
-                setPaymentDiscountPercent(
-                    Math.round(((allPaymentUzs * value) / 100) * 1000) / 1000
-                )
-                setPaymentDebt(UzsToUsd(allPaymentUzs - value, exchangerate))
-                setPaymentDebtUzs(allPaymentUzs - value)
-            }
+    const handleChangeDiscount = (value, type) => {
+        // const allPaymentAfterDiscount =
+        //     Math.round(((allPayment * 30) / 100) * 1000) / 1000
+        // const allPaymentUzsAfterDiscount =
+        //     Math.round(((allPaymentUzs * 30) / 100) * 1) / 1
+        // if (discountSelectOption.value === 'USD') {
+        //     if (value > allPaymentAfterDiscount) {
+        //         warningMoreDiscount(`${allPaymentAfterDiscount} USD`)
+        //     } else {
+        //         setPaymentDiscount(value)
+        //         setPaymentDiscountUzs(UsdToUzs(value, exchangerate))
+        //         setPaymentDiscountPercent(
+        //             Math.round(((allPayment * value) / 100) * 1000) / 1000
+        //         )
+        //         setPaymentDebt(allPayment - value)
+        //         setPaymentDebtUzs(UsdToUzs(allPayment - value, exchangerate))
+        //     }
+        // } else if (discountSelectOption.value === 'UZS') {
+        //     if (value > allPaymentUzsAfterDiscount) {
+        //         warningMoreDiscount(`${allPaymentUzsAfterDiscount} UZS`)
+        //     } else {
+        //         setPaymentDiscountUzs(value)
+        //         setPaymentDiscount(UzsToUsd(value, exchangerate))
+        //         setPaymentDiscountPercent(
+        //             Math.round(((allPaymentUzs * value) / 100) * 1000) / 1000
+        //         )
+        //         setPaymentDebt(UzsToUsd(allPaymentUzs - value, exchangerate))
+        //         setPaymentDebtUzs(allPaymentUzs - value)
+        //     }
+        // } else {
+        //     if (value > 30) {
+        //         warningMoreDiscount('30%')
+        //     } else {
+        //         const discountUsd =
+        //             Math.round(((allPayment * value) / 100) * 1000) / 1000
+        //         const discountUzs =
+        //             Math.round(((allPaymentUzs * value) / 100) * 1) / 1
+        //         setPaymentDiscountPercent(value)
+        //         setPaymentDiscount(discountUsd)
+        //         setPaymentDiscountUzs(discountUzs)
+        //         setPaymentDebt(convertToUsd(allPayment - discountUsd))
+        //         setPaymentDebtUzs(convertToUzs(allPaymentUzs - discountUzs))
+        //         setPaid(allPayment - discountUsd)
+        //         setPaidUzs(allPaymentUzs - discountUzs)
+        //     }
+        // }
+        if (type === 'usd') {
+            const discountUsd =
+                Math.round((value) * 1000) / 1000
+            setPaymentDiscountPercent(value)
+            setPaymentDiscount(discountUsd)
+            console.log(allPayment - discountUsd);
+            setPaidUzs(allMainPayment - 
+                UsdToUzs(discountUsd, exchangerate) 
+                - Number(paymentDiscountUzs)
+            )
+            setPaymentUsd(allPayment - discountUsd)
         } else {
-            if (value > 30) {
-                warningMoreDiscount('30%')
-            } else {
-                const discountUsd =
-                    Math.round(((allPayment * value) / 100) * 1000) / 1000
-                const discountUzs =
-                    Math.round(((allPaymentUzs * value) / 100) * 1) / 1
-                setPaymentDiscountPercent(value)
-                setPaymentDiscount(discountUsd)
-                setPaymentDiscountUzs(discountUzs)
-                setPaymentDebt(convertToUsd(allPayment - discountUsd))
-                setPaymentDebtUzs(convertToUzs(allPaymentUzs - discountUzs))
-                setPaid(allPayment - discountUsd)
-                setPaidUzs(allPaymentUzs - discountUzs)
-            }
+            const discountUzs =
+                Math.round((value) * 1) / 1
+            setPaymentDiscountPercent(value)
+            setPaymentDiscountUzs(discountUzs)
+            setPaidUzs(allMainPayment - discountUzs - Number(UsdToUzs(paymentDiscount, exchangerate)))
         }
-        setPaymentCash('')
-        setPaymentCashUzs('')
-        setPaymentCard('')
-        setPaymentCardUzs('')
-        setPaymentTransfer('')
-        setPaymentTransferUzs('')
-        setPaid(0)
-        setPaidUzs(0)
-    }
-
-    const handleChangePaymentInput = (value, key) => {
-        writePayment(value, key)
-    }
-
-    const handleClickDiscountBtn = () => {
-        setHasDiscount(!hasDiscount)
-        if (paymentType === 'cash') {
-            setPaymentCash(allPayment)
-            setPaymentCashUzs(allPaymentUzs)
-            setPaid(allPayment)
-            setPaidUzs(allPaymentUzs)
-        } else if (paymentType === 'card') {
-            setPaymentCard(allPayment)
-            setPaymentCardUzs(allPaymentUzs)
-            setPaid(allPayment)
-            setPaidUzs(allPaymentUzs)
-        } else if (paymentType === 'transfer') {
-            setPaymentTransfer(allPayment)
-            setPaymentTransferUzs(allPaymentUzs)
-            setPaid(allPayment)
-            setPaidUzs(allPaymentUzs)
-        } else {
+        if (type === 'uzs') {
             setPaymentCash('')
             setPaymentCashUzs('')
             setPaymentCard('')
             setPaymentCardUzs('')
             setPaymentTransfer('')
             setPaymentTransferUzs('')
-            setPaid(0)
-            setPaidUzs(0)
-            setPaymentDebt(allPayment)
-            setPaymentDebtUzs(allPaymentUzs)
+            setPaymentDebt('')
+            setPaymentDebtUzs('')
+            // setPaid(0)
+            // setPaidUzs(0)
         }
+    }
+
+    const handleChangePaymentInput = (value, key) => {
+        writePayment(value, key)
+    }
+    // console.log(allPaymentUzs);
+    const handleClickDiscountBtn = () => {
+        
+        setHasDiscount(!hasDiscount)
+        // if (paymentType === 'cash') {
+        //     setPaymentCash(allPayment)
+        //     setPaymentCashUzs(allPaymentUzs)
+        //     setPaid(allPayment)
+        //     setPaidUzs(allPaymentUzs)
+        // } else if (paymentType === 'card') {
+        //     setPaymentCard(allPayment)
+        //     setPaymentCardUzs(allPaymentUzs)
+        //     setPaid(allPayment)
+        //     setPaidUzs(allPaymentUzs)
+        // } else if (paymentType === 'transfer') {
+        //     setPaymentTransfer(allPayment)
+        //     setPaymentTransferUzs(allPaymentUzs)
+        //     setPaid(allPayment)
+        //     setPaidUzs(allPaymentUzs)
+        // } else {
+        //     setPaymentCash('')
+        //     setPaymentCashUzs('')
+        //     setPaymentCard('')
+        //     setPaymentCardUzs('')
+        //     setPaymentTransfer('')
+        //     setPaymentTransferUzs('')
+        //     setPaid(0)
+        //     setPaidUzs(0)
+        //     setPaymentDebt(allPayment)
+        //     setPaymentDebtUzs(allPaymentUzs)
+        // }
         setPaymentDiscount('')
         setPaymentDiscountUzs('')
         setPaymentDiscountPercent('')
@@ -1115,32 +1149,28 @@ const RegisterSelling = () => {
                 i === index
                     ? {
                         ...prevProduct,
-                        unitprice:
-                            currencyType === 'USD'
-                                ? value
-                                : UzsToUsd(value, exchangerate),
-                        unitpriceuzs:
-                            currencyType === 'UZS'
-                                ? value
-                                : UsdToUzs(value, exchangerate),
-                        totalprice:
-                            currencyType === 'USD'
-                                ? value *
-                                (Number(prevProduct.pieces))
-                                : UzsToUsd(
-                                    value *
-                                    Number(prevProduct.pieces),
-                                    exchangerate
-                                ),
-                        totalpriceuzs:
-                            currencyType === 'UZS'
-                                ? value *
-                                (Number(prevProduct.pieces))
-                                : UsdToUzs(
-                                    value *
-                                    Number(prevProduct.pieces),
-                                    exchangerate
-                                ),
+                        unitprice: prevProduct.isUsd
+                            ? value
+                            : UzsToUsd(value, exchangerate),
+                        unitpriceuzs: prevProduct.isUsd
+                            ? UsdToUzs(value, exchangerate)
+                            : value,
+                        totalprice: prevProduct.isUsd
+                            ? value *
+                            (Number(prevProduct.pieces))
+                            : UzsToUsd(
+                                value *
+                                Number(prevProduct.pieces),
+                                exchangerate
+                            ),
+                        totalpriceuzs: prevProduct.isUsd ?
+                            UsdToUzs(
+                                value *
+                                Number(prevProduct.pieces),
+                                exchangerate
+                            ) :
+                            value * (Number(prevProduct.pieces))
+
                     }
                     : prevProduct
             )
@@ -1148,28 +1178,27 @@ const RegisterSelling = () => {
                 i === index
                     ? {
                         ...prevProduct,
-                        tradeprice:
-                            currencyType === 'USD'
-                                ? value
-                                : UzsToUsd(value, exchangerate),
-                        tradepriceuzs:
-                            currencyType === 'UZS'
-                                ? value
-                                : UsdToUzs(value, exchangerate),
-                        totalprice:
-                            currencyType === 'USD'
-                                ? value * prevProduct.pieces
-                                : UzsToUsd(
-                                    value * prevProduct.pieces,
-                                    exchangerate
-                                ),
-                        totalpriceuzs:
-                            currencyType === 'UZS'
-                                ? value * prevProduct.pieces
-                                : UsdToUzs(
-                                    value * prevProduct.pieces,
-                                    exchangerate
-                                ),
+                        tradeprice: prevProduct.isUsd
+                            ? value
+                            : UzsToUsd(value, exchangerate),
+                        tradepriceuzs: prevProduct.isUsd
+                            ? UsdToUzs(value, exchangerate)
+                            : value,
+                        totalprice: prevProduct.isUsd
+                            ? value *
+                            (Number(prevProduct.pieces))
+                            : UzsToUsd(
+                                value *
+                                Number(prevProduct.pieces),
+                                exchangerate
+                            ),
+                        totalpriceuzs: prevProduct.isUsd ?
+                            UsdToUzs(
+                                value *
+                                Number(prevProduct.pieces),
+                                exchangerate
+                            ) :
+                            value * (Number(prevProduct.pieces))
                     }
                     : prevProduct
             )
@@ -1709,6 +1738,7 @@ const RegisterSelling = () => {
                 exchangerate={exchangerate}
                 type={paymentType}
                 active={paymentModalVisible}
+                allMainPayment={allMainPayment}
                 togglePaymentModal={togglePaymentModal}
                 changePaymentType={handleChangePaymentType}
                 onChange={handleChangePaymentInput}
@@ -1719,15 +1749,8 @@ const RegisterSelling = () => {
                 cash={currencyType === 'USD' ? paymentCash : paymentCashUzs}
                 debt={paymentDebt}
                 debtuzs={paymentDebtUzs}
-                discount={
-                    currencyType === 'USD'
-                        ? discountSelectOption.value === 'USD'
-                            ? paymentDiscount
-                            : paymentDiscountPercent
-                        : discountSelectOption.value === 'UZS'
-                            ? paymentDiscountUzs
-                            : paymentDiscountPercent
-                }
+                discount={paymentDiscount}
+                discountUzs={paymentDiscountUzs}
                 handleChangeDiscount={handleChangeDiscount}
                 hasDiscount={hasDiscount}
                 transfer={

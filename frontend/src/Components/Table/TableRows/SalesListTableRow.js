@@ -249,6 +249,12 @@ export const SalesListTableRow = ({
                         ).toLocaleString('ru-Ru')}{' '}
                         {currency}
                     </td>
+                    <td className='text-warning-500 text-right td'>
+                        {saleconnector.discounts.reduce((prev, el) => prev + (el.discountuzs && el.discountuzs || 0), 0)} UZS
+                    </td>
+                    <td className='text-warning-500 text-right td'>
+                        {saleconnector.discounts.reduce((prev, el) => prev + (el.discount && el.discount || 0), 0)} USD
+                    </td>
                     {/* <td className='text-warning-500 text-right td'>
                         {reduceEl(
                             saleconnector.discounts,

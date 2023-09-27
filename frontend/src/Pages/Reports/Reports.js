@@ -43,10 +43,10 @@ const Reports = () => {
             name: 'Qaytarilgan',
             type: 'backproducts',
         },
-        // {
-        //     name: 'Chegirmalar',
-        //     type: 'discounts',
-        // },
+        {
+            name: 'Chegirmalar',
+            type: 'discounts',
+        },
         {
             name: 'Qarzlar',
             type: 'debts',

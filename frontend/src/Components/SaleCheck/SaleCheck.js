@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import { useSelector } from 'react-redux'
 import { uniqueId, map } from 'lodash'
+import { roundUsd, roundUzs } from '../../App/globalFunctions'
 export const SaleCheck = forwardRef((props, ref) => {
     const { product } = props
     const { products } = product
@@ -143,34 +144,46 @@ export const SaleCheck = forwardRef((props, ref) => {
                 </li>
                 <li className='check-ul-li-foot'>
                     {' '}
-                    To'langan:{' '}
+                    To'langan UZS:{' '}
                     <span className='font-bold'>
-                        {product?.payment?.paymentuzs}{' '} UZS
+                        {roundUzs(product?.payment?.paymentuzs)}{' '} UZS
                     </span>
                 </li>
                 <li className='check-ul-li-foot'>
                     {' '}
                     To'langan USD:{' '}
                     <span className='font-bold'>
-                        {product?.payment?.usdpayment} USD
+                        {roundUsd(product?.payment?.usdpayment)} USD
                     </span>
                 </li>
-                {product?.debt?.debtType === 'dollar' ?
-                    <li className='check-ul-li-foot'>
-                        {' '}
-                        Qarz:{' '}
-                        <span className='font-bold'>
-                            {product?.debt?.debt.toLocaleString('ru-Ru')} USD
-                        </span>
-                    </li> :
-                    <li className='check-ul-li-foot'>
-                        {' '}
-                        Qarz:{' '}
-                        <span className='font-bold'>
-                            {product?.debt?.debtuzs.toLocaleString('ru-Ru')}{' '} UZS
-                        </span>
-                    </li>
-                }
+                <li className='check-ul-li-foot'>
+                    {' '}
+                    Chegirma UZS:{' '}
+                    <span className='font-bold'>
+                        {product?.discount?.discountuzs && roundUzs(product?.discount?.discountuzs)} UZS
+                    </span>
+                </li>
+                <li className='check-ul-li-foot'>
+                    {' '}
+                    Chegirma USD:{' '}
+                    <span className='font-bold'>
+                        {product?.discount?.discount && roundUzs(product?.discount?.discount)} USD
+                    </span>
+                </li>
+                <li className='check-ul-li-foot'>
+                    {' '}
+                    Qarz UZS:{' '}
+                    <span className='font-bold'>
+                        {product?.debt?.debtuzs && roundUsd(product?.debt?.debtuzs)} UZS
+                    </span>
+                </li> 
+                <li className='check-ul-li-foot'>
+                    {' '}
+                    Qarz USD:{' '}
+                    <span className='font-bold'>
+                        {product?.debt?.debt && roundUzs(product?.debt?.debt)}{' '} USD
+                    </span>
+                </li>
             </ul>
         </div>
     )

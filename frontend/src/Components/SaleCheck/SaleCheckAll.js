@@ -358,6 +358,20 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                 </li>
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
+                    Chegirma UZS:{' '}
+                    <span className='text-black-900 font-bold'>
+                        {product?.discounts && [...product.discounts].reduce((prev, discount) => prev + (discount.discountuzs && discount.discountuzs || 0), 0)} UZS
+                    </span>
+                </li>
+                <li className='text-black-900 check-ul-li-foot'>
+                    {' '}
+                    Chegirma USD:{' '}
+                    <span className='text-black-900 font-bold'>
+                    {product?.discounts && [...product.discounts].reduce((prev, discount) => prev + (discount.discount && discount.discount || 0), 0)} USD
+                    </span>
+                </li>
+                <li className='text-black-900 check-ul-li-foot'>
+                    {' '}
                     Qarz UZS:{' '}
                     <span className='text-black-900 font-bold'>
                         {product?.debts && [...product.debts].reduce((prev, debt) => prev + (debt.debtType === "sum" && debt.debtuzs || 0), 0)} UZS

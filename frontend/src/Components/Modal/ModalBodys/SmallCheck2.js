@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import { uniqueId, map } from 'lodash'
 import { useSelector } from 'react-redux'
+import { roundUsd, roundUzs } from '../../../App/globalFunctions'
 
 export const SmallCheck2 = forwardRef((props, ref) => {
     const {
@@ -86,10 +87,17 @@ export const SmallCheck2 = forwardRef((props, ref) => {
             )}
             <div className='border-t-[0.8px] border-black-700 w-full mt-4 mb-4 text-left'>
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
-                    Jami :{' '}
+                    Jami UZS:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
                         {product?.payment?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}
                         UZS
+                    </span>
+                </h3>
+                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                    Jami USD:{' '}
+                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                        {product?.payment?.totalprice.toLocaleString('ru-Ru')}{' '}
+                        USD
                     </span>
                 </h3>
                 {/* <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
@@ -106,7 +114,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                 </h3> */}
                 <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
-                    To'langan:{' '}
+                    To'langan UZS:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
                         {product?.payment?.paymentuzs.toLocaleString('ru-Ru')}{' '}
                         UZS
@@ -120,21 +128,37 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         USD
                     </span>
                 </h3>
-                {product?.debt?.debtType === 'dollar' ? <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
-                    Qarz:{' '}
+                    Chegirma UZS:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {product?.debt?.debt.toLocaleString('ru-Ru')} USD
+                        {product?.discount?.discountuzs && roundUzs(product?.discount?.discountuzs) || 0}{' '}
+                        UZS
                     </span>
-                </h3> :
-                    <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
-                        {' '}
-                        Qarz:{' '}
-                        <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                            {product?.debt?.debtuzs.toLocaleString('ru-Ru')}{' '} UZS
-                        </span>
-                    </h3>
-                }
+                </h3>
+                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                    {' '}
+                    Chegirma USD:{' '}
+                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                        {product?.discount?.discount && roundUsd(product?.discount?.discount) || 0}{' '}
+                        USD
+                    </span>
+                </h3>
+                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                    {' '}
+                    Qarz UZS:{' '}
+                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                        {product?.debt?.debtuzs || 0} UZS
+                    </span>
+                </h3>
+                <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                    {' '}
+                    Qarz USD:{' '}
+                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                        {product?.debt?.debt || 0}{' '} USD
+                    </span>
+                </h3>
+
             </div>
         </div>
     )

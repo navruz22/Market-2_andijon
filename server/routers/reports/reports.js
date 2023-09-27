@@ -848,7 +848,7 @@ module.exports.getDiscountsReport = async (req, res) => {
           client:
             discount.saleconnector &&
             discount.saleconnector.client &&
-            discount.saleconnector.client,
+            discount.saleconnector.client,  
           totalprice: discount.totalprice,
           totalpriceuzs: discount.totalpriceuzs,
           discount: discount.discount,
