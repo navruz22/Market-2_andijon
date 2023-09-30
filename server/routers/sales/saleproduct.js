@@ -201,7 +201,7 @@ module.exports.register = async (req, res) => {
       await updateproduct.save();
     }
 
-    if (discount.discount > 0) {
+    if (discount.discount > 0 || discount.discountuzs > 0) {
       const newDiscount = new Discount({
         discount: convertToUsd(discount.discount),
         discountuzs: convertToUzs(discount.discountuzs),

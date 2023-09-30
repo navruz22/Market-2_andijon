@@ -174,14 +174,14 @@ export const SaleCheck = forwardRef((props, ref) => {
                     {' '}
                     Qarz UZS:{' '}
                     <span className='font-bold'>
-                        {product?.debt?.debtuzs && roundUsd(product?.debt?.debtuzs)} UZS
+                        {product?.debt?.debtuzs && product?.debt?.debtType === 'sum' && roundUsd(product?.debt?.debtuzs)} UZS
                     </span>
                 </li> 
                 <li className='check-ul-li-foot'>
                     {' '}
                     Qarz USD:{' '}
                     <span className='font-bold'>
-                        {product?.debt?.debt && roundUzs(product?.debt?.debt)}{' '} USD
+                        {product?.debt?.debt && product?.debt?.debtType === 'dollar' && roundUzs(product?.debt?.debt)}{' '} USD
                     </span>
                 </li>
             </ul>
