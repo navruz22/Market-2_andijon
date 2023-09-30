@@ -66,7 +66,7 @@ function AllCheck({ product }) {
         setSelled(filter(product?.products, (item) => item.pieces > 0))
         setReturned(filter(product?.products, (item) => item.pieces < 0))
         setSelledDiscounts(
-            filter(product?.discounts, (item) => item.discount > 0)
+            filter(product?.discounts, (item) => (item.discount > 0 || item.discount > 0))
         )
         setReturnedDiscounts(
             filter(product?.discounts, (item) => item.discount < 0)

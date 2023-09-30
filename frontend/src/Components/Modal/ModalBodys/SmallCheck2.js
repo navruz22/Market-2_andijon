@@ -89,18 +89,6 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         USD
                     </span>
                 </h3>}
-                {/* <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
-                    {' '}
-                    Chegirma:{' '}
-                    <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                        {product?.hasOwnProperty('discount')
-                            ? currencyType === 'USD'
-                                ? product?.discount.discount
-                                : product?.discount.discountuzs
-                            : 0}{' '}
-                        {currencyType}
-                    </span>
-                </h3> */}
                 {product?.payment?.paymentuzs && <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
                     To'langan UZS:{' '}
@@ -133,7 +121,7 @@ export const SmallCheck2 = forwardRef((props, ref) => {
                         USD
                     </span>
                 </h3>}
-                {product?.debt?.debtType === 'sum' && product?.debt?.debt && <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
+                {product?.debt?.debtType === 'sum' && product?.debt?.debtuzs && <h3 style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold pt-4'>
                     {' '}
                     Qarz UZS:{' '}
                     <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>

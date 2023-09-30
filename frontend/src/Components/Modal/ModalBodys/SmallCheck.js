@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import { uniqueId, map } from 'lodash'
 import { useSelector } from 'react-redux'
+import { roundUsd, roundUzs } from '../../../App/globalFunctions'
 
 export const SmallCheck = forwardRef((props, ref) => {
     const {
@@ -72,12 +73,6 @@ export const SmallCheck = forwardRef((props, ref) => {
                     </span>
                 </div>
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
-                    Manzil:
-                    <span className='text-[12px] text-black-900 font-bold' >
-                        {market?.address}
-                    </span>
-                </div>
-                <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     Sana:
                     <span className='text-[12px] text-black-900 font-bold'>
                         {new Date(product?.createdAt).toLocaleDateString()}
@@ -94,12 +89,6 @@ export const SmallCheck = forwardRef((props, ref) => {
                         {product?.client?.name ||
                             product?.packman?.name ||
                             ''}
-                    </span>
-                </div>
-                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
-                    Sotuv{' '}
-                    <span className='text-[12px] text-black-900 font-bold'>
-                        {product?.id}
                     </span>
                 </div>
                 <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
@@ -136,7 +125,7 @@ export const SmallCheck = forwardRef((props, ref) => {
                                     {index + 1}. {item?.product?.productdata?.name}
                                 </div>
                                 <div className='text-right text-[12px] text-black-900 font-bold'>
-                                    {item?.pieces} * {currencyType === 'USD' ? item?.unitprice.toLocaleString('ru-Ru') : item?.unitpriceuzs.toLocaleString('ru-Ru')} = {currencyType === 'USD' ? item?.totalprice.toLocaleString('ru-Ru') : item?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}{currencyType}
+                                    {item?.pieces} * {item?.product?.isUsd === 'USD' ? item?.unitprice.toLocaleString('ru-Ru') : item?.unitpriceuzs.toLocaleString('ru-Ru')} = {item?.product?.isUsd ? item?.totalprice.toLocaleString('ru-Ru') : item?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}{currencyType}
                                 </div>
                             </div>
                         ))}
@@ -195,56 +184,66 @@ export const SmallCheck = forwardRef((props, ref) => {
                     </table> */}
                 </div>
             )}
-            <div className='text-black-900  check-ul-li-foot mt-4'>
+            {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0) > 0 && <div className='text-black-900  check-ul-li-foot mt-4'>
                 Jami UZS:{' '}
                 <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)}{' '}
+                    {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)}{' '}
                     UZS
                 </span>
-            </div>
-            <div className='text-black-900  check-ul-li-foot mt-4'>
+            </div>}
+            {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0) > 0 && <div className='text-black-900  check-ul-li-foot mt-4'>
                 Jami USD:{' '}
                 <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
-                {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)}{' '}
+                    {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)}{' '}
                     USD
                 </span>
-            </div>
-            {/* <div className='text-black-900 border-none check-ul-li-foot'>
-                {' '}
-                Chegirma:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
-                    {(
-                        calculateAllDiscounts(selledDiscounts) +
-                        calculateAllDiscounts(returnedDiscounts)
-                    ).toLocaleString('ru-Ru')}{' '}
-                    {currencyType}
-                </span>
-            </div> */}
-            <div className='text-black-900 border-none check-ul-li-foot'>
+            </div>}
+            {selledPayments.reduce((prev, el) => prev + (el?.paymentuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 To'langan:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {product?.payment?.paymentuzs.toLocaleString('ru-Ru')}{' '}
+                    {selledPayments.reduce((prev, el) => prev + (el?.paymentuzs || 0), 0)}{' '}
                     UZS
                 </span>
-            </div>
-            {product?.debt?.debtType === 'dollar' ? 
-                <div className='text-black-900 border-none check-ul-li-foot'>
-                    {' '}
-                    Qarz:{' '}
-                    <span className='text-black-900 text-[12px] font-bold'>
-                        {product?.debt?.debt.toLocaleString('ru-Ru')} USD
-                    </span>
-                </div> 
-                    :
-                <div className='text-black-900 border-none check-ul-li-foot'>
-                    {' '}
-                    Qarz:{' '}
-                    <span className='text-black-900 text-[12px] font-bold'>
-                        {product?.debt?.debtuzs.toLocaleString('ru-Ru')} UZS
-                    </span>
-                </div>
-            }
+            </div>}
+            {selledPayments.reduce((prev, el) => prev + (el?.usdpayment || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                To'langan:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                {selledPayments.reduce((prev, el) => prev + (el?.usdpayment || 0), 0)}{' '}
+                    USD
+                </span>
+            </div>}
+            {selledDiscounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Chegirma :{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {roundUzs(selledDiscounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0))}{' '}
+                    UZS
+                </span>
+            </div>}
+            {selledDiscounts.reduce((prev, el) => prev + (el?.discount || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Chegirma:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {roundUsd(selledDiscounts.reduce((prev, el) => prev + (el?.discount || 0), 0)) || 0}{' '}
+                    USD
+                </span>
+            </div>}
+            {product?.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0)) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Qarz:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0))} UZS
+                </span>
+            </div>}
+            {product?.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0)) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Qarz:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0))}{' '} USD
+                </span>
+            </div>}
         </div>
     )
 })
