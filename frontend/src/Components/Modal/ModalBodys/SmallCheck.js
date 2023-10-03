@@ -94,7 +94,19 @@ export const SmallCheck = forwardRef((props, ref) => {
                 <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
                     Sotuvchi:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
-                        {userInfo?.firstname} {userInfo?.lastname}
+                        {userInfo?.old_debtsusd} {userInfo?.lastname}
+                    </span>
+                </div>
+                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
+                    Eski qarz USD:{' '}
+                    <span className='text-[12px] text-black-900 font-bold'>
+                        {roundUsd(product?.old_debtsusd)} USD
+                    </span>
+                </div>
+                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
+                    Eski qarz UZS:{' '}
+                    <span className='text-[12px] text-black-900 font-bold'>
+                        {roundUsd(product?.old_debtsuzs)} UZS
                     </span>
                 </div>
                 {/* <div className='check-ul-li flex-col'>
@@ -125,7 +137,7 @@ export const SmallCheck = forwardRef((props, ref) => {
                                     {index + 1}. {item?.product?.productdata?.name}
                                 </div>
                                 <div className='text-right text-[12px] text-black-900 font-bold'>
-                                    {item?.pieces} * {item?.product?.isUsd === 'USD' ? item?.unitprice.toLocaleString('ru-Ru') : item?.unitpriceuzs.toLocaleString('ru-Ru')} = {item?.product?.isUsd ? item?.totalprice.toLocaleString('ru-Ru') : item?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}{currencyType}
+                                    {item?.pieces} * {item?.product?.isUsd ? item?.unitprice.toLocaleString('ru-Ru') : item?.unitpriceuzs.toLocaleString('ru-Ru')} = {item?.product?.isUsd ? item?.totalprice.toLocaleString('ru-Ru') : item?.totalpriceuzs.toLocaleString('ru-Ru')}{' '}{item?.product?.isUsd ? "USD" : "UZS"}
                                 </div>
                             </div>
                         ))}
@@ -244,6 +256,20 @@ export const SmallCheck = forwardRef((props, ref) => {
                     {product.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)}{' '} USD
                 </span>
             </div>}
+            {product?.alldebtsusd && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Umumiy qarz USD:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {roundUsd(product?.alldebtsusd) || 0}{' '} USD
+                </span>
+            </div> || " "}
+            {product?.alldebtsuzs && <div className='text-black-900 border-none check-ul-li-foot'>
+                {' '}
+                Umumiy qarz UZS:{' '}
+                <span className='text-black-900 text-[12px] font-bold'>
+                    {roundUzs(product?.alldebtsuzs) || 0}{' '} UZS
+                </span>
+            </div> || " "}
         </div>
     )
 })

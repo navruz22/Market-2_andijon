@@ -17,12 +17,12 @@ export const SalesListTableRow = ({
     const location = useLocation()
 
     const result = (prev, usd, uzs) => {
-        return currency === 'USD' ? prev + usd : prev + uzs
+        return  currency === 'USD' ? prev + usd : prev + uzs
     }
     const reduceEl = (arr, usd, uzs) => {
-        return arr.reduce((prev, item) => {
+        return arr ? arr.reduce((prev, item) => {
             return result(prev, item[usd], item[uzs])
-        }, 0)
+        }, 0) : 0
     }
 
     const calculateDebt = (data) => {
@@ -58,7 +58,7 @@ export const SalesListTableRow = ({
     if (location.pathname.includes('/kassa/sale')) {
         return (
             <>
-                {map(data, (saleconnector, index) => (
+                {data && map(data, (saleconnector, index) => (
                     <tr className='tr' key={uniqueId('sales')}>
                         <td className='text-left td'>
                             {currentPage * countPage + 1 + index}
@@ -201,7 +201,7 @@ export const SalesListTableRow = ({
     }
     return (
         <>
-            {map(data, (saleconnector, index) => (
+            {data && data.length > 0 && map(data, (saleconnector, index) => (
                 <tr className='tr' key={uniqueId('sales')}>
                     <td className='text-left td'>
                         {currentPage * countPage + 1 + index}
@@ -250,10 +250,10 @@ export const SalesListTableRow = ({
                         {currency}
                     </td>
                     <td className='text-warning-500 text-right td'>
-                        {saleconnector.discounts.reduce((prev, el) => prev + (el.discountuzs && el.discountuzs || 0), 0)} UZS
+                        {saleconnector?.discounts && saleconnector.discounts.reduce((prev, el) => prev + (el.discountuzs && el.discountuzs || 0), 0)} UZS
                     </td>
                     <td className='text-warning-500 text-right td'>
-                        {saleconnector.discounts.reduce((prev, el) => prev + (el.discount && el.discount || 0), 0)} USD
+                        {saleconnector?.discounts && saleconnector.discounts.reduce((prev, el) => prev + (el.discount && el.discount || 0), 0)} USD
                     </td>
                     {/* <td className='text-warning-500 text-right td'>
                         {reduceEl(
@@ -264,13 +264,13 @@ export const SalesListTableRow = ({
                         {currency}
                     </td> */}
                     <td className='text-error-500 text-right td'>
-                        {saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS
+                        {saleconnector?.debts && saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS
                     </td>
                     <td className='text-error-500 text-right td'>
-                        {saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)} USD
+                        {saleconnector?.debts && saleconnector.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)} USD
                     </td>
                     <td className='text-left td  '>
-                        {saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (
+                        {saleconnector.dailyconnectors && saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (
                             <div className='flex justify-between items-center'>
                                 <span>{saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment}</span>
                                 <TableBtn

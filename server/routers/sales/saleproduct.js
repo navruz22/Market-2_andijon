@@ -724,7 +724,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           select: "debt debtuzs debtType",
         },
       })
-      .populate('debts', "debt debtuzs debtType")
+      .populate('debts', "debt debtuzs debtType createdAt")
       .populate(
         "discounts",
         "discount discountuzs createdAt procient products totalprice totalpriceuzs"
@@ -746,6 +746,7 @@ module.exports.getsaleconnectors = async (req, res) => {
       });
 
     const filteredProductsSale = saleconnectors.map((connector) => {
+
       const filterProducts = connector.products.filter((product) => {
         return (
           new Date(product.createdAt) > new Date(startDate) &&
@@ -764,11 +765,28 @@ module.exports.getsaleconnectors = async (req, res) => {
           new Date(payment.createdAt) < new Date(endDate)
         );
       });
+      const filterDebts = [...connector.debts].filter((payment) => {
+        return (
+          new Date(payment.createdAt) > new Date(startDate) &&
+          new Date(payment.createdAt) < new Date(endDate)
+        );
+      });
+
+      const alldebtsusd = [...connector.debts].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)
+      const alldebtsuzs = [...connector.debts].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)
+
+      const oldebtsusd = alldebtsusd - [...filterDebts].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)
+      const oldebtsuzs = alldebtsuzs - [...filterDebts].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)
+
       return {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
         discounts: filterDiscount,
-        debts: connector.debts,
+        debts: filterDebts,
+        alldebtsusd: alldebtsusd,
+        alldebtsuzs: alldebtsuzs,
+        old_debtsusd: oldebtsusd,
+        old_debtsuzs: oldebtsuzs,
         user: connector.user,
         createdAt: connector.createdAt,
         updatedAt: connector.updatedAt,
@@ -779,7 +797,7 @@ module.exports.getsaleconnectors = async (req, res) => {
         saleconnector: connector,
       };
     });
-
+    
     const count = filteredProductsSale.length;
 
     res.status(200).json({
