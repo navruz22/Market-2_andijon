@@ -29,6 +29,7 @@ function AllCheck({ product }) {
             }, 2000)
         })
     }, [setLoadContent])
+    console.log(product);
     const reactToPrintContent = React.useCallback(() => {
         return saleCheckRef.current
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -89,11 +90,11 @@ function AllCheck({ product }) {
                 ref={saleCheckRef}
                 returned={returned}
                 selled={selled}
-                selledDiscounts={selledDiscounts}
+                selledDiscounts={[...selledDiscounts]}
                 returnedDiscounts={returnedDiscounts}
                 selledPayments={selledPayments}
                 returnedPayments={returnedPayments}
-                product={product}
+                product={{...product}}
                 userInfo={userInfo}
             />
             <div className='hidden'>
@@ -101,11 +102,11 @@ function AllCheck({ product }) {
                     ref={saleSmallCheckRef}
                     returned={returned}
                     selled={selled}
-                    selledDiscounts={selledDiscounts}
+                    selledDiscounts={[...selledDiscounts]}
                     returnedDiscounts={returnedDiscounts}
                     selledPayments={selledPayments}
                     returnedPayments={returnedPayments}
-                    product={product}
+                    product={{...product}}
                     userInfo={userInfo}
                 />
             </div>

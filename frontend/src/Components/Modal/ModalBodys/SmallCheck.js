@@ -14,7 +14,7 @@ export const SmallCheck = forwardRef((props, ref) => {
         product,
         userInfo,
     } = props
-
+    console.log(product);
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
@@ -214,34 +214,34 @@ export const SmallCheck = forwardRef((props, ref) => {
                     USD
                 </span>
             </div>}
-            {selledDiscounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.discounts && product?.discounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Chegirma :{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {roundUzs(selledDiscounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0))}{' '}
+                    {product?.discounts.reduce((prev, el) => prev + (el?.discountuzs || 0), 0)}{' '}
                     UZS
                 </span>
             </div>}
-            {selledDiscounts.reduce((prev, el) => prev + (el?.discount || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.discounts && product?.discounts.reduce((prev, el) => prev + (el?.discount || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Chegirma:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {roundUsd(selledDiscounts.reduce((prev, el) => prev + (el?.discount || 0), 0)) || 0}{' '}
+                    {product?.discounts.reduce((prev, el) => prev + (el?.discount || 0), 0) || 0}{' '}
                     USD
                 </span>
             </div>}
-            {product?.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0)) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Qarz:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0))} UZS
+                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS
                 </span>
             </div>}
-            {product?.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0)) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Qarz:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0))}{' '} USD
+                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)}{' '} USD
                 </span>
             </div>}
         </div>
