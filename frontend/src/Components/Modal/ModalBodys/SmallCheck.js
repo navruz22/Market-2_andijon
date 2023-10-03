@@ -66,12 +66,12 @@ export const SmallCheck = forwardRef((props, ref) => {
                     <img src={market?.image} alt="logo" />
                 </div>
                 {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
-                <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
+                {/* <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     Telefon:
                     <span className='text-[12px] text-black-900 font-bold'>
                         {market.phone1}
                     </span>
-                </div>
+                </div> */}
                 <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     Sana:
                     <span className='text-[12px] text-black-900 font-bold'>
@@ -242,18 +242,18 @@ export const SmallCheck = forwardRef((props, ref) => {
                     USD
                 </span>
             </div>}
-            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debtuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Qarz:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)} UZS
+                    {product.debts.reduce((prev, el) => prev + (el.debtuzs || 0), 0)} UZS
                 </span>
             </div>}
-            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.debts && product?.debts.reduce((prev, el) => prev + (el.debt || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
                 {' '}
                 Qarz:{' '}
                 <span className='text-black-900 text-[12px] font-bold'>
-                    {product.debts.reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)}{' '} USD
+                    {product.debts.reduce((prev, el) => prev + (el.debt || 0), 0)}{' '} USD
                 </span>
             </div>}
             {product?.alldebtsusd && <div className='text-black-900 border-none check-ul-li-foot'>

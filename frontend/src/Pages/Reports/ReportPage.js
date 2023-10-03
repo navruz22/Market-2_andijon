@@ -456,7 +456,7 @@ const ReportPage = () => {
     }
 
     const handleClickPrint = (saleconnector) => {
-        console.log(saleconnector);
+        
         if (id === 'debts') {
             setModalData(saleconnector)
             setModalBody('allChecks')
@@ -482,6 +482,7 @@ const ReportPage = () => {
                 setModalBody('checkSell')
                 setModalData(saleconnector)
                 setModalVisible(!modalVisible)
+                console.log('qwerty');
             } else {
                 setModalBody('allChecks')
                 setModalData(saleconnector)

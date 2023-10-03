@@ -228,7 +228,7 @@ function CustomerPayment({
                                 </h3>
                             </li>
                         }
-                        <li className='custom-payment-ul-li'>
+                        {/* <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {t('Qarz')} :{' '}
                             </span>
@@ -246,7 +246,7 @@ function CustomerPayment({
                                     label={t('UZS')}
                                 />
                             </h3>
-                        </li>
+                        </li> */}
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
@@ -293,12 +293,12 @@ function CustomerPayment({
                             onClick={changePaymentType}
                         />} */}
                     </div>
-                    {!returned && (
+                    {/* {!returned && (
                         <DiscountBtn
                             text={t(`Chegirma`)}
                             onClick={handleClickDiscountBtn}
                         />
-                    )}
+                    )} */}
                     <Payment
                         text={t(`To'lash`)}
                         onClick={handleClickPay}

@@ -215,13 +215,13 @@ module.exports.getReport = async (req, res) => {
 
     reports.income.income = roundUsd(
       Number(reports.sale.sale) -
-        Number(incomingprice) -
-        Number(reports.discounts.discounts)
+      Number(incomingprice) -
+      Number(reports.discounts.discounts)
     );
     reports.income.incomeuzs = roundUzs(
       Number(reports.sale.saleuzs) -
-        Number(incomingpriceuzs) -
-        Number(reports.discounts.discountsuzs)
+      Number(incomingpriceuzs) -
+      Number(reports.discounts.discountsuzs)
     );
 
     // Get debts report functions  START
@@ -454,18 +454,18 @@ module.exports.getProfitData = async (req, res) => {
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingprice) ||
-                (item.product && item.product.price.incomingprice) ||
-                0),
+            ((item.price && item.price.incomingprice) ||
+              (item.product && item.product.price.incomingprice) ||
+              0),
           0
         );
         const totalincomingpriceuzs = sale.products.reduce(
           (prev, item) =>
             prev +
             item.pieces *
-              ((item.price && item.price.incomingpriceuzs) ||
-                (item.product && item.product.price.incomingpriceuzs) ||
-                0),
+            ((item.price && item.price.incomingpriceuzs) ||
+              (item.product && item.product.price.incomingpriceuzs) ||
+              0),
           0
         );
         const totalprice = sale.products.reduce(
@@ -645,10 +645,59 @@ module.exports.getPayment = async (req, res) => {
     };
 
     for (const payment of allpayments) {
-     
+
+      const daily = await DailySaleConnector.findOne({
+        market,
+        payment: payment._id
+      })
+        .select("-__v -updatedAt -isArchive")
+        .populate("user", "firstname lastname")
+        .populate("client", "name")
+        .populate({
+          path: "products",
+          select:
+            "totalprice totalpriceuzs pieces isPackcount isUsd packcountpieces price unitprice unitpriceuzs product createdAt user",
+          populate: {
+            path: "product",
+            select: "productdata packcount isUsd",
+            populate: {
+              path: "productdata",
+              select: "name code",
+            },
+          },
+        })
+        .populate({
+          path: "products",
+          select:
+            "totalprice totalpriceuzs pieces isPackcount isUsd packcountpieces price unitprice unitpriceuzs product createdAt user",
+          populate: {
+            path: "user",
+            select: "firstname lastname",
+          },
+        })
+        .populate({
+          path: "products",
+          select:
+            "totalprice totalpriceuzs pieces isPackcount isUsd packcountpieces price unitprice unitpriceuzs product createdAt user",
+          populate: {
+            path: "user",
+            select: "firstname lastname",
+          },
+        })
+        .populate({
+          path: "debt",
+          select: "debt debtuzs debtType",
+        })
+        .populate({
+          path: "payment",
+          select:
+            "cash cashuzs card carduzs transfer transferuzs usdpayment payment paymentuzs totalprice totalpriceuzs",
+        })
+        
+
       respayments.push({
         id: payment.saleconnector && payment.saleconnector.id,
-        saleconnector: payment.saleconnector,
+        saleconnector: daily,
         createdAt: payment.createdAt,
         client:
           payment.saleconnector &&
@@ -700,6 +749,7 @@ module.exports.getPayment = async (req, res) => {
     let paymentsreport = response.splice(currentPage * countPage, countPage);
     res.status(201).json({ data: paymentsreport, count, total });
   } catch (error) {
+    console.log(error);
     res.status(400).json({ error: "Serverda xatolik yuz berdi..." });
   }
 };
@@ -765,13 +815,10 @@ module.exports.getDebtsReport = async (req, res) => {
       .map((sale) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
-        
-        if (sale.client && sale.client.name === '2222') {
-          console.log(sale.debts);
-        }
+
         const debt = sale.debts.reduce((prev, debt) => prev + debt?.debt, 0)
-        const debtuzs = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'sum' ? debt?.debtuzs : 0), 0)
-        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debtType === 'dollar' ? debt?.debt : 0), 0)
+        const debtuzs = sale.debts.reduce((prev, debt) => prev + (debt?.debtuzs || 0), 0)
+        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debt || 0), 0)
 
         const debtComment =
           sale.debts.length > 0
@@ -848,7 +895,7 @@ module.exports.getDiscountsReport = async (req, res) => {
           client:
             discount.saleconnector &&
             discount.saleconnector.client &&
-            discount.saleconnector.client,  
+            discount.saleconnector.client,
           totalprice: discount.totalprice,
           totalpriceuzs: discount.totalpriceuzs,
           discount: discount.discount,
