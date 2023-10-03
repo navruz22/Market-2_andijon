@@ -223,7 +223,7 @@ function CustomerPayment({
                                     {t('Qarzlar')} :{' '}
                                 </span>
                                 <h3 className='text-error-500 text-[1rem]'>
-                                    {roundUsd(debt)} USD <br /><br />
+                                    {Math.round(debt * 1000) / 1000} USD <br /><br />
                                     {debtuzs} UZS
                                 </h3>
                             </li>
