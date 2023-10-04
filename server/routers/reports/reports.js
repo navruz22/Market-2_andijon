@@ -611,7 +611,7 @@ module.exports.getPayment = async (req, res) => {
         },
       })
       .lean();
-
+      
     const respayments = [];
 
     const total = {
@@ -698,6 +698,7 @@ module.exports.getPayment = async (req, res) => {
       respayments.push({
         id: payment.saleconnector && payment.saleconnector.id,
         saleconnector: daily,
+        saleconnector2: payment.saleconnector,
         createdAt: payment.createdAt,
         client:
           payment.saleconnector &&
@@ -741,12 +742,12 @@ module.exports.getPayment = async (req, res) => {
     total.result.usdpayment = total.payment.usdpayment + total.back.usdpayment;
     total.result.transferuzs =
       total.payment.transferuzs + total.back.transferuzs;
-
-    const response = respayments.filter(
-      (product) => product.saleconnector !== null
-    );
-    const count = response.length;
-    let paymentsreport = response.splice(currentPage * countPage, countPage);
+    console.log(respayments);
+    // const response = respayments.filter(
+    //   (product) => product.saleconnector !== null
+    // );
+    const count = respayments.length;
+    let paymentsreport = respayments.splice(currentPage * countPage, countPage);
     res.status(201).json({ data: paymentsreport, count, total });
   } catch (error) {
     console.log(error);

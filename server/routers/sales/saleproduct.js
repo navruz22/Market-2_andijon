@@ -1136,8 +1136,6 @@ module.exports.payment = async (req, res) => {
 
     const debt = new Debt({
       comment: "",
-      debt: -1 * payment.usdpayment,
-      debtuzs: -1 * (payment.cashuzs || payment.carduzs || payment.transfer),
       debtType: payment.debtType,
       totalprice: payment.totalprice,
       totalpriceuzs: payment.totalpriceuzs,
@@ -1145,6 +1143,13 @@ module.exports.payment = async (req, res) => {
       user,
       saleconnector: saleconnector._id,
     })
+    if (payment.debtType === 'dollar') {
+      debt.debt = -1 *  payment.usdpayment
+      debt.debtuzs = 0
+    } else {
+      debt.debtuzs = -1 * (payment.cashuzs || payment.carduzs || payment.transfer)
+      debt.debt = 0
+    }
     await debt.save()
     saleconnector.debts.push(debt._id); 
     saleconnector.payments.push(newPayment._id);

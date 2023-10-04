@@ -59,9 +59,10 @@ export const PaymentsTableRow = ({
                         {currency}
                     </td>
                     <td className='text-success-500 text-right td py-[0.625rem] font-bold'>
-                        {!sale.totalprice ? (<>
-                            {sale?.usdpayment ? sale?.usdpayment + ' USD' : currency === 'USD' ? (sale.cash + sale.card + sale.transfer) + ' ' + currency : (sale.cashuzs + sale.carduzs + sale.transferuzs) + ' ' + currency}
-                        </>) : 0} {' '}
+                        {!sale.totalprice && sale?.usdpayment} USD
+                    </td>
+                    <td className='text-success-500 text-right td py-[0.625rem] font-bold'>
+                        {!sale.totalprice && (sale.cashuzs + sale.carduzs + sale.transferuzs)} UZS
                     </td>
                     <td className='text-right td py-[0.625rem] font-bold'>
                         {sale?.usdpayment < 0 ? sale?.usdpayment : sale.cash < 0 || sale.card < 0 || sale.transfer < 0 ? (<>

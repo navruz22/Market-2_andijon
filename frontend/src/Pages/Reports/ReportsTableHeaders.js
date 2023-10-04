@@ -197,7 +197,10 @@ export const ReportsTableHeaders = (header) => {
                 title: "O'tkazma",
             },
             {
-                title: "Qarzdan to'lov",
+                title: "Qarzdan to'lov USD",
+            },
+            {
+                title: "Qarzdan to'lov UZS",
             },
             {
                 title: "Qaytarilgan",
