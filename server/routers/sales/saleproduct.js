@@ -772,11 +772,11 @@ module.exports.getsaleconnectors = async (req, res) => {
         );
       });
 
-      const alldebtsusd = [...connector.debts].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)
-      const alldebtsuzs = [...connector.debts].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)
+      const alldebtsusd = [...connector.debts].reduce((prev, el) => prev + (el.debt || 0), 0)
+      const alldebtsuzs = [...connector.debts].reduce((prev, el) => prev + (el.debtuzs || 0), 0)
 
-      const oldebtsusd = alldebtsusd - [...filterDebts].reduce((prev, el) => prev + (el.debtType === 'dollar' && el.debt || 0), 0)
-      const oldebtsuzs = alldebtsuzs - [...filterDebts].reduce((prev, el) => prev + (el.debtType === 'sum' && el.debtuzs || 0), 0)
+      const oldebtsusd = alldebtsusd - [...filterDebts].reduce((prev, el) => prev + (el.debt || 0), 0)
+      const oldebtsuzs = alldebtsuzs - [...filterDebts].reduce((prev, el) => prev + (el.debtuzs || 0), 0)
 
       return {
         _id: connector._id,

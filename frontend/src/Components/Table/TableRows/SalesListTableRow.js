@@ -222,7 +222,8 @@ export const SalesListTableRow = ({
                     </td>
                     <td className='text-left td'>{saleconnector.id}</td>
                     <td className='text-left td'>
-                        {saleconnector?.client?.name ? (
+                    {saleconnector?.client?.name}
+                        {/* {saleconnector?.client?.name ? (
                             <div className='flex justify-between items-center'>
                                 <span> {saleconnector?.client?.name}</span>
                                 <TableBtn
@@ -239,7 +240,7 @@ export const SalesListTableRow = ({
                                     onClick={() => addPlus(saleconnector._id)}
                                 />
                             </div>
-                        )}
+                        )} */}
                     </td>
                     <td className='text-success-500 text-right td'>
                         {reduceEl(
