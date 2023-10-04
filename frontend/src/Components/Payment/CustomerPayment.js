@@ -228,7 +228,7 @@ function CustomerPayment({
                                 </h3>
                             </li>
                         }
-                        {/* <li className='custom-payment-ul-li'>
+                        {location.pathname.includes('/kassa/debts') && <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {t('Qarz')} :{' '}
                             </span>
@@ -246,7 +246,7 @@ function CustomerPayment({
                                     label={t('UZS')}
                                 />
                             </h3>
-                        </li> */}
+                        </li>}
                         <li className='custom-payment-ul-li'>
                             <span className='custom-payment-text-style'>
                                 {allPayment < 0
