@@ -91,6 +91,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
             : 0
     }
 
+    console.log(returned);
 
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
@@ -272,24 +273,24 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                                                 {item?.pieces}
                                             </td>
                                             <td className='check-table-body'>
-                                                {currencyType === 'USD'
+                                                {item.product.isUsd
                                                     ? item?.unitprice.toLocaleString(
                                                         'ru-Ru'
                                                     )
                                                     : item?.unitpriceuzs.toLocaleString(
                                                         'ru-Ru'
                                                     )}{' '}
-                                                {currencyType}
+                                                {item.product.isUsd ? "USD" : "UZS"}
                                             </td>
                                             <td className='check-table-body'>
-                                                {currencyType === 'USD'
+                                                {item.product.isUsd
                                                     ? item?.totalprice.toLocaleString(
                                                         'ru-Ru'
                                                     )
                                                     : item?.totalpriceuzs.toLocaleString(
                                                         'ru-Ru'
                                                     )}{' '}
-                                                {currencyType}
+                                                {item.product.isUsd ? "USD" : "UZS"}
                                             </td>
                                         </tr>
                                     )
@@ -301,10 +302,10 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                         <h3 className='text-black-900 text-[1.1rem] text-black-700 font-bold pt-4'>
                             Qaytarilganlar jami :{' '}
                             <span className='text-black-900 font-bold'>
-                                {calculateAllSum(returned).toLocaleString(
-                                    'ru-Ru'
-                                )}{' '}
-                                {currencyType}
+                                {returned.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)} USD
+                            </span> {'  '}
+                            <span className='text-black-900 font-bold'>
+                                {returned.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)} UZS
                             </span>
                         </h3>
                     </div>
@@ -367,21 +368,27 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                     {' '}
                     Chegirma USD:{' '}
                     <span className='text-black-900 font-bold'>
-                    {product?.discounts && [...product.discounts].reduce((prev, discount) => prev + (discount.discount && discount.discount || 0), 0)} USD
+                        {product?.discounts && [...product.discounts].reduce((prev, discount) => prev + (discount.discount && discount.discount || 0), 0)} USD
                     </span>
                 </li>
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     Qarz UZS:{' '}
                     <span className='text-black-900 font-bold'>
-                        {product?.debts && [...product.debts].reduce((prev, debt) => prev + (debt.debtuzs || 0), 0)} UZS
+                        {
+                            (product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))
+                        } UZS
                     </span>
                 </li>
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     Qarz USD:{' '}
                     <span className='text-black-900 font-bold'>
-                        {product?.debts && [...product.debts].reduce((prev, debt) => prev + (debt.debt || 0), 0)} USD
+                        {
+                            (product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))
+                        } USD
                     </span>
                 </li>
             </ul>

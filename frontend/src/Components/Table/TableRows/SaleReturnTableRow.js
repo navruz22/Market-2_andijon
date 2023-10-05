@@ -22,11 +22,11 @@ export const SaleReturnTableRow = ({
                         {salereturn.product.pieces}
                     </td>
                     <td className='text-right td'>
-                        {(currency === 'UZS'
-                                ? salereturn.product.totalpriceuzs
-                                : salereturn.product.totalprice
+                        {(salereturn.product.isUsd
+                                ? salereturn.product.totalprice
+                                : salereturn.product.totalpriceuzs
                         ).toLocaleString('ru-RU')}{' '}
-                        {currency}
+                        {salereturn.product.isUsd ? "USD" : "UZS"}
                     </td>
                     <td className='text-right td py-[5px]'>
                         <TableInput
@@ -43,10 +43,10 @@ export const SaleReturnTableRow = ({
                         />
                     </td>
                     <td className='text-right td'>
-                        {currency === 'UZS'
-                            ? salereturn.totalpriceuzs
-                            : salereturn.totalprice}{' '}
-                        {currency}
+                        {salereturn.product.isUsd
+                            ? salereturn.totalprice
+                            : salereturn.totalpriceuzs}{' '}
+                        {salereturn.product.isUsd ? "USD" : "UZS"}
                     </td>
                 </tr>
             ))}

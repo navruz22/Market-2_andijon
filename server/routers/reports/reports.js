@@ -817,9 +817,9 @@ module.exports.getDebtsReport = async (req, res) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
 
-        const debt = sale.debts.reduce((prev, debt) => prev + debt?.debt, 0)
-        const debtuzs = sale.debts.reduce((prev, debt) => prev + (debt?.debtuzs || 0), 0)
-        const debtusd = sale.debts.reduce((prev, debt) => prev + (debt?.debt || 0), 0)
+        const debt = sale.products.reduce((prev, p) => prev + (p.totalpriceuzs || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
+        const debtuzs = sale.products.reduce((prev, p) => prev + (!p.product.isUsd && p.totalpriceuzs || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
+        const debtusd = sale.products.reduce((prev, p) => prev + (p.product.isUsd && p.totalprice || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.usdpayment || 0), 0)
 
         const debtComment =
           sale.debts.length > 0
@@ -833,8 +833,8 @@ module.exports.getDebtsReport = async (req, res) => {
           id: sale.id,
           createdAt: sale.createdAt,
           client: sale.client && sale.client,
-          debtId: sale.debts.length > 0 && sale.debts[0]._id,
-          debtType: sale.debts.length > 0 && sale.debts[0].debtType,
+          // debtId: sale.debts.length > 0 && sale.debts[0]._id,
+          // debtType: "",
           debt: debt,
           debtuzs: debtuzs,
           debtusd: debtusd,

@@ -716,6 +716,16 @@ module.exports.getsaleconnectors = async (req, res) => {
         },
       })
       .populate({
+        path: "products",
+        select:
+          "totalprice unitprice totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces pieces createdAt discount saleproducts product fromFilial",
+        options: { sort: { createdAt: -1 } },
+        populate: {
+          path: "saleconnector",
+          select: "id",
+        },
+      })
+      .populate({
         path: "payments",
         select:
           "payment paymentuzs comment totalprice usdpayment totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs",
@@ -772,12 +782,14 @@ module.exports.getsaleconnectors = async (req, res) => {
         );
       });
 
-      const alldebtsusd = [...connector.debts].reduce((prev, el) => prev + (el.debt || 0), 0)
-      const alldebtsuzs = [...connector.debts].reduce((prev, el) => prev + (el.debtuzs || 0), 0)
-
-      const oldebtsusd = alldebtsusd - [...filterDebts].reduce((prev, el) => prev + (el.debt || 0), 0)
-      const oldebtsuzs = alldebtsuzs - [...filterDebts].reduce((prev, el) => prev + (el.debtuzs || 0), 0)
-
+      const alldebtsusd = [...connector.products].reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.usdpayment || 0), 0)
+      const alldebtsuzs = [...connector.products].reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+      
+      
+      const oldebtsusd = alldebtsusd - ([...filterProducts].reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) - [...filterPayment].reduce((prev, el) => prev + (el.usdpayment || 0), 0))
+      const oldebtsuzs = alldebtsuzs - ([...filterProducts].reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) - [...filterPayment].reduce((prev, el) => prev + (el.paymentuzs || 0), 0))
+      // console.log(alldebtsusd);
+      // console.log([...filterPayment].reduce((prev, el) => prev + (el.usdpayment || 0), 0));
       return {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
@@ -961,7 +973,7 @@ module.exports.registeredit = async (req, res) => {
         ).select("price");
 
         newSaleProduct.price = saleproductprice.price;
-        newSaleProduct.save();
+        await newSaleProduct.save();
 
         all.push(newSaleProduct);
       }
@@ -977,13 +989,14 @@ module.exports.registeredit = async (req, res) => {
     await dailysaleconnector.save();
 
     const saleconnector = await SaleConnector.findById(saleconnectorid);
-
+    
     saleconnector.dailyconnectors.push(dailysaleconnector._id);
-
+    console.log(all);
     let products = [];
 
     for (const saleproduct of all) {
       const sp = await SaleProduct.findById(saleproduct._id);
+      console.log(sp);
       sp.saleconnector = saleconnector._id;
       sp.dailysaleconnector = dailysaleconnector._id;
       await sp.save();
@@ -998,7 +1011,7 @@ module.exports.registeredit = async (req, res) => {
       await Discount.findByIdAndUpdate(discount._id, discount);
     }
 
-    if (debt.debt > 0) {
+    if (debt.debt > 0 || debt.debtuzs) {
       const newDebt = new Debt({
         comment: debt.comment,
         debt: debt.debt,
@@ -1014,7 +1027,8 @@ module.exports.registeredit = async (req, res) => {
       saleconnector.debts.push(newDebt._id);
       dailysaleconnector.debt = newDebt._id;
     }
-    if (payment.carduzs + payment.cashuzs + payment.transferuzs !== 0) {
+    if ((payment.carduzs + payment.cashuzs + payment.transferuzs !== 0) || (payment.usdpayment !== 0)) {
+      console.log('workkkkk');
       const newPayment = new Payment({
         comment: payment.comment,
         payment: convertToUsd(payment.card + payment.cash + payment.transfer),
@@ -1026,6 +1040,7 @@ module.exports.registeredit = async (req, res) => {
         transfer: convertToUsd(payment.transfer),
         carduzs: convertToUzs(payment.carduzs),
         cashuzs: convertToUzs(payment.cashuzs),
+        usdpayment: payment.usdpayment,
         transferuzs: payment.transferuzs,
         type: payment.type,
         totalprice,

@@ -17,7 +17,7 @@ export const SalesListTableRow = ({
     const location = useLocation()
 
     const result = (prev, usd, uzs) => {
-        return  currency === 'USD' ? prev + usd : prev + uzs
+        return currency === 'USD' ? prev + usd : prev + uzs
     }
     const reduceEl = (arr, usd, uzs) => {
         return arr ? arr.reduce((prev, item) => {
@@ -222,7 +222,7 @@ export const SalesListTableRow = ({
                     </td>
                     <td className='text-left td'>{saleconnector.id}</td>
                     <td className='text-left td'>
-                    {saleconnector?.client?.name}
+                        {saleconnector?.client?.name}
                         {/* {saleconnector?.client?.name ? (
                             <div className='flex justify-between items-center'>
                                 <span> {saleconnector?.client?.name}</span>
@@ -265,10 +265,16 @@ export const SalesListTableRow = ({
                         {currency}
                     </td> */}
                     <td className='text-error-500 text-right td'>
-                        {saleconnector?.debts && saleconnector.debts.reduce((prev, el) => prev + (el.debtuzs || 0), 0)} UZS
+                        {
+                            saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
+                            saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+                        } UZS
                     </td>
                     <td className='text-error-500 text-right td'>
-                        {saleconnector?.debts && saleconnector.debts.reduce((prev, el) => prev + (el.debt || 0), 0)} USD
+                        {
+                            saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
+                            saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+                        } USD
                     </td>
                     <td className='text-left td  '>
                         {saleconnector.dailyconnectors && saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (
