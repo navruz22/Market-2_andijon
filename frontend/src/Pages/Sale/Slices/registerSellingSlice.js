@@ -33,6 +33,7 @@ export const makePayment = createAsyncThunk(
     'registerSelling/makePayment',
     async (body = {}, {rejectWithValue}) => {
         try {
+            console.log(body);
             const {data} = await Api.post('/sales/saleproducts/register', body)
             return data
         } catch (error) {

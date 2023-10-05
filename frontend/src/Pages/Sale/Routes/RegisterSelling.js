@@ -758,6 +758,7 @@ const RegisterSelling = () => {
                 discountuzs: Number(paymentDiscountUzs),
                 usdpayment: Number(paymentUsd),
             },
+            
             debt: {
                 debt: Number(paymentDebt),
                 debtuzs: Number(paymentDebtUzs),
@@ -768,6 +769,7 @@ const RegisterSelling = () => {
             saleconnectorid: saleConnectorId,
             comment: saleComment,
         }
+        
         dispatch(saleConnectorId ? addPayment(body) : makePayment(body)).then(
             ({ payload, error }) => {
                 if (!error) {
@@ -829,7 +831,7 @@ const RegisterSelling = () => {
             saleconnectorid: saleConnectorId,
             comment: saleComment,
         }
-        console.log(body);
+        // console.log(body);
         // return
         dispatch(returnSaleProducts(body)).then(({ payload, error }) => {
             if (!error) {
@@ -1397,10 +1399,6 @@ const RegisterSelling = () => {
             const paymentUzs = convertToUzs(
                 totalPaymentsUzs - totalPaysUzs - totalDiscountsUzs - allUzs
             )
-            console.log(all);
-            console.log(allUzs);
-            console.log(payment);
-            console.log(paymentUzs);
             setReturnDiscounts(newRelease)
             if ((payment < 0) || (paymentUzs < 0)) {
                 setAllPayment(payment)

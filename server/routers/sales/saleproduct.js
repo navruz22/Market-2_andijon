@@ -242,7 +242,7 @@ module.exports.register = async (req, res) => {
       dailysaleconnector.debt = newDebt._id;
     }
 
-    if (payment.totalprice > 0) {
+    if ((payment.totalprice > 0 || payment.totalpriceuzs > 0)) {
       const newPayment = new Payment({
         comment: payment.comment,
         payment: convertToUsd(payment.card + payment.cash + payment.transfer),
@@ -668,7 +668,7 @@ module.exports.getsaleconnectors = async (req, res) => {
       id,
       updatedAt: {
         $gte: startDate,
-        $lt: endDate,
+        $lte: endDate,
       },
     })
       .select("-isArchive -market -__v")
