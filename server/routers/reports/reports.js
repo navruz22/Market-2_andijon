@@ -13,6 +13,7 @@ const {
   DailySaleConnector,
 } = require("../../models/Sales/DailySaleConnector.js");
 const { Client } = require("../../models/Sales/Client");
+const { Exchangerate } = require("../../models/Exchangerate/Exchangerate");
 require("../../models/Users");
 
 const reduce = (arr, el) =>
@@ -812,22 +813,50 @@ module.exports.getDebtsReport = async (req, res) => {
       .populate("dailyconnectors", "comment debt")
       .lean();
 
+    const exchangerate = await Exchangerate.find({
+      market,
+    })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const currency = exchangerate[0].exchangerate
+
     const debtsreport = saleconnector
       .map((sale) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
+
+        const paymentsusd = sale.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+        const paymentsuzs = sale.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+        const totalproductsusd = sale.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+        const totalproductsuzs = sale.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
 
         const debt =
           sale.products.reduce((prev, p) => prev + (p.totalpriceuzs || 0), 0) -
           sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
 
         const debtuzs =
-          sale.products.reduce((prev, p) => prev + (!p.product.isUsd && p.totalpriceuzs || 0), 0) -
-          sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0) 
+          (totalproductsuzs - paymentsuzs +
+            (
+              (totalproductsusd - paymentsusd) < 0 &&
+              Math.round((totalproductsusd - paymentsusd) * currency) || 0
+            )) > 0 && (totalproductsuzs - paymentsuzs +
+              (
+                (totalproductsusd - paymentsusd) < 0 &&
+                Math.round((totalproductsusd - paymentsusd) * currency) || 0
+              )) || 0
 
+              
         const debtusd =
-          sale.products.reduce((prev, p) => prev + (p.product.isUsd && p.totalprice || 0), 0) -
-          sale.payments.reduce((prev, p) => prev + (p.usdpayment || 0), 0)
+          (totalproductsusd - paymentsusd +
+            (
+              (totalproductsuzs - paymentsuzs) < 0 &&
+              (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+            )) > 0 && (totalproductsusd - paymentsusd +
+              (
+                (totalproductsuzs - paymentsuzs) < 0 &&
+                (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+              ))  || 0
 
         const debtComment =
           sale.debts.length > 0
@@ -848,10 +877,6 @@ module.exports.getDebtsReport = async (req, res) => {
           debtusd: debtusd,
           debtid: debtId,
           comment: debtComment,
-          paymentsusd: sale.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0),
-          paymentsuzs: sale.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0),
-          totalproductsusd: sale.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0),
-          totalproductsuzs: sale.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0),
           saleconnector: { ...sale },
         };
       })

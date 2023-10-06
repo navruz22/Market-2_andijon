@@ -41,29 +41,13 @@ export const DebtsTableRow = ({data, Pay, Print, Edit}) => {
                     <td className='text-right td font-medium'>
                         {/* {debt?.debtusd || 0} USD */}
                         {
-                            roundUsd(debt?.debtusd +
-                            (
-                                debt?.debtuzs < 0 &&
-                                UzsToUsd(debt?.debtuzs, currency) || 0
-                            ) > 0 && debt?.debtusd +
-                            (
-                                debt?.debtuzs < 0 &&
-                                UzsToUsd(debt?.debtuzs, currency) || 0
-                            ) || 0)
+                            roundUsd(debt?.debtusd || 0)
                         } USD
                     </td>
                     <td className='text-right td py-[0.625rem] font-medium'>
                         {/* {debt?.debtuzs || 0} UZS */}
                         {
-                            debt?.debtuzs +
-                            (
-                                debt?.debtusd < 0 &&
-                                UsdToUzs(debt?.debtusd, currency) || 0
-                            ) > 0 && debt?.debtuzs +
-                            (
-                                debt?.debtusd < 0 &&
-                                UzsToUsd(debt?.debtusd, currency) || 0
-                            )|| 0
+                            debt?.debtuzs || 0
                         } UZS
                     </td>
                     <td className='td border-r-0 py-[6px]'>
