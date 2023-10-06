@@ -1,8 +1,11 @@
 import {uniqueId, map} from 'lodash'
 import React, {useState} from 'react'
+import { useSelector } from 'react-redux'
+import { roundUsd, UsdToUzs, UzsToUsd } from '../../../App/globalFunctions'
 import TableBtn from '../../Buttons/TableBtn'
 
-export const DebtsTableRow = ({data, currency, Pay, Print, Edit}) => {
+export const DebtsTableRow = ({data, Pay, Print, Edit}) => {
+    const { currency } = useSelector((state) => state.currency)
     const [isEditComment, setIsEditComment] = useState(null)
 
     return (
@@ -36,10 +39,32 @@ export const DebtsTableRow = ({data, currency, Pay, Print, Edit}) => {
                         )}
                     </td>
                     <td className='text-right td font-medium'>
-                        {debt?.debtusd || 0} USD
+                        {/* {debt?.debtusd || 0} USD */}
+                        {
+                            roundUsd(debt?.debtusd +
+                            (
+                                debt?.debtuzs < 0 &&
+                                UzsToUsd(debt?.debtuzs, currency) || 0
+                            ) > 0 && debt?.debtusd +
+                            (
+                                debt?.debtuzs < 0 &&
+                                UzsToUsd(debt?.debtuzs, currency) || 0
+                            ) || 0)
+                        } USD
                     </td>
                     <td className='text-right td py-[0.625rem] font-medium'>
-                        {debt?.debtuzs || 0} UZS
+                        {/* {debt?.debtuzs || 0} UZS */}
+                        {
+                            debt?.debtuzs +
+                            (
+                                debt?.debtusd < 0 &&
+                                UsdToUzs(debt?.debtusd, currency) || 0
+                            ) > 0 && debt?.debtuzs +
+                            (
+                                debt?.debtusd < 0 &&
+                                UzsToUsd(debt?.debtusd, currency) || 0
+                            )|| 0
+                        } UZS
                     </td>
                     <td className='td border-r-0 py-[6px]'>
                         <div className='flex justify-center items-center gap-[0.625rem]'>

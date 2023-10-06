@@ -1,6 +1,7 @@
 import React, { forwardRef } from 'react'
 import { uniqueId, map } from 'lodash'
 import { useSelector } from 'react-redux'
+import { roundUsd, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
 
 export const SaleCheckAll = forwardRef((props, ref) => {
     const {
@@ -15,7 +16,7 @@ export const SaleCheckAll = forwardRef((props, ref) => {
     } = props
     console.log(selled);
     const { market } = useSelector((state) => state.login)
-    const { currencyType } = useSelector((state) => state.currency)
+    const { currencyType, currency} = useSelector((state) => state.currency)
     const calculateAllSum = (data) => {
         return data
             ? data.reduce((acc, pr) => {
@@ -376,8 +377,21 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                     Qarz UZS:{' '}
                     <span className='text-black-900 font-bold'>
                         {
-                            (product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))
+                            ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) + 
+                            (
+                                ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))) < 0 &&
+                                UsdToUzs((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)), currency) || 0
+                            )) > 0 && ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) + 
+                            (
+                                ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))) < 0 &&
+                                UsdToUzs((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)), currency) || 0
+                            )) || 0
                         } UZS
                     </span>
                 </li>
@@ -386,8 +400,21 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                     Qarz USD:{' '}
                     <span className='text-black-900 font-bold'>
                         {
-                            (product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))
+                            roundUsd(((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)) +
+                            (
+                                ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))) < 0 &&
+                                UzsToUsd((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)), currency) || 0
+                            )) > 0 && ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
+                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)) +
+                            (
+                                ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))) < 0 &&
+                                UzsToUsd((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
+                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)), currency) || 0
+                            )) || 0)
                         } USD
                     </span>
                 </li>

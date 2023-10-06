@@ -611,7 +611,7 @@ module.exports.getPayment = async (req, res) => {
         },
       })
       .lean();
-      
+
     const respayments = [];
 
     const total = {
@@ -693,7 +693,7 @@ module.exports.getPayment = async (req, res) => {
           select:
             "cash cashuzs card carduzs transfer transferuzs usdpayment payment paymentuzs totalprice totalpriceuzs",
         })
-        
+
 
       respayments.push({
         id: payment.saleconnector && payment.saleconnector.id,
@@ -817,9 +817,17 @@ module.exports.getDebtsReport = async (req, res) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
 
-        const debt = sale.products.reduce((prev, p) => prev + (p.totalpriceuzs || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
-        const debtuzs = sale.products.reduce((prev, p) => prev + (!p.product.isUsd && p.totalpriceuzs || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
-        const debtusd = sale.products.reduce((prev, p) => prev + (p.product.isUsd && p.totalprice || 0), 0) - sale.payments.reduce((prev, p) => prev + (p.usdpayment || 0), 0)
+        const debt =
+          sale.products.reduce((prev, p) => prev + (p.totalpriceuzs || 0), 0) -
+          sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
+
+        const debtuzs =
+          sale.products.reduce((prev, p) => prev + (!p.product.isUsd && p.totalpriceuzs || 0), 0) -
+          sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0) 
+
+        const debtusd =
+          sale.products.reduce((prev, p) => prev + (p.product.isUsd && p.totalprice || 0), 0) -
+          sale.payments.reduce((prev, p) => prev + (p.usdpayment || 0), 0)
 
         const debtComment =
           sale.debts.length > 0
@@ -840,6 +848,10 @@ module.exports.getDebtsReport = async (req, res) => {
           debtusd: debtusd,
           debtid: debtId,
           comment: debtComment,
+          paymentsusd: sale.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0),
+          paymentsuzs: sale.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0),
+          totalproductsusd: sale.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0),
+          totalproductsuzs: sale.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0),
           saleconnector: { ...sale },
         };
       })
