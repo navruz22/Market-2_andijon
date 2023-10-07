@@ -69,6 +69,7 @@ function CustomerPayment({
                 )
             case 'mixed':
                 return [
+                    { label: t('USD'), key: 'usd', value: paymentUsd },
                     { label: t('Naqd'), key: 'cash', value: cash },
                     { label: t('Plastik'), key: 'card', value: card },
                     {

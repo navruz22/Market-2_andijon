@@ -447,7 +447,7 @@ const RegisterSelling = () => {
                     Number(paymentCard)
 
                 setPaymentCashUzs(value)
-                setPaymentCash(UzsToUsd(value, exchangerate))
+                setPaymentCash(convertToUsd(UzsToUsd(value, exchangerate)))
                 // setPaymentDebt(convertToUsd(maxSum - allUsd))
 
                 setPaid(allUsd)
@@ -456,7 +456,7 @@ const RegisterSelling = () => {
                     setPaymentDebtUzs(maxSumUzs - (paymentUsd > maxSum ? UsdToUzs(paymentUsd - maxSum, exchangerate) : 0) - all)
                 } else {
                     setPaymentDebtUzs(0)
-                    setPaymentUsd(maxSum - UzsToUsd(all - maxSumUzs, exchangerate))
+                    setPaymentUsd(convertToUsd(maxSum - UzsToUsd(all - maxSumUzs, exchangerate)))
                     setPaymentDebt(0)
                 }
             } else if (type === 'usd') {
@@ -491,43 +491,67 @@ const RegisterSelling = () => {
                 const all =
                     Number(value) +
                     Number(paymentCashUzs) +
-                    Number(paymentTransferUzs) +
-                    Number(UsdToUzs(paymentUsd, exchangerate))
+                    Number(paymentTransferUzs) 
                 const allUsd =
                     Number(paymentCash) +
                     Number(UzsToUsd(value, exchangerate)) +
-                    Number(paymentTransfer) +
-                    Number(paymentUsd)
+                    Number(paymentTransfer) 
+                // if (all <= maxSumUzs) {
+                //     setPaymentCard(UzsToUsd(value, exchangerate))
+                //     setPaymentCardUzs(value)
+                //     setPaymentDebt(convertToUsd(maxSum - allUsd))
+                //     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
+                //     setPaid(UzsToUsd(all, exchangerate))
+                //     setPaidUzs(all)
+                // } else {
+                //     warningMorePayment()
+                // }
+
+                setPaymentCardUzs(value)
+                setPaymentCard(UzsToUsd(value, exchangerate))
+                // setPaymentDebt(convertToUsd(maxSum - allUsd))
+
+                setPaid(allUsd)
+                setPaidUzs(all)
                 if (all <= maxSumUzs) {
-                    setPaymentCard(UzsToUsd(value, exchangerate))
-                    setPaymentCardUzs(value)
-                    setPaymentDebt(convertToUsd(maxSum - allUsd))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
-                    setPaid(UzsToUsd(all, exchangerate))
-                    setPaidUzs(all)
+                    setPaymentDebtUzs(maxSumUzs - (paymentUsd > maxSum ? UsdToUzs(paymentUsd - maxSum, exchangerate) : 0) - all)
                 } else {
-                    warningMorePayment()
+                    setPaymentDebtUzs(0)
+                    setPaymentUsd(convertToUsd(maxSum - UzsToUsd(all - maxSumUzs, exchangerate)))
+                    setPaymentDebt(0)
                 }
             } else {
                 const all =
                     Number(value) +
                     Number(paymentCashUzs) +
-                    Number(paymentCardUzs) +
-                    Number(UsdToUzs(paymentUsd, exchangerate))
+                    Number(paymentCardUzs) 
                 const allUsd =
                     Number(paymentCash) +
                     Number(paymentCard) +
-                    Number(UzsToUsd(value, exchangerate)) +
-                    Number(paymentUsd)
+                    Number(UzsToUsd(value, exchangerate)) 
+                // if (all <= maxSumUzs) {
+                //     setPaymentTransfer(UzsToUsd(value, exchangerate))
+                //     setPaymentTransferUzs(value)
+                //     setPaymentDebt(convertToUsd(maxSum - allUsd))
+                //     setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
+                //     setPaid(allUsd)
+                //     setPaidUzs(all)
+                // } else {
+                //     warningMorePayment()
+                // }
+
+                setPaymentTransferUzs(value)
+                setPaymentTransfer(UzsToUsd(value, exchangerate))
+                // setPaymentDebt(convertToUsd(maxSum - allUsd))
+
+                setPaid(allUsd)
+                setPaidUzs(all)
                 if (all <= maxSumUzs) {
-                    setPaymentTransfer(UzsToUsd(value, exchangerate))
-                    setPaymentTransferUzs(value)
-                    setPaymentDebt(convertToUsd(maxSum - allUsd))
-                    setPaymentDebtUzs(convertToUzs(maxSumUzs - all))
-                    setPaid(allUsd)
-                    setPaidUzs(all)
+                    setPaymentDebtUzs(maxSumUzs - (paymentUsd > maxSum ? UsdToUzs(paymentUsd - maxSum, exchangerate) : 0) - all)
                 } else {
-                    warningMorePayment()
+                    setPaymentDebtUzs(0)
+                    setPaymentUsd(convertToUsd(maxSum - UzsToUsd(all - maxSumUzs, exchangerate)))
+                    setPaymentDebt(0)
                 }
             }
         }
