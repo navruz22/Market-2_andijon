@@ -61,10 +61,10 @@ export const SmallCheck = forwardRef((props, ref) => {
     console.log(market);
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md w-[7.5cm]'}>
-            <div className='flex pb-2 flex-col text-center justify-center border-b-[0.8px] border-black-700'>
-                <div>
+            <div className='flex pb-[1px] flex-col text-center justify-center border-b-[0.8px] border-black-700'>
+                {/* <div>
                     <img src={market?.image} alt="logo" />
-                </div>
+                </div> */}
                 {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
                 {/* <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
                     Telefon:
@@ -72,10 +72,10 @@ export const SmallCheck = forwardRef((props, ref) => {
                         {market.phone1}
                     </span>
                 </div> */}
-                <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
+                <div className='flex justify-between items-center py-[1px] text-[12px] font-bold'>
                     Sana:
                     <span className='text-[12px] text-black-900 font-bold'>
-                        {new Date(product?.createdAt).toLocaleDateString()}
+                        {new Date(product?.createdAt).toLocaleDateString()} {new Date(product?.createdAt).toLocaleTimeString()}
                         {/* <span className='ml-3 font-bold'>
                                 {new Date(
                                     product?.createdAt
@@ -83,7 +83,7 @@ export const SmallCheck = forwardRef((props, ref) => {
                             </span> */}
                     </span>
                 </div>
-                <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
+                <div className='flex justify-between items-center py-[1px] text-[12px] font-bold'>
                     Mijoz:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
                         {product?.client?.name ||
@@ -91,19 +91,19 @@ export const SmallCheck = forwardRef((props, ref) => {
                             ''}
                     </span>
                 </div>
-                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
+                {/* <div className={'flex justify-between items-center py-[1px] text-[12px] font-bold'}>
                     Sotuvchi:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
                         {userInfo?.old_debtsusd} {userInfo?.lastname}
                     </span>
-                </div>
-                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
+                </div> */}
+                <div className={'flex justify-between items-center py-[1px] text-[12px] font-bold'}>
                     Eski qarz USD:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
                         {roundUsd(product?.old_debtsusd)} USD
                     </span>
                 </div>
-                <div className={'flex justify-between items-center py-1 text-[12px] font-bold'}>
+                <div className={'flex justify-between items-center py-[1px] text-[12px] font-bold'}>
                     Eski qarz UZS:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
                         {roundUsd(product?.old_debtsuzs)} UZS
@@ -126,9 +126,9 @@ export const SmallCheck = forwardRef((props, ref) => {
                 </div> */}
             </div>
             {selled?.length > 0 && (
-                <div className='mt-5'>
-                    <h3 className='text-[14px] text-black-900 mb-5 font-bold'>
-                        Sotilganlar :
+                <div className='mt-[1px]'>
+                    <h3 className='text-[14px] text-center text-black-900 mb-[1px] font-bold'>
+                        SOTILGANLAR
                     </h3>
                     <div>
                         {map(selled, (item, index) => (
@@ -145,8 +145,8 @@ export const SmallCheck = forwardRef((props, ref) => {
                 </div>
             )}
             {returned?.length > 0 && (
-                <div className='mt-5'>
-                    <h3 className='text-[14px] text-black-900 mb-5 font-bold'>
+                <div className='mb-[-1px] mt-[-1px]'>
+                    <h3 className='text-[14px] text-black-900 mb-[1px] font-bold'>
                         Qaytarilganlar jami :
                     </h3>
                     <div>
@@ -177,67 +177,67 @@ export const SmallCheck = forwardRef((props, ref) => {
                     </div>}
                 </div>
             )}
-            {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0) > 0 && <div className='text-black-900  check-ul-li-foot mt-4'>
+            {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0) > 0 && <div className='flex justify-between items-center mb-[-1px] text-black-900 text-[14px] font-bold border-none'>
                 Jami UZS:{' '}
-                <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                <span style={{ fontWeight: "bolder" }} className='text-right text-black-900 text-[12px] font-bold'>
                     {[...selled].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)}{' '}
                     UZS
                 </span>
             </div>}
-            {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0) > 0 && <div className='text-black-900  check-ul-li-foot mt-4'>
+            {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0) > 0 && <div className='flex justify-between items-center mb-[-1px] text-black-900 text-[14px] font-bold mt-[-1px] border-none '>
                 Jami USD:{' '}
-                <span style={{ fontWeight: "bolder" }} className='text-black-900 text-[12px] font-bold'>
+                <span style={{ fontWeight: "bolder" }} className='text-right text-black-900 text-[12px] font-bold'>
                     {[...selled].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)}{' '}
                     USD
                 </span>
             </div>}
-            {product.payments && [...product.payments].reduce((prev, el) => prev + (el?.paymentuzs || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product.payments && [...product.payments].reduce((prev, el) => prev + (el?.paymentuzs || 0), 0) > 0 && <div className='flex justify-between items-center mb-[-1px] text-black-900 text-[14px] font-bold mt-[-1px] border-none'>
                 {' '}
                 To'langan:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-right text-[12px] font-bold'>
                     {selledPayments.reduce((prev, el) => prev + (el?.paymentuzs || 0), 0)}{' '}
                     UZS
                 </span>
             </div>}
-            {product.payments && [...product.payments].reduce((prev, el) => prev + (el?.usdpayment || 0), 0) > 0 && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product.payments && [...product.payments].reduce((prev, el) => prev + (el?.usdpayment || 0), 0) > 0 && <div className='flex justify-between items-center mb-[-1px] text-black-900 text-[14px] font-bold mt-[-1px] border-none'>
                 {' '}
                 To'langan:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-right text-[12px] font-bold'>
                     {selledPayments.reduce((prev, el) => prev + (el?.usdpayment || 0), 0)}{' '}
                     USD
                 </span>
             </div>}
-            <div className='text-black-900 border-none check-ul-li-foot'>
+            <div className='flex justify-between items-center mb-[1px] mt-[1px] text-[14px] font-bold text-black-900 border-none'>
                 {' '}
                 Qarz:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-right text-[12px] font-bold'>
                     {
                         (product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
                         (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))
                     } UZS
                 </span>
             </div>
-            <div className='text-black-900 border-none check-ul-li-foot'>
+            <div className='flex justify-between items-center mb-[1px] mt-[1px] text-black-900 text-[14px] font-bold border-none'>
                 {' '}
                 Qarz:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-[12px] text-right font-bold'>
                     {
                         (product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
                         (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))
                     } USD
                 </span>
             </div>
-            {product?.alldebtsusd && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.alldebtsusd && <div className='flex justify-between items-center mb-[1px] mt-[1px] text-black-900 text-[14px] font-bold border-none'>
                 {' '}
                 Umumiy qarz USD:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-[12px] text-right font-bold'>
                     {roundUsd(product?.alldebtsusd) || 0}{' '} USD
                 </span>
             </div> || " "}
-            {product?.alldebtsuzs && <div className='text-black-900 border-none check-ul-li-foot'>
+            {product?.alldebtsuzs && <div className='flex justify-between items-center mb-[1px] mt-[1px] text-black-900 text-[14px] font-bold border-none'>
                 {' '}
                 Umumiy qarz UZS:{' '}
-                <span className='text-black-900 text-[12px] font-bold'>
+                <span className='text-black-900 text-[12px] text-right font-bold'>
                     {roundUzs(product?.alldebtsuzs) || 0}{' '} UZS
                 </span>
             </div> || " "}
