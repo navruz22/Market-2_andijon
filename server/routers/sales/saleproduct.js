@@ -781,6 +781,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           new Date(payment.createdAt) < new Date(endDate)
         );
       });
+      
 
       const alldebtsusd = [...connector.products].reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.usdpayment || 0), 0)
       const alldebtsuzs = [...connector.products].reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
