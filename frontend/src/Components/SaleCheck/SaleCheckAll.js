@@ -1,7 +1,7 @@
 import React, { forwardRef } from 'react'
 import { uniqueId, map } from 'lodash'
 import { useSelector } from 'react-redux'
-import { roundUsd, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
+import { roundUsd, roundUzs, UsdToUzs, UzsToUsd } from '../../App/globalFunctions'
 
 export const SaleCheckAll = forwardRef((props, ref) => {
     const {
@@ -376,46 +376,14 @@ export const SaleCheckAll = forwardRef((props, ref) => {
                     {' '}
                     Qarz UZS:{' '}
                     <span className='text-black-900 font-bold'>
-                        {
-                            ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) + 
-                            (
-                                ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))) < 0 &&
-                                UsdToUzs((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)), currency) || 0
-                            )) > 0 && ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) + 
-                            (
-                                ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0))) < 0 &&
-                                UsdToUzs((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)), currency) || 0
-                            )) || 0
-                        } UZS
+                        {roundUzs(product?.debtuzs)} UZS
                     </span>
                 </li>
                 <li className='text-black-900 check-ul-li-foot'>
                     {' '}
                     Qarz USD:{' '}
                     <span className='text-black-900 font-bold'>
-                        {
-                            roundUsd(((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)) +
-                            (
-                                ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))) < 0 &&
-                                UzsToUsd((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)), currency) || 0
-                            )) > 0 && ((product?.products && product?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)) -
-                            (product?.payments && product?.payments.reduce((prev, el) => prev + (el.usdpayment || 0), 0)) +
-                            (
-                                ((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0))) < 0 &&
-                                UzsToUsd((product?.products && product?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)) -
-                                (product?.payments && product?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)), currency) || 0
-                            )) || 0)
-                        } USD
+                        {roundUsd(product?.debtusd)} USD
                     </span>
                 </li>
             </ul>

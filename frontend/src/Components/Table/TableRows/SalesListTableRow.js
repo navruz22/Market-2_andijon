@@ -125,42 +125,10 @@ export const SalesListTableRow = ({
                         {currency}
                     </td> */}
                     <td className='text-error-500 text-right td'>
-                        {
-                            saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                            saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0) +
-                            (
-                                (saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                    saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)) < 0 &&
-                                UsdToUzs(saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                    saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0), currency) || 0
-                            ) > 0 && saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                            saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0) +
-                            (
-                                (saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                    saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)) < 0 &&
-                                UsdToUzs(saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                    saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0), currency) || 0
-                            ) || 0
-                        } UZS
+                        {saleconnector?.debtuzs} UZS
                     </td>
                     <td className='text-error-500 text-right td'>
-                        {
-                            roundUsd(saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0) +
-                                (
-                                    (saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                                        saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) < 0 &&
-                                    UzsToUsd(saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                                        saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0), currency) || 0
-                                )) > 0 && roundUsd(saleconnector?.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) -
-                                saleconnector?.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0) +
-                                (
-                                    (saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                                        saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)) < 0 &&
-                                    UzsToUsd(saleconnector?.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) -
-                                        saleconnector?.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0), currency) || 0
-                                )) || 0 
-                        } USD
+                        {roundUsd(saleconnector?.debtusd)} USD
                     </td>
                     <td className='text-left td  '>
                         {saleconnector.dailyconnectors && saleconnector.dailyconnectors[saleconnector.dailyconnectors.length - 1].comment ? (

@@ -21,6 +21,7 @@ const { filter } = require("lodash");
 const {
   WarhouseProduct,
 } = require("../../models/WarhouseProduct/WarhouseProduct");
+const { Exchangerate } = require("../../models/Exchangerate/Exchangerate");
 
 const convertToUsd = (value) => Math.round(value * 100) / 100;
 const convertToUzs = (value) => Math.round(value);
@@ -698,8 +699,8 @@ module.exports.getsaleconnectors = async (req, res) => {
         populate: {
           path: "product",
           select: "productdata packcount isUsd",
-          populate: { 
-            path: "productdata", 
+          populate: {
+            path: "productdata",
             select: "name code",
             // match: {name: product}
           },
@@ -751,9 +752,17 @@ module.exports.getsaleconnectors = async (req, res) => {
             ((search.client.length > 0 &&
               connector.client !== null &&
               connector.client) ||
-            search.client.length === 0) && connector.products.some(item => search.product ? item.product.productdata.name === search.product : item.product.productdata.name)
+              search.client.length === 0) && connector.products.some(item => search.product ? item.product.productdata.name === search.product : item.product.productdata.name)
         );
       });
+
+    const exchangerate = await Exchangerate.find({
+      market,
+    })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const currency = exchangerate[0].exchangerate
 
     const filteredProductsSale = saleconnectors.map((connector) => {
 
@@ -769,6 +778,7 @@ module.exports.getsaleconnectors = async (req, res) => {
           new Date(payment.createdAt) < new Date(endDate)
         );
       });
+      
       const filterDiscount = connector.discounts.filter((payment) => {
         return (
           new Date(payment.createdAt) > new Date(startDate) &&
@@ -781,21 +791,70 @@ module.exports.getsaleconnectors = async (req, res) => {
           new Date(payment.createdAt) < new Date(endDate)
         );
       });
-      
 
-      const alldebtsusd = [...connector.products].reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.usdpayment || 0), 0)
-      const alldebtsuzs = [...connector.products].reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) - [...connector.payments].reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
-      
-      
-      const oldebtsusd = alldebtsusd - ([...filterProducts].reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0) - [...filterPayment].reduce((prev, el) => prev + (el.usdpayment || 0), 0))
-      const oldebtsuzs = alldebtsuzs - ([...filterProducts].reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0) - [...filterPayment].reduce((prev, el) => prev + (el.paymentuzs || 0), 0))
+      const paymentsusd = connector.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+      const paymentsuzs = connector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+      const totalproductsusd = connector.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+      const totalproductsuzs = connector.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+
+      const curr_paymentsusd = filterPayment.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+      const curr_paymentsuzs = filterPayment.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+      const curr_totalproductsusd = filterProducts.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+      const curr_totalproductsuzs = filterProducts.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+
+      const alldebtsusd = (totalproductsusd - paymentsusd +
+        (
+          (totalproductsuzs - paymentsuzs) < 0 &&
+          (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+        )) > 0 && (totalproductsusd - paymentsusd +
+          (
+            (totalproductsuzs - paymentsuzs) < 0 &&
+            (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+          )) || 0
+
+      const alldebtsuzs = (totalproductsuzs - paymentsuzs +
+        (
+          (totalproductsusd - paymentsusd) < 0 &&
+          Math.round((totalproductsusd - paymentsusd) * currency) || 0
+        )) > 0 && (totalproductsuzs - paymentsuzs +
+          (
+            (totalproductsusd - paymentsusd) < 0 &&
+            Math.round((totalproductsusd - paymentsusd) * currency) || 0
+          )) || 0
+
+      const debtuzs =
+        (curr_totalproductsuzs - curr_paymentsuzs +
+          (
+            (curr_totalproductsusd - curr_paymentsusd) < 0 &&
+            Math.round((curr_totalproductsusd - curr_paymentsusd) * currency) || 0
+          )) > 0 && (curr_totalproductsuzs - curr_paymentsuzs +
+            (
+              (curr_totalproductsusd - curr_paymentsusd) < 0 &&
+              Math.round((curr_totalproductsusd - curr_paymentsusd) * currency) || 0
+            )) || 0
+
+      const debtusd =
+        (curr_totalproductsusd - curr_paymentsusd +
+          (
+            (curr_totalproductsuzs - curr_paymentsuzs) < 0 &&
+            (Math.round(((curr_totalproductsuzs - curr_paymentsuzs) / currency) * 10000) / 10000) || 0
+          )) > 0 && (curr_totalproductsusd - curr_paymentsusd +
+            (
+              (curr_totalproductsuzs - curr_paymentsuzs) < 0 &&
+              (Math.round(((curr_totalproductsuzs - curr_paymentsuzs) / currency) * 10000) / 10000) || 0
+            )) || 0
+
+
+      const oldebtsusd = alldebtsusd - debtusd
+      const oldebtsuzs = alldebtsuzs - debtuzs
       // console.log(alldebtsusd);
       // console.log([...filterPayment].reduce((prev, el) => prev + (el.usdpayment || 0), 0));
       return {
         _id: connector._id,
         dailyconnectors: connector.dailyconnectors,
         discounts: filterDiscount,
-        debts: filterDebts,
+        debtusd: debtusd,
+        debtuzs: debtuzs,
         alldebtsusd: alldebtsusd,
         alldebtsuzs: alldebtsuzs,
         old_debtsusd: oldebtsusd,
@@ -810,7 +869,7 @@ module.exports.getsaleconnectors = async (req, res) => {
         saleconnector: connector,
       };
     });
-    
+
     const count = filteredProductsSale.length;
 
     res.status(200).json({
@@ -990,7 +1049,7 @@ module.exports.registeredit = async (req, res) => {
     await dailysaleconnector.save();
 
     const saleconnector = await SaleConnector.findById(saleconnectorid);
-    
+
     saleconnector.dailyconnectors.push(dailysaleconnector._id);
     console.log(all);
     let products = [];
@@ -1099,7 +1158,7 @@ module.exports.registeredit = async (req, res) => {
 };
 
 module.exports.payment = async (req, res) => {
-  try { 
+  try {
     const { payment, market, debtId, user, saleconnectorid } = req.body;
 
     const marke = await Market.findById(market);
@@ -1160,14 +1219,14 @@ module.exports.payment = async (req, res) => {
       saleconnector: saleconnector._id,
     })
     if (payment.debtType === 'dollar') {
-      debt.debt = -1 *  payment.usdpayment
+      debt.debt = -1 * payment.usdpayment
       debt.debtuzs = 0
     } else {
       debt.debtuzs = -1 * (payment.cashuzs || payment.carduzs || payment.transfer)
       debt.debt = 0
     }
     await debt.save()
-    saleconnector.debts.push(debt._id); 
+    saleconnector.debts.push(debt._id);
     saleconnector.payments.push(newPayment._id);
     await saleconnector.save();
     const returnpayment = await Payment.findById(newPayment._id).populate({
@@ -1250,16 +1309,16 @@ module.exports.getreportproducts = async (req, res) => {
         filter(saleproducts, (saleproduct) =>
           search.nameofclient.length > 0
             ? saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null &&
-              saleproduct.saleconnector &&
-              saleproduct.saleconnector.client &&
-              saleproduct.saleconnector.client !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null &&
+            saleproduct.saleconnector &&
+            saleproduct.saleconnector.client &&
+            saleproduct.saleconnector.client !== null
             : saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null
         )
       );
 
@@ -1301,16 +1360,16 @@ module.exports.getreportproducts = async (req, res) => {
         filter(saleproducts, (saleproduct) =>
           search.nameofclient.length > 0
             ? saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null &&
-              saleproduct.saleconnector &&
-              saleproduct.saleconnector.client &&
-              saleproduct.saleconnector.client !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null &&
+            saleproduct.saleconnector &&
+            saleproduct.saleconnector.client &&
+            saleproduct.saleconnector.client !== null
             : saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null
         )
       );
 
@@ -1390,16 +1449,16 @@ module.exports.getexcelreportproducts = async (req, res) => {
         filter(saleproducts, (saleproduct) =>
           search.nameofclient.length > 0
             ? saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null &&
-              saleproduct.saleconnector &&
-              saleproduct.saleconnector.client &&
-              saleproduct.saleconnector.client !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null &&
+            saleproduct.saleconnector &&
+            saleproduct.saleconnector.client &&
+            saleproduct.saleconnector.client !== null
             : saleproduct.product.productdata &&
-              saleproduct.product.productdata !== null &&
-              saleproduct.user &&
-              saleproduct.user !== null
+            saleproduct.product.productdata !== null &&
+            saleproduct.user &&
+            saleproduct.user !== null
         )
       );
 

@@ -34,7 +34,7 @@ export const ProductTableRow = ({
                     </td>
                     <td className='td text-left'>{product.productdata.name}</td>
                     <td className='td text-right'>
-                        {product.total.toLocaleString('ru-RU')}{' '}
+                        {product.total && product.total.toLocaleString('ru-RU') || 0}{' '}
                         {product.unit && product.unit.name}
                     </td>
                     <td className='td text-right'>
