@@ -652,6 +652,14 @@ module.exports.getPayment = async (req, res) => {
       },
     };
 
+    const exchangerate = await Exchangerate.find({
+      market,
+    })
+      .sort({ createdAt: -1 })
+      .lean()
+
+    const currency = exchangerate[0].exchangerate
+
     for (const payment of allpayments) {
 
       const daily = await DailySaleConnector.findOne({
