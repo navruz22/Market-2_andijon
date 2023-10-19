@@ -42,6 +42,7 @@ import { RegisterIncomingOrdersTableRow } from './TableRows/RegisterIncomingOrde
 import { IncomingOrderProductsTableRow } from './TableRows/IncomingOrderProductsTableRow.js'
 import { ReceiveOrderProductsTableRow } from './TableRows/ReceiveOrderProductsTableRow.js'
 import { LabelsIncome } from './TableRows/LabelsIncome'
+import { PaymentsSellingTable } from './TableRows/PaymentsSellingTable'
 function Table({
     page,
     data,
@@ -344,6 +345,17 @@ function Table({
             case 'payments':
                 return (
                     <PaymentsTableRow
+                        currentPage={currentPage}
+                        countPage={countPage}
+                        currency={currency}
+                        data={data}
+                        type={type}
+                        Print={Print}
+                    />
+                )
+            case 'payments_selling':
+                return (
+                    <PaymentsSellingTable
                         currentPage={currentPage}
                         countPage={countPage}
                         currency={currency}

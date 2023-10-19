@@ -14,73 +14,18 @@ export const SmallCheck = forwardRef((props, ref) => {
         product,
         userInfo,
     } = props
-    console.log(product);
-    const { market } = useSelector((state) => state.login)
-    const { currencyType, currency } = useSelector((state) => state.currency)
-    const calculateAllSum = (data) => {
-        return data
-            ? data.reduce((acc, pr) => {
-                return (
-                    acc +
-                    pr[
-                    currencyType === 'USD'
-                        ? 'totalprice'
-                        : 'totalpriceuzs'
-                    ]
-                )
-            }, 0)
-            : 0
-    }
-    const calculateAllFilialSum = (data) => {
-        if (currencyType === 'USD') {
-            return data.reduce((prev, el) => prev + ((el.fromFilial || 0) * el.unitprice), 0)
-        } else {
-            return data.reduce((prev, el) => prev + ((el.fromFilial || 0) * el.unitpriceuzs), 0)
-        }
-    }
-    const calculateAllDiscounts = (data) => {
-        return data
-            ? data.reduce((acc, pr) => {
-                return (
-                    acc +
-                    pr[currencyType === 'USD' ? 'discount' : 'discountuzs']
-                )
-            }, 0)
-            : 0
-    }
-    const calculateAllPayments = (data) => {
-        return data
-            ? data.reduce((acc, pr) => {
-                return (
-                    acc +
-                    pr[currencyType === 'USD' ? 'payment' : 'paymentuzs']
-                )
-            }, 0)
-            : 0
-    }
-    console.log(market);
+  
+    // const { market } = useSelector((state) => state.login)
+    // const { currencyType, currency } = useSelector((state) => state.currency)
+    
+    
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md w-[7.5cm]'}>
             <div className='flex pb-[1px] flex-col text-center justify-center border-b-[0.8px] border-black-700'>
-                {/* <div>
-                    <img src={market?.image} alt="logo" />
-                </div> */}
-                {/* <h2 className='text-[16px] mb-4 font-bold'>{market.name}</h2> */}
-                {/* <div className='flex justify-between items-center py-1 text-[12px] font-bold'>
-                    Telefon:
-                    <span className='text-[12px] text-black-900 font-bold'>
-                        {market.phone1}
-                    </span>
-                </div> */}
                 <div className='flex justify-between items-center py-[1px] text-[12px] font-bold'>
                     Sana:
                     <span className='text-[12px] text-black-900 font-bold'>
                         {new Date(product?.createdAt).toLocaleDateString()} {new Date(product?.createdAt).toLocaleTimeString()}
-                        {/* <span className='ml-3 font-bold'>
-                                {new Date(
-                                    product?.createdAt
-                                ).toLocaleTimeString()}
-                            </span> */}
                     </span>
                 </div>
                 <div className='flex justify-between items-center py-[1px] text-[12px] font-bold'>
@@ -91,12 +36,6 @@ export const SmallCheck = forwardRef((props, ref) => {
                             ''}
                     </span>
                 </div>
-                {/* <div className={'flex justify-between items-center py-[1px] text-[12px] font-bold'}>
-                    Sotuvchi:{' '}
-                    <span className='text-[12px] text-black-900 font-bold'>
-                        {userInfo?.old_debtsusd} {userInfo?.lastname}
-                    </span>
-                </div> */}
                 <div className={'flex justify-between items-center py-[1px] text-[12px] font-bold'}>
                     Eski qarz USD:{' '}
                     <span className='text-[12px] text-black-900 font-bold'>
@@ -109,21 +48,6 @@ export const SmallCheck = forwardRef((props, ref) => {
                         {roundUsd(product?.old_debtsuzs)} UZS
                     </span>
                 </div>
-                {/* <div className='check-ul-li flex-col'>
-                    <div className={'grow text-center'}>
-                        <h2 className='check-text-style mb-5'>
-                            Sotuv: <span className={'ml-2 font-bold'}>{product?.id}</span>
-                        </h2>
-                    </div>
-                    <div className='check-ul-li justify-end'>
-                        <p>
-                            Sotuvchi:{' '}
-                            <span className='check-ul-li-span font-bold'>
-                                {userInfo?.firstname} {userInfo?.lastname}
-                            </span>
-                        </p>
-                    </div>
-                </div> */}
             </div>
             {selled?.length > 0 && (
                 <div className='mt-[1px]'>

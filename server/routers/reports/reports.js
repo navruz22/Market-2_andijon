@@ -562,7 +562,8 @@ module.exports.getPayment = async (req, res) => {
         populate: {
           path: "payments",
           select:
-            "cash cashuzs card carduzs transfer transferuzs payment paymentuzs totalprice totalpriceuzs",
+            "payment paymentuzs comment totalprice usdpayment totalpriceuzs createdAt cash cashuzs card carduzs transfer transferuzs",
+          sort: 1
         },
       })
       .populate({
@@ -571,7 +572,7 @@ module.exports.getPayment = async (req, res) => {
         populate: {
           path: "products",
           select:
-            "totalprice totalpriceuzs pieces isPackcount packcountpieces price unitprice unitpriceuzs product createdAt user",
+            "totalprice unitprice isUsd totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces pieces createdAt discount saleproducts product fromFilial",
           populate: {
             path: "product",
             select: "productdata packcount isUsd",
@@ -580,6 +581,7 @@ module.exports.getPayment = async (req, res) => {
               select: "name code",
             },
           },
+          sort: 1
         },
       })
       .populate({
@@ -588,11 +590,12 @@ module.exports.getPayment = async (req, res) => {
         populate: {
           path: "products",
           select:
-            "totalprice totalpriceuzs pieces isPackcount packcountpieces price unitprice unitpriceuzs product createdAt user",
+            "totalprice unitprice isUsd totalpriceuzs unitpriceuzs isPackcount packcountpieces pieces pieces createdAt discount saleproducts product fromFilial",
           populate: {
             path: "user",
             select: "firstname lastname",
           },
+          sort: 1
         },
       })
       .populate({
@@ -610,6 +613,10 @@ module.exports.getPayment = async (req, res) => {
           path: "debts",
           select: "debt debtuzs debtType",
         },
+      })
+      .populate({
+        path: "debt",
+        select: "debt debtuzs debtType"
       })
       .lean();
 
@@ -694,17 +701,68 @@ module.exports.getPayment = async (req, res) => {
           select:
             "cash cashuzs card carduzs transfer transferuzs usdpayment payment paymentuzs totalprice totalpriceuzs",
         })
+        .lean()
 
+      // const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+
+      const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt) ) {
+          prev += (el.usdpayment && el.usdpayment || 0)
+        }
+        return prev;
+      }, 0)
+
+      // const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+
+      const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (el.paymentuzs || 0)
+        }
+        return prev;
+      }, 0)
+
+      // const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+      // const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+
+      const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (el.product.isUsd && el.totalprice || 0)
+        }
+        return prev;
+      }, 0)
+      const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (!el.product.isUsd && el.totalpriceuzs || 0)
+        }
+        return prev;
+      }, 0)
+
+      
+
+      const alldebtsusd = totalproductsusd - paymentsusd
+      const alldebtsuzs = totalproductsuzs - paymentsuzs
+
+      const oldebtsusd = alldebtsusd - (payment?.debt?.debt || 0)
+      const oldebtsuzs = alldebtsuzs - (payment?.debt?.debtuzs || 0)
 
       respayments.push({
         id: payment.saleconnector && payment.saleconnector.id,
-        saleconnector: daily,
+        saleconnector: {
+          ...daily,
+          alldebtsusd: alldebtsusd,
+          alldebtsuzs: alldebtsuzs,
+          old_debtsusd: oldebtsusd,
+          old_debtsuzs: oldebtsuzs,
+        },
         saleconnector2: payment.saleconnector,
         createdAt: payment.createdAt,
         client:
           payment.saleconnector &&
           payment.saleconnector.client &&
           payment.saleconnector.client,
+        user: payment.saleconnector &&
+          payment.saleconnector.user &&
+          payment.saleconnector.user,
         cash: payment.cash,
         cashuzs: payment.cashuzs,
         usdpayment: payment.usdpayment,
@@ -714,6 +772,10 @@ module.exports.getPayment = async (req, res) => {
         transferuzs: payment.transferuzs,
         totalprice: (payment.totalprice && payment.totalprice) || 0,
         totalpriceuzs: (payment.totalpriceuzs && payment.totalpriceuzs) || 0,
+        debtuzs: payment.debtuzs,
+        debt: payment.debt,
+        alldebtsusd: alldebtsusd,
+          alldebtsuzs: alldebtsuzs,
       });
 
       if (payment.cash < 0 || payment.card < 0 || payment.transfer < 0 || payment.usdpayment < 0) {
@@ -846,7 +908,7 @@ module.exports.getDebtsReport = async (req, res) => {
                 Math.round((totalproductsusd - paymentsusd) * currency) || 0
               )) || 0
 
-              
+
         const debtusd =
           (totalproductsusd - paymentsusd +
             (
@@ -856,7 +918,7 @@ module.exports.getDebtsReport = async (req, res) => {
               (
                 (totalproductsuzs - paymentsuzs) < 0 &&
                 (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
-              ))  || 0
+              )) || 0
 
         const debtComment =
           sale.debts.length > 0

@@ -3,7 +3,7 @@ import React from 'react'
 import { roundUsd, roundUzs } from '../../../App/globalFunctions'
 import TableBtn from '../../Buttons/TableBtn'
 
-export const PaymentsTableRow = ({
+export const PaymentsSellingTable = ({
     data,
     currentPage,
     countPage,
@@ -38,25 +38,10 @@ export const PaymentsTableRow = ({
                     <td className='text-right td'>{sale.id}</td>
                     <td className='text-right td'>{sale?.client?.name}</td>
                     <td className='text-right td py-[0.625rem] font-bold'>
-                        {currency === 'USD'
-                            ? sale?.cash
-                            : sale?.cashuzs}{' '}
-                        {currency}
+                        {sale.cashuzs + sale.carduzs + sale.transferuzs} UZS
                     </td>
                     <td className='text-right td py-[0.625rem] font-bold'>
                         {sale?.usdpayment} USD
-                    </td>
-                    <td className='text-right td py-[0.625rem] font-bold'>
-                        {currency === 'USD'
-                            ? sale?.card
-                            : sale?.carduzs}{' '}
-                        {currency}
-                    </td>
-                    <td className='text-right td py-[0.625rem] font-bold'>
-                        {currency === 'USD'
-                            ? sale?.transfer
-                            : sale?.transferuzs}{' '}
-                        {currency}
                     </td>
                     <td className='text-success-500 text-right td py-[0.625rem] font-bold'>
                         {!sale.totalprice && sale?.usdpayment} USD
@@ -64,18 +49,18 @@ export const PaymentsTableRow = ({
                     <td className='text-success-500 text-right td py-[0.625rem] font-bold'>
                         {!sale.totalprice && (sale.cashuzs + sale.carduzs + sale.transferuzs)} UZS
                     </td>
-                    <td className='text-right td py-[0.625rem] font-bold'>
+                    {/* <td className='text-right td py-[0.625rem] font-bold'>
                         {sale?.usdpayment < 0 ? sale?.usdpayment : sale.cash < 0 || sale.card < 0 || sale.transfer < 0 ? (<>
                             {currency === 'USD' ? (sale.cash + sale.card + sale.transfer) : (sale.cashuzs + sale.carduzs + sale.transferuzs)}
                         </>) : 0} {' '}
                         {currency}
-                    </td>
+                    </td> */}
                     <td className='py-[0.375rem] td border-r-0'>
                         <div className='flex items-center justify-center gap-[0.625rem]'>
                             <TableBtn
                                 type={'print'}
                                 bgcolor={'bg-primary-800'}
-                                onClick={() => Print(sale.saleconnector)}
+                                onClick={() => Print(sale.totalprice ? sale.saleconnector : sale)}
                             />
                         </div>
                     </td>

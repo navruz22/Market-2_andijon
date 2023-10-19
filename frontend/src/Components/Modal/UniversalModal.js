@@ -138,7 +138,7 @@ function UniversalModal({
                     toggleModal={toggleModal}
                 />
             case 'checkSell':
-                return <Check returned={false} product={product} />
+                return <Check returned={false} product={printedSelling} />
             case 'checkSellReturn':
                 return <Check returned={true} product={product} />
             case 'checkOrder':

@@ -54,16 +54,19 @@ module.exports.updateProductPrices = async (req, res) => {
     const products = await Product.find({ market });
 
     map(products, async (product) => {
-      const price = await ProductPrice.findById(product.price);
-      price.sellingpriceuzs = roundToUzs(
-        price.sellingprice * exchangerate.exchangerate
-      );
-      if (price.tradeprice) {
-        price.tradepriceuzs = roundToUzs(
-          price.tradeprice * exchangerate.exchangerate
+      if (product.isUsd) {
+        const price = await ProductPrice.findById(product.price);
+        price.sellingpriceuzs = roundToUzs(
+          price.sellingprice * exchangerate.exchangerate
         );
+        await price.save();
       }
-      await price.save();
+      // if (price.tradeprice) {
+      //   price.tradepriceuzs = roundToUzs(
+      //     price.tradeprice * exchangerate.exchangerate
+      //   );
+      // }
+      
     });
     res.status(200).json({ message: "Mahsulot narxlari yangilandi." });
   } catch (error) {

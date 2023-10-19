@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import ExportBtn from '../../../Components/Buttons/ExportBtn.js'
 import Pagination from '../../../Components/Pagination/Pagination.js'
 import Table from '../../../Components/Table/Table.js'
 import SearchForm from '../../../Components/SearchForm/SearchForm.js'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import Spinner from '../../../Components/Spinner/SmallLoader.js'
 import NotFind from '../../../Components/NotFind/NotFind.js'
-import {motion} from 'framer-motion'
+import { motion } from 'framer-motion'
 import {
     clearSearchedSellings,
     getSellings,
@@ -14,65 +14,65 @@ import {
     excelAllSellings,
     addClient,
 } from '../Slices/sellingsSlice.js'
-import {regexForTypeNumber} from '../../../Components/RegularExpressions/RegularExpressions.js'
+import { regexForTypeNumber } from '../../../Components/RegularExpressions/RegularExpressions.js'
 import UniversalModal from '../../../Components/Modal/UniversalModal.js'
-import {useTranslation} from 'react-i18next'
-import {filter, map} from 'lodash'
-import {universalSort, exportExcel} from './../../../App/globalFunctions'
-import {universalToast} from '../../../Components/ToastMessages/ToastMessages.js'
+import { useTranslation } from 'react-i18next'
+import { filter, map } from 'lodash'
+import { universalSort, exportExcel } from './../../../App/globalFunctions'
+import { universalToast } from '../../../Components/ToastMessages/ToastMessages.js'
 import socket from '../../../Config/socket.js'
 import { setAllProductsBySocket } from '../Slices/registerSellingSlice.js'
+import { getPaymentReport } from '../../Reports/reportsSlice.js'
 
-const Sellings = ({id}) => {
-    const {t} = useTranslation(['common'])
+const Sellings = ({ id }) => {
+    const { t } = useTranslation(['common'])
     const headers = [
         {
             title: '№',
         },
         {
-            title: t('Sana'),
+            title: 'Sana',
             filter: 'createdAt',
         },
         {
-            title: t('ID'),
-            filter: 'id',
+            title: 'ID',
+            filter: 'saleconnector.id',
         },
         {
-            title: t('Mijoz'),
+            title: 'Mijoz'
         },
         {
-            title: t('Jami'),
+            title: "To'lov UZS",
         },
         {
-            title: t('Chegirma'),
+            title: "To'lov USD",
         },
         {
-            title: t('Chegirma USD'),
+            title: "Qarzdan to'lov USD",
         },
         {
-            title: t('Qarz'),
+            title: "Qarzdan to'lov UZS",
         },
+        // {
+        //     title: "Qaytarilgan",
+        // },
         {
-            title: t('Qarz USD'),
-        },
-        {
-            title: t('Izoh'),
-        },
-        {
-            title: '',
-            styles: 'w-[7rem]',
+            title: "",
         },
     ]
     const dispatch = useDispatch()
-    const {currencyType} = useSelector((state) => state.currency)
-    const {user, market} = useSelector((state) => state.login)
+    const { currencyType } = useSelector((state) => state.currency)
+    const { user, market } = useSelector((state) => state.login)
     const {
-        sellings,
+        // sellings,
         searchedSellings,
         getSellingsLoading,
         total,
         totalSearched,
     } = useSelector((state) => state.sellings)
+    const { datas: sellings } = useSelector(
+        (state) => state.reports
+    )
     const [chooseBody, setChooseBody] = useState('')
     const [data, setData] = useState(sellings)
     const [storeData, setStoreData] = useState(sellings)
@@ -105,7 +105,7 @@ const Sellings = ({id}) => {
     const [selectedProduct, setSelectedProduct] = useState('')
 
     // filter by total
-    const filterByTotal = ({value}) => {
+    const filterByTotal = ({ value }) => {
         setShowByTotal(value)
         setCurrentPage(0)
     }
@@ -114,9 +114,9 @@ const Sellings = ({id}) => {
     const handleChangeId = (e) => {
         const val = e.target.value
         const valForSearch = val.replace(/\s+/g, ' ').trim()
-        regexForTypeNumber.test(val) && setSearch({...search, id: val})
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-            dispatch(clearSearchedSellings())
+        regexForTypeNumber.test(val) && setSearch({ ...search, id: val })
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
             setFilteredDataTotal(total)
@@ -131,9 +131,9 @@ const Sellings = ({id}) => {
     const handleChangeClient = (e) => {
         const val = e.target.value
         const valForSearch = val.toLowerCase().replace(/\s+/g, ' ').trim()
-        setSearch({...search, client: val})
-        ;(searchedData.length > 0 || totalSearched > 0) &&
-            dispatch(clearSearchedSellings())
+        setSearch({ ...search, client: val })
+            ; (searchedData.length > 0 || totalSearched > 0) &&
+                dispatch(clearSearchedSellings())
         if (valForSearch === '') {
             setData(sellings)
             setFilteredDataTotal(total)
@@ -161,7 +161,7 @@ const Sellings = ({id}) => {
                 endDate: endDate.toISOString(),
                 search: search,
             }
-            dispatch(getSellingsByFilter(body))
+            dispatch(getPaymentReport(body))
         }
     }
 
@@ -206,32 +206,32 @@ const Sellings = ({id}) => {
                 discount:
                     item.discounts.length > 0
                         ? item.discounts.map((discount) => {
-                              return discount
-                          })
+                            return discount
+                        })
                         : 0,
                 discountusd:
                     item.discounts.length > 0
                         ? item.discounts.map((discount) => {
-                              return discount
-                          })
+                            return discount
+                        })
                         : 0,
                 debd:
                     item?.products[0]?.totalpriceuzs -
                         item?.payments[0]?.paymentuzs -
                         item?.discounts.length >
-                    0
+                        0
                         ? item.discounts.map((discount) => {
-                              return discount.discount
-                          })
+                            return discount.discount
+                        })
                         : 0,
                 debdusd:
                     item.products[0].totalprice -
                         item.payments[0].payment -
                         item.discounts.length >
-                    0
+                        0
                         ? item.discounts.map((discount) => {
-                              return discount.discount
-                          })
+                            return discount.discount
+                        })
                         : 0,
             }))
             exportExcel(SellingData, fileName, sellingHeaders)
@@ -241,7 +241,7 @@ const Sellings = ({id}) => {
     }
 
     const handleClickPrint = (selling) => {
-        setChooseBody('allChecks')
+        setChooseBody('checkSell')
         setPrintedSelling(selling)
         setModalVisible(true)
     }
@@ -274,19 +274,31 @@ const Sellings = ({id}) => {
         setFilteredDataTotal(total)
     }, [total])
     useEffect(() => {
+        // const body = {
+        //     filialId: id,
+        //     currentPage,
+        //     countPage: showByTotal,
+        //     startDate: startDate.toISOString(),
+        //     endDate: endDate.toISOString(),
+        //     search: {
+        //         id: '',
+        //         client: '',
+        //     },
+        // }
         const body = {
-            filialId: id,
+            type: 'payments',
             currentPage,
             countPage: showByTotal,
             startDate: startDate.toISOString(),
             endDate: endDate.toISOString(),
+            // market: _id,
             search: {
                 id: '',
                 client: '',
             },
         }
-        dispatch(getSellings(body))
-    }, [currentPage, showByTotal, startDate, endDate, dispatch, id])
+        dispatch(getPaymentReport(body))
+    }, [currentPage, showByTotal, startDate, endDate, dispatch])
 
     useEffect(() => {
         const body = {
@@ -371,7 +383,7 @@ const Sellings = ({id}) => {
                 market: market._id,
             })
         market &&
-            socket.on('getProductsOfCount', ({id, products}) => {
+            socket.on('getProductsOfCount', ({ id, products }) => {
                 if (id === market._id) {
                     productsForSearch = [
                         ...productsForSearch,
@@ -386,7 +398,7 @@ const Sellings = ({id}) => {
                 }
             })
         market &&
-            socket.on('error', ({id, message}) => {
+            socket.on('error', ({ id, message }) => {
                 id === market._id && universalToast(message, 'error')
             })
 
@@ -417,10 +429,10 @@ const Sellings = ({id}) => {
             animate='open'
             exit='collapsed'
             variants={{
-                open: {opacity: 1, height: 'auto'},
-                collapsed: {opacity: 0, height: 0},
+                open: { opacity: 1, height: 'auto' },
+                collapsed: { opacity: 0, height: 0 },
             }}
-            transition={{duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98]}}
+            transition={{ duration: 0.8, ease: [0.04, 0.62, 0.23, 0.98] }}
         >
             <UniversalModal
                 printedSelling={printedSelling}
@@ -474,13 +486,13 @@ const Sellings = ({id}) => {
                         currentPage={currentPage}
                         currency={currencyType}
                         countPage={showByTotal}
-                        page={'saleslist'}
+                        page={'payments_selling'}
                         headers={headers}
                         Print={handleClickPrint}
                         addPlus={addPlus}
                         Sort={filterData}
                         sortItem={sorItem}
-                        sellers={user?.type === 'Seller' ? true : false}
+                        // sellers={user?.type === 'Seller' ? true : false}
                         editComment={editComment}
                     />
                 )}

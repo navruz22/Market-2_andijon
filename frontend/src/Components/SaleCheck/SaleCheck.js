@@ -3,14 +3,15 @@ import { useSelector } from 'react-redux'
 import { uniqueId, map } from 'lodash'
 import { roundUsd, roundUzs } from '../../App/globalFunctions'
 export const SaleCheck = forwardRef((props, ref) => {
+    console.log(props);
     const { product } = props
-    const { products } = product
+    // const { products } = product
     const { market } = useSelector((state) => state.login)
     const { currencyType } = useSelector((state) => state.currency)
     const calculateDebt = (total, payment, discount = 0) => {
         return (total - payment - discount).toLocaleString('ru-Ru')
     }
-    console.log(product);
+    // console.log(product);
     return (
         <div ref={ref} className={'bg-white-900 p-4 rounded-md'}>
             <div className='flex pb-2 justify-between border-b-[0.8px] border-black-700'>
@@ -54,7 +55,7 @@ export const SaleCheck = forwardRef((props, ref) => {
                         <h2 className='check-text-style mb-5'>
                             Sotuv:{' '}
                             <span className={'ml-2 font-bold'}>
-                                {product?.saleconnector.id}
+                                {product?.saleconnector?.id}
                             </span>
                         </h2>
                         <h2 className='check-text-style font-bold'>
@@ -80,20 +81,13 @@ export const SaleCheck = forwardRef((props, ref) => {
                             <td className='check-table-rtr'>Kodi</td>
                             <td className='check-table-rtr'>Maxsulot</td>
                             <td className='check-table-rtr'>Soni</td>
-                            {product?.products.some(el => el.isPackcount) && <td className='check-table-rtr'>To'plam</td>}
+                            {product?.products && product?.products.some(el => el.isPackcount) && <td className='check-table-rtr'>To'plam</td>}
                             <td className='check-table-rtr'>Narxi (dona)</td>
                             <td className='check-table-rtr'>Jami</td>
                         </tr>
                     </thead>
                     <tbody>
-                        {map([...products].sort(
-                            (a, b) =>
-                                a.product?.category?.code.localeCompare(
-                                    b.product?.category?.code
-                                ) ||
-                                a.product?.productdata?.code -
-                                b.product?.productdata?.code
-                        ), (item, index) => {
+                        {product?.products && product?.products.length > 0 && map(product?.products, (item, index) => {
                             return (
                                 <tr key={uniqueId('saleCheck')}>
                                     <td className='p-1 border text-center text-[0.875rem] font-bold'>
@@ -108,7 +102,7 @@ export const SaleCheck = forwardRef((props, ref) => {
                                     <td className='check-table-body'>
                                         {item?.pieces}
                                     </td>
-                                    {product?.products.some(el => el.isPackcount) && <td className='check-table-body'>
+                                    {product?.products && product?.products.some(el => el.isPackcount) && <td className='check-table-body'>
                                         {item?.isPackcount && item?.packcountpieces > 0 ? item?.packcountpieces : ""}
                                     </td>}
                                     <td className='check-table-body'>
@@ -135,10 +129,10 @@ export const SaleCheck = forwardRef((props, ref) => {
                     Jami:{' '}
                     <div className='flex gap-2'>
                         <span className='font-bold text-[#000]'>
-                            {[...products].reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)} USD <br />
+                            {product?.products && product?.products.reduce((prev, el) => prev + (el?.product?.isUsd && el?.totalprice || 0), 0)} USD <br />
                         </span>
                         <span className='font-bold text-[#000]'>
-                            {[...products].reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)} UZS
+                            {product?.products && product?.products.reduce((prev, el) => prev + (!el?.product?.isUsd && el?.totalpriceuzs || 0), 0)} UZS
                         </span>
                     </div>
                 </li>
@@ -156,7 +150,7 @@ export const SaleCheck = forwardRef((props, ref) => {
                         {roundUsd(product?.payment?.usdpayment)} USD
                     </span>
                 </li>
-                <li className='check-ul-li-foot'>
+                {/* <li className='check-ul-li-foot'>
                     {' '}
                     Chegirma UZS:{' '}
                     <span className='font-bold'>
@@ -169,19 +163,19 @@ export const SaleCheck = forwardRef((props, ref) => {
                     <span className='font-bold'>
                         {product?.discount?.discount && roundUzs(product?.discount?.discount)} USD
                     </span>
-                </li>
+                </li> */}
                 <li className='check-ul-li-foot'>
                     {' '}
                     Qarz UZS:{' '}
                     <span className='font-bold'>
-                        {product?.debt?.debtuzs && product?.debt?.debtType === 'sum' && roundUsd(product?.debt?.debtuzs)} UZS
+                        {product?.debt?.debtuzs && roundUzs(product?.debt?.debtuzs)} UZS
                     </span>
                 </li> 
                 <li className='check-ul-li-foot'>
                     {' '}
                     Qarz USD:{' '}
                     <span className='font-bold'>
-                        {product?.debt?.debt && product?.debt?.debtType === 'dollar' && roundUzs(product?.debt?.debt)}{' '} USD
+                        {product?.debt?.debt && roundUsd(product?.debt?.debt)}{' '} USD
                     </span>
                 </li>
             </ul>

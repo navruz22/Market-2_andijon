@@ -752,7 +752,7 @@ const RegisterSelling = () => {
                 }
             }),
             client: {
-                _id: clientValue ? clientValue.value : null,
+                _id: clientValue ? clientValue?.value : null,
                 name: clientValue ? clientValue.label : userValue,
                 packman: clientValue?.packman,
             },
@@ -793,6 +793,7 @@ const RegisterSelling = () => {
             saleconnectorid: saleConnectorId,
             comment: saleComment,
         }
+        console.log(body);
         
         dispatch(saleConnectorId ? addPayment(body) : makePayment(body)).then(
             ({ payload, error }) => {
@@ -881,7 +882,7 @@ const RegisterSelling = () => {
             )
             const body = {
                 temporary: {
-                    saleconnectorid: null,
+                    saleconnectorid: clientValue.saleconnectorid || null,
                     clientValue,
                     packmanValue,
                     userValue,
@@ -890,6 +891,8 @@ const RegisterSelling = () => {
                     totalPriceUzs: allUzs,
                 },
             }
+            // console.log(body);
+            // return 
             dispatch(savePayment(body)).then(({ error }) => {
                 if (!error) {
                     clearAll(false)
@@ -1653,8 +1656,10 @@ const RegisterSelling = () => {
             setSaleConnectorId(data.saleconnector._id)
         }
         if (data && data.temporary) {
+            console.log(data.temporary);
             setTemporary(data.temporary)
             setTableProducts(data.temporary.tableProducts)
+            setSaleConnectorId(data.temporary.clientValue?.saleconnectorid || null)
             setClientValue(data.temporary.clientValue)
             setPackmanValue(data.temporary.packmanValue)
             setUserValue(data.temporary.userValue)

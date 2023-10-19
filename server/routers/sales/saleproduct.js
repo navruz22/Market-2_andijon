@@ -224,7 +224,7 @@ module.exports.register = async (req, res) => {
       }
     }
     let debtid = null
-    if (debt.debt > 0) {
+    if (debt.debt > 0 || debt.debtuzs > 0) {
       const newDebt = new Debt({
         comment: comment,
         debt: debt.debt,
@@ -256,7 +256,7 @@ module.exports.register = async (req, res) => {
         carduzs: payment.carduzs,
         cashuzs: payment.cashuzs,
         transferuzs: payment.transferuzs,
-        usdpayment: payment.usdpayment,
+        usdpayment: payment.usdpayment, 
         type: payment.type,
         totalprice,
         totalpriceuzs,
@@ -500,7 +500,7 @@ module.exports.addproducts = async (req, res) => {
     }
 
     let debtid = null
-    if (debt.debt > 0) {
+    if (debt.debt > 0 || debt.debtuzs > 0) {
       const newDebt = new Debt({
         comment: comment,
         debt: debt.debt,
@@ -519,7 +519,7 @@ module.exports.addproducts = async (req, res) => {
       dailysaleconnector.debt = newDebt._id;
     }
 
-    if (payment.totalprice > 0) {
+    if (payment.totalpriceuzs > 0 || payment.totalprice > 0) {
       const newPayment = new Payment({
         comment: payment.comment,
         payment: convertToUsd(payment.card + payment.cash + payment.transfer),
