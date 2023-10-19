@@ -711,10 +711,41 @@ module.exports.getPayment = async (req, res) => {
         })
         .lean()
 
-      const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
-      const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
-      const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
-      const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+      // const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+
+      const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt) ) {
+          prev += (el.usdpayment && el.usdpayment || 0)
+        }
+        return prev;
+      }, 0)
+
+      // const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+
+      const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (el.paymentuzs || 0)
+        }
+        return prev;
+      }, 0)
+
+      // const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+      // const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+
+      const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (el.product.isUsd && el.totalprice || 0)
+        }
+        return prev;
+      }, 0)
+      const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => {
+        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+          prev += (!el.product.isUsd && el.totalpriceuzs || 0)
+        }
+        return prev;
+      }, 0)
+
+      
 
       const alldebtsusd = (totalproductsusd - paymentsusd +
         (
@@ -735,7 +766,6 @@ module.exports.getPayment = async (req, res) => {
             (totalproductsusd - paymentsusd) < 0 &&
             Math.round((totalproductsusd - paymentsusd) * currency) || 0
           )) || 0
-
 
       const oldebtsusd = alldebtsusd - (payment?.debt?.debt || 0)
       const oldebtsuzs = alldebtsuzs - (payment?.debt?.debtuzs || 0)
