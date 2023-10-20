@@ -611,12 +611,12 @@ module.exports.getPayment = async (req, res) => {
         select: "id client createdAt products payments user dailyconnectors debts",
         populate: {
           path: "debts",
-          select: "debt debtuzs debtType",
+          select: "debt debtuzs debtType createdAt",
         },
       })
       .populate({
         path: "debt",
-        select: "debt debtuzs debtType"
+        select: "debt debtuzs debtType createdAt"
       })
       .lean();
 
@@ -713,59 +713,86 @@ module.exports.getPayment = async (req, res) => {
 
       // const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
 
-      const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => {
-        if (new Date(el.createdAt) <= new Date(payment.createdAt) ) {
-          prev += (el.usdpayment && el.usdpayment || 0)
-        }
-        return prev;
-      }, 0)
+      // const paymentsusd = payment.saleconnector.payments.reduce((prev, el) => {
+      //   if (new Date(el.createdAt) <= new Date(payment.createdAt) ) {
+      //     prev += (el.usdpayment && el.usdpayment || 0)
+      //   }
+      //   return prev;
+      // }, 0)
 
-      // const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+      // // const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
 
-      const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => {
-        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
-          prev += (el.paymentuzs || 0)
-        }
-        return prev;
-      }, 0)
+      // const paymentsuzs = payment.saleconnector.payments.reduce((prev, el) => {
+      //   if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+      //     prev += (el.paymentuzs || 0)
+      //   }
+      //   return prev;
+      // }, 0)
 
       // const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
       // const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
 
-      const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => {
-        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
-          prev += (el.product.isUsd && el.totalprice || 0)
-        }
-        return prev;
-      }, 0)
-      const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => {
-        if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
-          prev += (!el.product.isUsd && el.totalpriceuzs || 0)
-        }
-        return prev;
-      }, 0)
+      // const totalproductsusd = payment.saleconnector.products.reduce((prev, el) => {
+      //   if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+      //     prev += (el.product.isUsd && el.totalprice || 0)
+      //   }
+      //   return prev;
+      // }, 0)
+      // const totalproductsuzs = payment.saleconnector.products.reduce((prev, el) => {
+      //   if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+      //     prev += (!el.product.isUsd && el.totalpriceuzs || 0)
+      //   }
+      //   return prev;
+      // }, 0)
 
       
 
-      const alldebtsusd = (totalproductsusd - paymentsusd +
-        (
-          (totalproductsuzs - paymentsuzs) < 0 &&
-          (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
-        )) > 0 && (totalproductsusd - paymentsusd +
-          (
-            (totalproductsuzs - paymentsuzs) < 0 &&
-            (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
-          )) || 0
+      // const alldebtsusd = (totalproductsusd - paymentsusd +
+      //   (
+      //     (totalproductsuzs - paymentsuzs) < 0 &&
+      //     (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+      //   )) > 0 && (totalproductsusd - paymentsusd +
+      //     (
+      //       (totalproductsuzs - paymentsuzs) < 0 &&
+      //       (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+      //     )) || 0
 
-      const alldebtsuzs = (totalproductsuzs - paymentsuzs +
-        (
-          (totalproductsusd - paymentsusd) < 0 &&
-          Math.round((totalproductsusd - paymentsusd) * currency) || 0
-        )) > 0 && (totalproductsuzs - paymentsuzs +
-          (
-            (totalproductsusd - paymentsusd) < 0 &&
-            Math.round((totalproductsusd - paymentsusd) * currency) || 0
-          )) || 0
+      // const alldebtsuzs = (totalproductsuzs - paymentsuzs +
+      //   (
+      //     (totalproductsusd - paymentsusd) < 0 &&
+      //     Math.round((totalproductsusd - paymentsusd) * currency) || 0
+      //   )) > 0 && (totalproductsuzs - paymentsuzs +
+      //     (
+      //       (totalproductsusd - paymentsusd) < 0 &&
+      //       Math.round((totalproductsusd - paymentsusd) * currency) || 0
+      //     )) || 0
+
+      // console.log(alldebtsusd);
+      // console.log(alldebtsuzs);
+
+      const alldebtsusd = payment.saleconnector.debts.reduce((prev, el) => {
+          if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+            prev += el.debt
+          }
+          return prev;
+        }, 0) - payment.saleconnector.payments.reduce((prev, item) => {
+          if (new Date(item.createdAt) <= new Date(payment.createdAt)) {
+            prev += (!item.totalpriceuzs && (item.usdpayment) || 0)
+          }
+          return prev;
+        }, 0)
+
+      const alldebtsuzs = payment.saleconnector.debts.reduce((prev, el) => {
+          if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
+            prev += el.debtuzs
+          }
+          return prev;
+        }, 0) - payment.saleconnector.payments.reduce((prev, item) => {
+          if (new Date(item.createdAt) <= new Date(payment.createdAt)) {
+            prev += (!item.totalpriceuzs && (item.cashuzs + item.carduzs + item.transferuzs) || 0)
+          }
+          return prev;
+        }, 0)
 
       const oldebtsusd = alldebtsusd - (payment?.debt?.debt || 0)
       const oldebtsuzs = alldebtsuzs - (payment?.debt?.debtuzs || 0)
