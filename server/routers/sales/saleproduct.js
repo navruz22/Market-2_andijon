@@ -1049,9 +1049,9 @@ module.exports.registeredit = async (req, res) => {
     await dailysaleconnector.save();
 
     const saleconnector = await SaleConnector.findById(saleconnectorid);
-
+    console.log(saleconnector);
     saleconnector.dailyconnectors.push(dailysaleconnector._id);
-    console.log(all);
+    
     let products = [];
 
     for (const saleproduct of all) {

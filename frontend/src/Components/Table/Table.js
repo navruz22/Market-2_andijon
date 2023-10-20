@@ -362,6 +362,7 @@ function Table({
                         data={data}
                         type={type}
                         Print={Print}
+                        sellers={sellers}
                     />
                 )
             case 'card':

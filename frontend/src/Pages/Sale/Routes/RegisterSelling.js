@@ -1668,13 +1668,14 @@ const RegisterSelling = () => {
             setClientData()
         }
         if (data && data.saleconnector && data.returnProducts) {
+            console.log(data.saleconnector);
             setClientData()
             let returned = []
             map(data.saleconnector.products, (saleProduct) => {
                 const sale = {
                     _id: saleProduct.product._id,
                     isUsd: saleProduct.product.isUsd,
-                    discount: saleProduct.discount && saleProduct.discount,
+                    discount: saleProduct.discount && saleProduct.discount || 0,
                     pieces: saleProduct.pieces,
                     totalprice: saleProduct.totalprice,
                     totalpriceuzs: saleProduct.totalpriceuzs,
@@ -1698,11 +1699,11 @@ const RegisterSelling = () => {
                     })
                 return ''
             })
-
+            setSaleConnectorId(data.saleconnector.saleconnector)
             setReturnProducts(
                 filter(returned, (product) => product.product.pieces > 0)
             )
-            setDiscounts([...data.saleconnector.discounts])
+            setDiscounts([])
             const totalSumm = (datas, property, type) => {
                 return type === 'uzs'
                     ? convertToUzs(
@@ -1719,10 +1720,10 @@ const RegisterSelling = () => {
                 data.saleconnector.products.reduce((prev, el) => prev + (!el.product.isUsd ? el.totalpriceuzs : 0), 0)
             )
             setTotalPaysUsd(
-                data.saleconnector.payments.reduce((prev, el) => prev + (el.usdpayment ? el.usdpayment : 0), 0)
+                data.saleconnector.payment.usdpayment
             )
             setTotalPaysUzs(
-                data.saleconnector.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+                data.saleconnector.payment.paymentuzs
             )
         }
         window.history.replaceState({}, document.title)

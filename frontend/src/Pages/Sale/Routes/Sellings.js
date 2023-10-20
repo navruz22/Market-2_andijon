@@ -492,7 +492,7 @@ const Sellings = ({ id }) => {
                         addPlus={addPlus}
                         Sort={filterData}
                         sortItem={sorItem}
-                        // sellers={user?.type === 'Seller' ? true : false}
+                        sellers={user?.type === 'Seller' ? true : false}
                         editComment={editComment}
                     />
                 )}

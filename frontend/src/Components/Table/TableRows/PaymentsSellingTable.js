@@ -1,5 +1,6 @@
 import { uniqueId, map } from 'lodash'
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import { roundUsd, roundUzs } from '../../../App/globalFunctions'
 import TableBtn from '../../Buttons/TableBtn'
 
@@ -9,7 +10,8 @@ export const PaymentsSellingTable = ({
     countPage,
     currency,
     Print,
-    type
+    type,
+    sellers
 }) => {
 
     const payDebt = data.reduce((prev, el) => {
@@ -24,7 +26,16 @@ export const PaymentsSellingTable = ({
         }
         return prev
     }, 0)
-    console.log(data);
+    
+    const navigate = useNavigate()
+    const linkToSale = (saleconnector, returnProducts) => {
+        navigate(`${sellers ? '/' : '/sotuv/sotish'}`, {
+            replace: true,
+            state: { saleconnector, returnProducts },
+        })
+    }
+
+
     return (
         <>
             {map(data, (sale, index) => (
@@ -62,6 +73,16 @@ export const PaymentsSellingTable = ({
                                 bgcolor={'bg-primary-800'}
                                 onClick={() => Print(sale.totalprice ? sale.saleconnector : sale)}
                             />
+                            <TableBtn
+                                    type={'return'}
+                                    bgcolor={'bg-error-500'}
+                                    onClick={() =>
+                                        linkToSale(
+                                            sale.saleconnector,
+                                            true
+                                        )
+                                    }
+                                />
                         </div>
                     </td>
                 </tr>
