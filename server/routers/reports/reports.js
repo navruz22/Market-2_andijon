@@ -940,37 +940,53 @@ module.exports.getDebtsReport = async (req, res) => {
         const reduce = (arr, el) =>
           arr.reduce((prev, item) => prev + (item[el] || 0), 0);
 
-        const paymentsusd = sale.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
-        const paymentsuzs = sale.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
-        const totalproductsusd = sale.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
-        const totalproductsuzs = sale.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
+        // const paymentsusd = sale.payments.reduce((prev, el) => prev + (el.usdpayment && el.usdpayment || 0), 0)
+        // const paymentsuzs = sale.payments.reduce((prev, el) => prev + (el.paymentuzs || 0), 0)
+        // const alldebtsusd = sale.products.reduce((prev, el) => prev + (el.product.isUsd && el.totalprice || 0), 0)
+        // const alldebtsuzs = sale.products.reduce((prev, el) => prev + (!el.product.isUsd && el.totalpriceuzs || 0), 0)
 
         const debt =
           sale.products.reduce((prev, p) => prev + (p.totalpriceuzs || 0), 0) -
           sale.payments.reduce((prev, p) => prev + (p.paymentuzs || 0), 0)
 
-        const debtuzs =
-          (totalproductsuzs - paymentsuzs +
-            (
-              (totalproductsusd - paymentsusd) < 0 &&
-              Math.round((totalproductsusd - paymentsusd) * currency) || 0
-            )) > 0 && (totalproductsuzs - paymentsuzs +
-              (
-                (totalproductsusd - paymentsusd) < 0 &&
-                Math.round((totalproductsusd - paymentsusd) * currency) || 0
-              )) || 0
+        // const debtuzs =
+        //   (totalproductsuzs - paymentsuzs +
+        //     (
+        //       (totalproductsusd - paymentsusd) < 0 &&
+        //       Math.round((totalproductsusd - paymentsusd) * currency) || 0
+        //     )) > 0 && (totalproductsuzs - paymentsuzs +
+        //       (
+        //         (totalproductsusd - paymentsusd) < 0 &&
+        //         Math.round((totalproductsusd - paymentsusd) * currency) || 0
+        //       )) || 0
 
 
-        const debtusd =
-          (totalproductsusd - paymentsusd +
-            (
-              (totalproductsuzs - paymentsuzs) < 0 &&
-              (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
-            )) > 0 && (totalproductsusd - paymentsusd +
-              (
-                (totalproductsuzs - paymentsuzs) < 0 &&
-                (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
-              )) || 0
+        // const debtusd =
+        //   (totalproductsusd - paymentsusd +
+        //     (
+        //       (totalproductsuzs - paymentsuzs) < 0 &&
+        //       (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+        //     )) > 0 && (totalproductsusd - paymentsusd +
+        //       (
+        //         (totalproductsuzs - paymentsuzs) < 0 &&
+        //         (Math.round(((totalproductsuzs - paymentsuzs) / currency) * 10000) / 10000) || 0
+        //       )) || 0
+
+              const debtusd = sale.debts.reduce((prev, el) => {
+                  prev += (el.debt > 0 ? el.debt : 0)
+                return prev;
+              }, 0) - sale.payments.reduce((prev, item) => {
+                  prev += (!item.totalpriceuzs && (item.usdpayment) || 0)
+                return prev;
+              }, 0)
+      
+            const debtuzs = sale.debts.reduce((prev, el) => {
+                  prev += (el.debtuzs > 0 ? el.debtuzs : 0)
+                return prev;
+              }, 0) - sale.payments.reduce((prev, item) => {
+                  prev += (!item.totalpriceuzs && (item.cashuzs + item.carduzs + item.transferuzs) || 0)
+                return prev;
+              }, 0)
 
         const debtComment =
           sale.debts.length > 0
