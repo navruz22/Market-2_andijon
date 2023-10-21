@@ -772,7 +772,7 @@ module.exports.getPayment = async (req, res) => {
 
       const alldebtsusd = payment.saleconnector.debts.reduce((prev, el) => {
           if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
-            prev += el.debt
+            prev += (el.debt > 0 ? el.debt : 0)
           }
           return prev;
         }, 0) - payment.saleconnector.payments.reduce((prev, item) => {
@@ -784,7 +784,7 @@ module.exports.getPayment = async (req, res) => {
 
       const alldebtsuzs = payment.saleconnector.debts.reduce((prev, el) => {
           if (new Date(el.createdAt) <= new Date(payment.createdAt)) {
-            prev += el.debtuzs
+            prev += (el.debtuzs > 0 ? el.debtuzs : 0)
           }
           return prev;
         }, 0) - payment.saleconnector.payments.reduce((prev, item) => {
