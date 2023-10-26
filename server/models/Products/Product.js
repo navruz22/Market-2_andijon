@@ -61,7 +61,10 @@ function validateProductExcel(product) {
     incomingpriceuzs: Joi.number(),
     sellingpriceuzs: Joi.number(),
     minimumcount: Joi.number(),
+    packcount: Joi.number(),
     total: Joi.number(),
+    tradeprice: Joi.number(),
+    tradepriceuzs: Joi.number(),
   });
 
   return schema.validate(product);

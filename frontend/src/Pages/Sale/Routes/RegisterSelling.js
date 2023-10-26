@@ -856,7 +856,7 @@ const RegisterSelling = () => {
             saleconnectorid: saleConnectorId,
             comment: saleComment,
         }
-        // console.log(body);
+        console.log(body);
         // return
         dispatch(returnSaleProducts(body)).then(({ payload, error }) => {
             if (!error) {

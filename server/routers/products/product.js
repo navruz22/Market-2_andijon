@@ -80,6 +80,7 @@ module.exports.registerAll = async (req, res) => {
         tradeprice,
         tradepriceuzs,
         minimumcount,
+        packcount,
       } = product;
 
       let categor = await Category.findOne({
@@ -114,6 +115,7 @@ module.exports.registerAll = async (req, res) => {
         unit,
         total: Math.round(total * 10) / 10,
         minimumcount: minimumcount ? minimumcount : 0,
+        packcount
       });
 
       // Create Price
@@ -1156,7 +1158,7 @@ module.exports.getProductExcel = async (req, res) => {
       market,
     })
       .sort({ _id: -1 })
-      .select("total unit price productdata category minimumcount")
+      .select("total unit price productdata category minimumcount packcount")
       .populate(
         "price",
         "incomingprice sellingprice incomingpriceuzs sellingpriceuzs"
